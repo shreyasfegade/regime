@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REGIME — Market State Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#060608;color:#E8EAF0;font-family:'Inter',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+#particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.header{display:flex;align-items:center;padding:0 24px;height:54px;background:rgba(6,6,8,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:100}
+.logo{font-size:15px;font-weight:700;letter-spacing:.18em;display:flex;align-items:center;gap:7px}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:#378ADD}
+.spacer{flex:1}
+.controls{display:flex;align-items:center;gap:8px}
+.controls input{background:#161922;border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#E8EAF0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 11px;outline:none;color-scheme:dark}
+.controls input:focus{border-color:rgba(255,255,255,.12)}
+#ticker-input{width:82px;text-transform:uppercase;letter-spacing:.06em}
+.analyze-btn{background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:6px;color:#E8EAF0;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:7px 18px;cursor:pointer;transition:border-color .25s,color .25s;min-width:80px}
+.analyze-btn:hover{border-color:#1D9E75;color:#1D9E75}
+.main{position:relative;z-index:5;display:grid;grid-template-columns:1fr 260px;gap:16px;padding:16px 24px;max-width:1600px;margin:0 auto}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.stat-card{background:#0E1018;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:14px 16px;opacity:0}
+#regime-card{border-left:3px solid #378ADD}
+.stat-label{font-size:9.5px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:7px}
+.stat-value{font-size:26px;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace}
+.chart-wrap{background:#0E1018;border:1px solid rgba(255,255,255,.06);border-radius:6px;overflow:hidden;position:relative}
+#scan-line{display:none;position:absolute;left:0;width:100%;height:1px;background:rgba(255,255,255,.25);box-shadow:0 0 12px rgba(255,255,255,.3);pointer-events:none;z-index:5}
+.prob-wrap{background:#0E1018;border:1px solid rgba(255,255,255,.06);border-radius:6px;overflow:hidden;margin-top:10px}
+.tl-wrap{background:#0E1018;border:1px solid rgba(255,255,255,.06);border-radius:6px;overflow:hidden;margin-top:10px;height:36px}
+.tl-wrap canvas{width:100%;height:36px;display:block;cursor:pointer}
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.sb-sec{background:#0E1018;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:14px;opacity:0}
+.sb-lbl{font-size:9.5px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:11px}
+.st-row{display:grid;grid-template-columns:1fr 44px 52px 44px;align-items:center;height:28px;border-bottom:1px solid rgba(255,255,255,.03);font-size:11px;opacity:0;transform:translateX(10px)}
+.st-row.show{opacity:1;transform:translateX(0);transition:all .4s cubic-bezier(.16,1,.3,1)}
+.st-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.st-name{display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+.st-v{text-align:right;color:rgba(255,255,255,.5);font-size:11px}
+.ring-wrap{position:relative;width:110px;height:110px;margin:8px auto}
+#ring-svg{width:100%;height:100%}
+#ring-lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rv{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.rs{font-size:9px;color:rgba(255,255,255,.35)}
+#tooltip{position:fixed;background:rgba(14,16,24,.96);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 13px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:1000;backdrop-filter:blur(8px);font-family:'JetBrains Mono',monospace;font-size:11px;min-width:140px}
+.tt-r{font-weight:600;margin-bottom:4px}.tt-d{display:flex;justify-content:space-between;gap:12px;line-height:1.7}.tt-l{color:rgba(255,255,255,.35)}.tt-v{color:#fff}
+.err{margin:10px 24px 0;padding:12px 18px;border-radius:6px;background:rgba(216,90,48,.06);border:1px solid rgba(216,90,48,.2);color:rgba(216,90,48,.9);font-size:13px;display:none}
+</style>
+</head><body>
+<canvas id="particle-canvas"></canvas>
+<div class="header">
+<div class="logo">REGIME<div class="logo-dot" id="logo-dot"></div></div><div class="spacer"></div>
+<div class="controls">
+<input id="ticker-input" type="text" value="SPY" spellcheck="false">
+<input id="dt-start" type="date" value="2018-01-01">
+<input id="dt-end" type="date">
+<button class="analyze-btn" id="btn-go">Analyze</button>
+</div></div>
+<div class="err" id="err-bar"></div>
+<div class="main">
+<div class="left-col">
+<div class="stat-row">
+<div class="stat-card" id="regime-card"><div class="stat-label">Current Regime</div><div class="stat-value" id="stat-regime-name">—</div></div>
+<div class="stat-card"><div class="stat-label">Confidence</div><div class="stat-value" id="stat-confidence">—</div></div>
+<div class="stat-card"><div class="stat-label">Persistence</div><div class="stat-value" id="stat-persistence">—</div></div>
+<div class="stat-card"><div class="stat-label">Regimes Found</div><div class="stat-value" id="stat-regimes">4</div></div>
+</div>
+<div class="chart-wrap" id="chart-wrap"><div id="scan-line"></div><canvas id="chart-canvas"></canvas></div>
+<div class="prob-wrap"><canvas id="prob-canvas"></canvas></div>
+<div class="tl-wrap"><canvas id="tl-canvas"></canvas></div>
+</div>
+<div class="sidebar">
+<div class="sb-sec" id="sb-matrix"><div class="sb-lbl">Transition Matrix</div><canvas id="matrix-cv" width="232" height="220"></canvas></div>
+<div class="sb-sec" id="sb-stats"><div class="sb-lbl">Regime Statistics</div><div id="stats-tbl"></div></div>
+<div class="sb-sec" id="sb-ring"><div class="sb-lbl">Regime Duration</div><div class="ring-wrap"><svg id="ring-svg" viewBox="0 0 110 110"></svg><div id="ring-lbl"></div></div></div>
+</div></div>
+<div id="tooltip"></div>
+<script src="/static/app.js"></script>
+</body></html>
