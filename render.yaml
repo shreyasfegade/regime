@@ -1,0 +1,12 @@
+# One-click deploy to Render (https://render.com).
+# Push this repo to GitHub, then: New + → Blueprint → pick the repo.
+# Render reads this file and provisions everything automatically.
+services:
+  - type: web
+    name: regime
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/presets
+    autoDeploy: true

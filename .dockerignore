@@ -1,0 +1,14 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.venv
+venv
+.ai-docs
+.claude
+demo_frames
+*.log
+*.md
+!README.md
+.vercel
+api

@@ -5,12 +5,17 @@ Serves the static frontend from /static.
 """
 
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+
+# Resolve paths relative to this file so the app runs from any working
+# directory (Docker, Render, serverless, `python -m uvicorn`, …).
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 from analytics import crisis_early_warning, forward_return_edge, model_diagnostics
 from backtest import run_backtest, run_walkforward
@@ -39,7 +44,7 @@ app.add_middleware(
 @app.get("/")
 async def root() -> FileResponse:
     """Serve the main frontend page."""
-    return FileResponse("static/index.html")
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/api/presets")
@@ -206,4 +211,4 @@ def _build_response(
     }
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
