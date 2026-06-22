@@ -1,185 +1,111 @@
 # REGIME
 
-**Detect hidden market regimes in any US stock using a 4-state Hidden Markov Model.** Rendered as a living, breathing Canvas-based visualization.
+**Classify any equity into one of four hidden market regimes with a Gaussian Hidden Markov Model — then see it, trade it, and stress-test it.** Built India-first for NSE/BSE equities and indices, rendered through a zero-dependency HTML5 Canvas engine where every pixel is drawn by hand.
 
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
 ![Canvas API](https://img.shields.io/badge/Canvas_API-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-![REGIME Dashboard Demo](demo.gif)
+![REGIME Dashboard](demo.gif)
 
-<details>
-<summary><b>📸 More Screenshots</b></summary>
-<br>
-
-| Dashboard (SPY) | Dashboard (AAPL) |
-|---|---|
-| ![SPY Analysis](screenshots/hero.png) | ![AAPL Analysis](screenshots/detail.png) |
-
-</details>
+> The demo above predates the current redesign — see [Running it](#running-it) to spin up the live interface.
 
 ---
 
-## The Problem
+## The idea
 
-Financial markets are non-stationary systems. Trends, volatility, and trading behaviors shift over time, yet traditional quantitative strategies often treat market dynamics as static. Standard indicators (like moving averages or Bollinger Bands) lag significantly and fail to capture the underlying transition between structural market phases (e.g., transitioning from low-volatility accumulation to a high-volatility liquidity crisis). 
+Markets are non-stationary. A stock spends months grinding higher in a calm uptrend, then a few brutal weeks in a volatility spike, then a long quiet base — and a single set of "average" statistics describes none of those phases well. **REGIME treats the market as a hidden state machine.** A 4-state Gaussian HMM reads daily return, volatility, volume, and momentum and infers which *unobserved* regime the market is in on any given day:
 
-## The Solution
+| Regime | Character | Strategy stance |
+|---|---|---|
+| 🟢 **Bullish Trending** | Positive drift, contained volatility | 100% invested |
+| 🔵 **Accumulation** | Near-zero drift, very low volatility — quiet basing | 50% invested |
+| 🟠 **Bearish Trending** | Negative drift, elevated volatility | Cash |
+| 🔴 **Crisis** | Extreme dispersion, sharp downside — panic | Cash |
 
-**REGIME** models market dynamics as a Hidden Markov Process. By analyzing daily return distributions and volatility profiles, it reveals the hidden states governing price action in real-time. Instead of presenting this data in dry tabular formats, REGIME visualizes the market as a living organism. Using a custom high-performance HTML5 Canvas renderer, it showcases regime shifts through ambient particle movements, gradient-bleeding transition zones, and oscillating probability bands.
+The states are discovered unsupervised; a labeler then maps each one to a semantic regime by inspecting the learned emission parameters, so the dashboard stays consistent across tickers and reruns.
 
----
+## What's in it
 
-## Features
+- **4-state Gaussian HMM** over five engineered features — log return, 5- and 20-day volatility, volume z-score, and 10-day momentum — fit with `hmmlearn`, decoded via Viterbi, with posterior probabilities per day.
+- **India-first data layer.** Native handling of NSE (`.NS`), BSE (`.BO`), and Indian indices (`^NSEI`, `^BSESN`, `^NSEBANK`), plus US symbols for comparison. Friendly aliases (`NIFTY` → `^NSEI`) and per-symbol currency rendering (₹ / $).
+- **Regime-rotation backtest.** Turns the classification into a tradable long/flat signal, executes on the *prior* day's regime (no lookahead), charges realistic switching costs, and benchmarks against buy-and-hold — reporting CAGR, Sharpe, Sortino, max drawdown, Calmar, and time-in-market with an animated equity curve.
+- **A custom Canvas renderer, not a charting library.** Candlesticks, probability fields, the transition heatmap, the regime timeline, and the equity curve are all drawn directly to `<canvas>` and animated with GSAP. The whole UI re-tints itself from the active regime.
+- **Considered dark interface** — glass panels, a command-palette ticker picker, breathing probability bands, a regime-reactive particle field, and number count-ups, all tuned for a professional-tool feel.
 
-- **4-State Gaussian HMM** — Automatically classifies market behavior into four statistically distinct regimes:
-  - 🟢 **State 0 (Bullish Momentum)**: High positive returns, low volatility.
-  - 🔴 **State 1 (Bearish Decline)**: Negative returns, elevated volatility.
-  - ⚡ **State 2 (High-Volatility Crisis)**: Extreme return dispersion, sharp downside pressure.
-  - 🟡 **State 3 (Quiet Accumulation/Consolidation)**: Near-zero returns, extremely low volatility.
-- **Dynamic Particle Field** — An ambient background particle simulation where particle velocity, turbulence, and color spectrum are bound directly to the current market regime.
-- **Gradient Regime Bleeding** — Visualizes regime transition zones on the main candlestick chart as smooth, bleeding gradients rather than blocky dividers, mirroring the continuous nature of market transitions.
-- **Oscillating Probability Bands** — Displays HMM state confidence as breathing probability zones beneath the price action, adding organic micro-animations that reflect statistical uncertainty.
-- **Cascading Candlestick Renderer** — Renders hundreds of daily price candles using native Canvas rendering with staggered entry animations powered by GSAP.
-- **Interactive Transition Heatmap** — Renders the HMM's internal transition matrix as an interactive grid, illustrating the probability of shifting from one market state to another.
-- **Timeline Film-Strip Strip** — A compressed horizontal minimap of historical regime classifications allowing quick scrolling and overview of year-scale cycles.
+## How it works
 
----
+```
+   ┌──────────────┐      ┌───────────────────┐      ┌────────────────────┐
+   │  DATA LAYER  │      │     ML ENGINE     │      │      FRONTEND      │
+   │              │      │                   │      │                    │
+   │ yfinance     │─OHLCV│ 5-feature matrix  │states│ Canvas candlesticks│
+   │ NSE/BSE/US   │─────►│ Gaussian HMM (EM) │─────►│ probability field  │
+   │ validation   │ raw  │ Viterbi decode    │+probs│ transition heatmap │
+   │ currency tag │      │ state auto-labeler│      │ backtest equity    │
+   └──────────────┘      └─────────┬─────────┘      └────────────────────┘
+                                   │ states + prices
+                                   ▼
+                         ┌───────────────────┐
+                         │  BACKTEST ENGINE  │  regime → exposure,
+                         │  1-bar lag + costs│  equity curve, metrics
+                         └───────────────────┘
+```
 
-## Tech Stack
+`server.py` exposes `/api/analyze?ticker=&start=&end=` (full pipeline → JSON) and `/api/presets` (the curated ticker list). The frontend is served static and talks only to those two endpoints.
 
-- **Backend**: FastAPI (Python 3.11+) + Uvicorn
-- **Frontend**: Vanilla HTML5 Canvas API + CSS variables + GSAP (no heavy JS frameworks or charting libraries)
-- **Machine Learning**: `hmmlearn` (Gaussian HMM), `scikit-learn`, `pandas`, `numpy`
-- **Data Source**: `yfinance` (Yahoo Finance API)
+## Running it
 
----
+**Prerequisites:** Python 3.10+ and a modern browser.
 
-## Quick Start
+```bash
+git clone https://github.com/shreyasfegade/regime.git
+cd regime
+pip install -r requirements.txt
+python -m uvicorn server:app --port 8050
+```
 
-### Prerequisites
+Open **http://localhost:8050** and analyze. Defaults to `RELIANCE.NS`; try `^NSEI`, `INFY.NS`, `HDFCBANK.NS`, `TATAMOTORS.NS`, or a US name like `AAPL`. Indian equities need their exchange suffix (`.NS` for NSE, `.BO` for BSE); the picker fills it in for you.
 
-- Python 3.10+
-- A modern web browser supporting Canvas and ES6 Javascript
+## About the backtest
 
-### Installation & Run
+The backtest is a **diagnostic of the regime concept, not an out-of-sample trading record** — and the interface says so. Two design choices keep it honest:
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/shreyasfegade/regime.git
-   cd regime
-   ```
+- **One-bar execution lag.** The position held on day *t* is decided by the regime observed at the *close of day t-1*, so the strategy only ever acts on information it already had.
+- **Switching costs.** A 5 bps round-trip cost (a realistic blended estimate of brokerage + STT + slippage on liquid Indian equities) is charged every time exposure changes.
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+The honest caveat: the HMM is fit once over the *entire* history, so the regime *labels* are in-sample. The lag and costs make the comparison fair; they don't make it predictive. A walk-forward refit is the natural next step (see below).
 
-3. **Launch the server:**
-   ```bash
-   python -m uvicorn server:app --port 8050
-   ```
+## Notes on yfinance & Indian coverage
 
-4. **Access the dashboard:**
-   Open [http://localhost:8050](http://localhost:8050) in your browser.
+- NSE and BSE equities resolve cleanly with `.NS` / `.BO` suffixes; large-cap history typically goes back well over a decade.
+- **Indices often report zero or missing volume** on Yahoo (`^NSEI`, `^BSESN`). REGIME tolerates this — the volume z-score degrades gracefully rather than erroring.
+- Yahoo data is **adjusted-close based** and occasionally has gaps around corporate actions or holidays; the data layer forward-fills small gaps and rejects series with more than 5% missing prices.
+- A minimum of **two years** of history is required to fit the HMM reliably.
 
----
+## Project layout
 
-## Architecture
-
-```text
+```
 regime/
-├── .ai-docs/               # Archived original AI specs (ignored by git)
 ├── static/
-│   ├── index.html          # Shell layout, CSS styles, and typography
-│   └── app.js              # Canvas charts, HMM visualizer, particle engine
-├── config.py               # Theme colors, styling tokens, and constants
-├── data.py                 # Yahoo Finance data ingestion & validation
-├── features.py             # Feature engineering (returns, range volatility)
-├── model.py                # HMM model training, decoding, and state auto-labeling
-├── server.py               # FastAPI server and analysis endpoints
-├── requirements.txt        # Python dependency manifest
-├── LICENSE                 # MIT License
-└── README.md               # Project documentation
+│   ├── index.html     # Shell, design system, layout
+│   └── app.js         # Canvas engine, animations, backtest curve
+├── config.py          # Single source of truth: params, palette, presets, costs
+├── data.py            # yfinance ingestion, ticker/currency handling, validation
+├── features.py        # Five-feature engineering + normalization
+├── model.py           # HMM fit, Viterbi decode, state labeling, regime stats
+├── backtest.py        # Regime-rotation strategy + performance metrics
+├── server.py          # FastAPI endpoints
+└── requirements.txt
 ```
 
----
+## Roadmap
 
-## Current Status
-
-This project is a **functional experimental prototype**. 
-
-- **Implemented**: Daily data parsing, statistical feature engineering (daily return and close-to-close log range volatility), Gaussian HMM fitting, auto-labeling of decoded states, API endpoint delivery, and full interactive dashboard rendering.
-- **In Progress**: Real-time ticker validation, expanding transition matrix tooltips with exact probabilities.
-- **Planned**: Support for crypto and commodity tickers (adapting features for 24/7 markets), regime persistence forecasting models.
-
----
-
-## Architecture
-
-```
-┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-│   DATA LAYER    │         │   ML ENGINE     │         │    FRONTEND     │
-│                 │         │                 │         │                 │
-│ • Yahoo Finance │────────►│ • Feature Eng.  │────────►│ • Canvas API    │
-│ • Daily OHLCV   │  raw    │ • Gaussian HMM  │ states  │ • GSAP Tweens   │
-│ • 1yr history   │  prices │ • State Labeler │ + probs │ • Crosshairs    │
-│                 │         │ • Transition Mx │         │ • Heatmap       │
-└─────────────────┘         └─────────────────┘         └─────────────────┘
-```
-
-### Data Flow
-
-```
-1. Ticker submitted (e.g., "SPY")
-   ↓
-2. Yahoo Finance fetched ─────────────── ~800ms (1yr daily OHLCV)
-   ↓
-3. Features computed ──────────────────── ~50ms (log returns + range volatility)
-   ↓
-4. 4-state Gaussian HMM fitted ───────── ~200ms (Expectation-Maximization)
-   ↓
-5. States auto-labeled ────────────────── ~10ms (ranked by μ_return, μ_volatility)
-   ↓
-6. Canvas rendered ────────────────────── ~30ms (candlesticks + overlays + heatmap)
-
-Total: ~1.1s from ticker input to full visualization
-```
-
-`hmmlearn` assigns state indices (0–3) randomly on each training run. The post-training labeler ranks states by mean return and mean volatility, mapping them to semantic profiles (Bullish, Bearish, High-Volatility, Accumulation) so the dashboard stays consistent across tickers.
-
-The frontend uses native Canvas instead of SVG to avoid DOM overhead at high element counts. GSAP tweens feed directly into the canvas redraw loop at 60fps.
-
----
-
-## Limitations
-
-- **US Equity Focus**: Designed primarily around daily close data for US stocks; indicators may behave differently on index assets or commodity assets.
-- **Random Initializations**: Gaussian Mixture and Hidden Markov Models are sensitive to starting coordinates; rarely, edge cases in volatile stock histories can result in ambiguous state mapping.
-- **Historical Scope**: Requires a minimum of 1 year of historical data to fit the HMM parameters reliably.
-
----
-
-## What This Project Taught Me
-
-- How Hidden Markov Models classify sequential data into latent states, and why unsupervised state labeling is non-trivial.
-- Why Canvas rendering outperforms SVG for high-density financial chart visualizations.
-- How feature engineering (log returns, range volatility) transforms raw price data into model-ready inputs.
-- The architecture of serving ML model outputs through low-latency API endpoints.
-
-## Development Note
-
-**Built with AI-assisted development.** I directed the product vision, designed the UX, and made the key architecture decisions. AI tools accelerated the implementation.
-
-My contributions:
-- The core idea: applying Hidden Markov Models to market regime detection and visualizing it as a living organism.
-- UX direction: particle fields reacting to market state, gradient-bleeding regime transitions, organic probability bands.
-- Architecture: choosing pure Canvas rendering over charting libraries, and the heuristic framework for consistent state labeling.
-- Iterating on the dashboard layout, color semantics, and interaction design.
-
----
+- **Walk-forward backtest** — periodically refit the HMM on a trailing window and classify only forward, for a genuine out-of-sample record.
+- **Regime-conditional position sizing** beyond the simple long/flat exposure map.
+- **Intraday and crypto support** — adapt the features for 24/7 markets.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
