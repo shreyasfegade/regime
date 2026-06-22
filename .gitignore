@@ -140,6 +140,18 @@ Thumbs.db
 # Project Specific
 demo_frames/
 .env
-.ai-docs/
 node_modules/
+
+# AI tooling / agent scaffolding — never tracked
+.ai-docs/
+.claude/
+.cursor/
+.cursorrules
+.aider*
+.continue/
+.windsurf/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.github/copilot-instructions.md
 

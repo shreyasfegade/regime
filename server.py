@@ -12,8 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from config import REGIME_COLORS
-from data import fetch_ohlcv
+from backtest import run_backtest
+from config import DEFAULT_START, DEFAULT_TICKER, REGIME_COLORS, TICKER_PRESETS
+from data import currency_for, fetch_ohlcv, normalize_ticker
 from features import engineer_features
 from model import (
     compute_persistence_forecast,
@@ -24,7 +25,7 @@ from model import (
     label_states,
 )
 
-app = FastAPI(title="REGIME API", version="2.0.0")
+app = FastAPI(title="REGIME API", version="3.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,10 +41,16 @@ async def root() -> FileResponse:
     return FileResponse("static/index.html")
 
 
+@app.get("/api/presets")
+async def presets() -> JSONResponse:
+    """Return the curated ticker presets for the UI picker."""
+    return JSONResponse(content={"presets": TICKER_PRESETS})
+
+
 @app.get("/api/analyze")
 async def analyze(
-    ticker: str = Query(default="SPY"),
-    start: str = Query(default="2018-01-01"),
+    ticker: str = Query(default=DEFAULT_TICKER),
+    start: str = Query(default=DEFAULT_START),
     end: str = Query(default=None),
 ) -> JSONResponse:
     """Run the full regime analysis pipeline and return JSON."""
@@ -51,7 +58,7 @@ async def analyze(
         end = datetime.now().strftime("%Y-%m-%d")
 
     try:
-        result = _run_pipeline(ticker.strip().upper(), start, end)
+        result = _run_pipeline(normalize_ticker(ticker), start, end)
         return JSONResponse(content=result)
     except ValueError as exc:
         return JSONResponse(
@@ -80,18 +87,21 @@ def _run_pipeline(ticker: str, start: str, end: str) -> dict:
     persistence = compute_persistence_forecast(hmm_model, current_state)
     stats = compute_regime_stats(df_trimmed, state_sequence, label_map)
     blocks = get_regime_blocks(dates_index, state_sequence, label_map)
+    backtest = run_backtest(
+        df_trimmed["Close"].values, dates_index, state_sequence, label_map,
+    )
 
     return _build_response(
         ticker, df_trimmed, dates_index, state_sequence,
         state_probs, label_map, stats, blocks,
-        hmm_model, current_label, current_confidence, persistence,
+        hmm_model, current_label, current_confidence, persistence, backtest,
     )
 
 
 def _build_response(
     ticker: str, df, dates_index, state_sequence,
     state_probs, label_map, stats, blocks,
-    hmm_model, current_label, current_confidence, persistence,
+    hmm_model, current_label, current_confidence, persistence, backtest,
 ) -> dict:
     """Package all analysis results into the JSON response dict."""
     dates_list = [d.strftime("%Y-%m-%d") for d in dates_index]
@@ -135,6 +145,7 @@ def _build_response(
 
     return {
         "ticker": ticker,
+        "currency": currency_for(ticker),
         "dates": dates_list,
         "ohlc": ohlc_list,
         "volume": [int(v) for v in df["Volume"].values],
@@ -151,6 +162,7 @@ def _build_response(
         "current_confidence": round(current_confidence, 4),
         "persistence_forecast": round(persistence, 1),
         "regime_blocks": regime_blocks,
+        "backtest": backtest,
     }
 
 

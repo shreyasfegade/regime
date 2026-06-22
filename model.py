@@ -13,7 +13,7 @@ from config import (
     LABEL_ACCUMULATION,
     LABEL_BEARISH,
     LABEL_BULLISH,
-    LABEL_HIGH_VOL,
+    LABEL_CRISIS,
     N_ITER,
     N_STATES,
     RANDOM_STATE,
@@ -71,7 +71,7 @@ def label_states(model: GaussianHMM) -> dict[int, str]:
     Logic:
         - Feature index 0 = log_return (mean return character)
         - Feature index 2 = volatility_20d (volatility character)
-        - Highest vol_20d mean → 'High Volatility'
+        - Highest vol_20d mean → 'Crisis'
         - Lowest vol_20d mean AND lowest |return| → 'Accumulation'
         - Among remaining: higher return → 'Bullish Trending'
         - Among remaining: lower return  → 'Bearish Trending'
@@ -88,10 +88,10 @@ def label_states(model: GaussianHMM) -> dict[int, str]:
     label_map: dict[int, str] = {}
     assigned: set[int] = set()
 
-    # 1. Highest volatility → High Volatility
+    # 1. Highest volatility → Crisis
     vol_order = np.argsort(mean_vol_20d)
     high_vol_idx = int(vol_order[-1])
-    label_map[high_vol_idx] = LABEL_HIGH_VOL
+    label_map[high_vol_idx] = LABEL_CRISIS
     assigned.add(high_vol_idx)
 
     # 2. Among remaining: lowest vol AND lowest |return| → Accumulation

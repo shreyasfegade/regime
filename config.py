@@ -19,40 +19,53 @@ MOMENTUM_WINDOW: int = 10
 WARMUP_PERIOD: int = 20  # rows dropped after rolling windows
 
 # ─── Regime Labels ───────────────────────────────────────────────────
+# The four market states the HMM resolves to. "Crisis" is the
+# highest-volatility, panic-driven state (drawdowns, capitulation);
+# "Accumulation" is the quiet, low-volatility base-building state.
 LABEL_BULLISH: str = 'Bullish Trending'
 LABEL_BEARISH: str = 'Bearish Trending'
-LABEL_HIGH_VOL: str = 'High Volatility'
+LABEL_CRISIS: str = 'Crisis'
 LABEL_ACCUMULATION: str = 'Accumulation'
 
+REGIME_ORDER: list[str] = [
+    LABEL_BULLISH,
+    LABEL_ACCUMULATION,
+    LABEL_BEARISH,
+    LABEL_CRISIS,
+]
+
 # ─── Regime Colors ───────────────────────────────────────────────────
+# A considered four-way palette: emerald (trend up), azure (base build),
+# coral (trend down), crimson (panic). Each is distinct at a glance even
+# for color-vision-deficient viewers — hue AND luminance separate them.
 REGIME_COLORS: dict[str, dict[str, str]] = {
     'Bullish Trending': {
-        'primary': '#1D9E75',
-        'fill': 'rgba(29, 158, 117, 0.12)',
-        'fill_band': 'rgba(29, 158, 117, 0.6)',
-        'line_band': 'rgba(29, 158, 117, 0.4)',
-        'dim': '#0F6E56',
+        'primary': '#1FC77D',
+        'fill': 'rgba(31, 199, 125, 0.12)',
+        'fill_band': 'rgba(31, 199, 125, 0.60)',
+        'line_band': 'rgba(31, 199, 125, 0.40)',
+        'dim': '#0F7D4E',
     },
     'Bearish Trending': {
-        'primary': '#D85A30',
-        'fill': 'rgba(216, 90, 48, 0.12)',
-        'fill_band': 'rgba(216, 90, 48, 0.6)',
-        'line_band': 'rgba(216, 90, 48, 0.4)',
-        'dim': '#993C1D',
+        'primary': '#E8623A',
+        'fill': 'rgba(232, 98, 58, 0.12)',
+        'fill_band': 'rgba(232, 98, 58, 0.60)',
+        'line_band': 'rgba(232, 98, 58, 0.40)',
+        'dim': '#A03E22',
     },
-    'High Volatility': {
-        'primary': '#BA7517',
-        'fill': 'rgba(186, 117, 23, 0.18)',
-        'fill_band': 'rgba(186, 117, 23, 0.6)',
-        'line_band': 'rgba(186, 117, 23, 0.4)',
-        'dim': '#854F0B',
+    'Crisis': {
+        'primary': '#F5384E',
+        'fill': 'rgba(245, 56, 78, 0.18)',
+        'fill_band': 'rgba(245, 56, 78, 0.60)',
+        'line_band': 'rgba(245, 56, 78, 0.40)',
+        'dim': '#A81F30',
     },
     'Accumulation': {
-        'primary': '#378ADD',
-        'fill': 'rgba(55, 138, 221, 0.10)',
-        'fill_band': 'rgba(55, 138, 221, 0.6)',
-        'line_band': 'rgba(55, 138, 221, 0.4)',
-        'dim': '#185FA5',
+        'primary': '#4D8DF5',
+        'fill': 'rgba(77, 141, 245, 0.10)',
+        'fill_band': 'rgba(77, 141, 245, 0.60)',
+        'line_band': 'rgba(77, 141, 245, 0.40)',
+        'dim': '#21509E',
     },
 }
 
@@ -61,28 +74,65 @@ BAND_ORDER: list[str] = [
     'Accumulation',
     'Bullish Trending',
     'Bearish Trending',
-    'High Volatility',
+    'Crisis',
 ]
 
+# ─── Markets & Tickers ───────────────────────────────────────────────
+# REGIME is India-first. yfinance exposes NSE symbols with a `.NS`
+# suffix and BSE symbols with `.BO`. Indices use a `^` prefix.
+DEFAULT_TICKER: str = 'RELIANCE.NS'
+DEFAULT_START: str = '2018-01-01'
+
+# Curated presets surfaced in the UI ticker picker. Grouped by market.
+# Each entry: symbol, display name, market tag.
+TICKER_PRESETS: list[dict[str, str]] = [
+    # Indian indices
+    {'symbol': '^NSEI', 'name': 'NIFTY 50', 'market': 'India · Index'},
+    {'symbol': '^NSEBANK', 'name': 'NIFTY Bank', 'market': 'India · Index'},
+    {'symbol': '^BSESN', 'name': 'SENSEX', 'market': 'India · Index'},
+    # Indian large caps
+    {'symbol': 'RELIANCE.NS', 'name': 'Reliance Industries', 'market': 'India · NSE'},
+    {'symbol': 'TCS.NS', 'name': 'Tata Consultancy', 'market': 'India · NSE'},
+    {'symbol': 'INFY.NS', 'name': 'Infosys', 'market': 'India · NSE'},
+    {'symbol': 'HDFCBANK.NS', 'name': 'HDFC Bank', 'market': 'India · NSE'},
+    {'symbol': 'ICICIBANK.NS', 'name': 'ICICI Bank', 'market': 'India · NSE'},
+    {'symbol': 'TATAMOTORS.NS', 'name': 'Tata Motors', 'market': 'India · NSE'},
+    {'symbol': 'ADANIENT.NS', 'name': 'Adani Enterprises', 'market': 'India · NSE'},
+    {'symbol': 'BAJFINANCE.NS', 'name': 'Bajaj Finance', 'market': 'India · NSE'},
+    # US reference
+    {'symbol': '^GSPC', 'name': 'S&P 500', 'market': 'US · Index'},
+    {'symbol': 'AAPL', 'name': 'Apple', 'market': 'US · NASDAQ'},
+    {'symbol': 'TSLA', 'name': 'Tesla', 'market': 'US · NASDAQ'},
+]
+
+# Currency rendering, keyed by the symbol suffix yfinance uses.
+CURRENCY_BY_SUFFIX: dict[str, dict[str, str]] = {
+    '.NS': {'code': 'INR', 'symbol': '₹'},   # NSE
+    '.BO': {'code': 'INR', 'symbol': '₹'},   # BSE
+    '_DEFAULT': {'code': 'USD', 'symbol': '$'},
+}
+# Indices that are denominated in INR despite carrying a `^` prefix.
+INR_INDEX_SYMBOLS: set[str] = {'^NSEI', '^NSEBANK', '^BSESN', '^CNXIT', '^CNXAUTO'}
+
 # ─── Dark Theme Palette ──────────────────────────────────────────────
-BG_PRIMARY: str = '#0D0F14'
-BG_SURFACE: str = '#13161E'
-BG_ELEVATED: str = '#1A1E29'
-BG_HOVER: str = '#1E2333'
-BORDER_COLOR: str = '#262C3D'
-BORDER_LIGHT: str = '#2E3547'
+BG_PRIMARY: str = '#08090C'
+BG_SURFACE: str = '#0F1217'
+BG_ELEVATED: str = '#141821'
+BG_HOVER: str = '#1B202C'
+BORDER_COLOR: str = '#222838'
+BORDER_LIGHT: str = '#2C3344'
 
 # ─── Text Colors ─────────────────────────────────────────────────────
-TEXT_PRIMARY: str = '#E8EAF0'
-TEXT_SECONDARY: str = '#9CA3AF'
-TEXT_MUTED: str = '#6B7280'
-TEXT_DIM: str = '#3D4557'
+TEXT_PRIMARY: str = '#ECEEF3'
+TEXT_SECONDARY: str = '#9AA1B0'
+TEXT_MUTED: str = '#646B7C'
+TEXT_DIM: str = '#3A4150'
 
 # ─── Chart Colors ────────────────────────────────────────────────────
-CANDLE_UP: str = '#1D9E75'
-CANDLE_DOWN: str = '#D85A30'
-GRID_COLOR: str = '#1A1E29'
-ZERO_LINE_COLOR: str = '#262C3D'
+CANDLE_UP: str = '#1FC77D'
+CANDLE_DOWN: str = '#E8623A'
+GRID_COLOR: str = '#141821'
+ZERO_LINE_COLOR: str = '#222838'
 
 # ─── Typography ──────────────────────────────────────────────────────
 FONT_FAMILY: str = "'Inter', 'system-ui', '-apple-system', sans-serif"
@@ -98,9 +148,22 @@ PANEL_BORDER_RADIUS: int = 8
 
 # ─── Transition Matrix Heatmap ───────────────────────────────────────
 HEATMAP_COLORSCALE: list[list] = [
-    [0, '#13161E'],
-    [1, '#1D9E75'],
+    [0, '#0F1217'],
+    [1, '#1FC77D'],
 ]
 HEATMAP_SIZE: int = 220
 
-
+# ─── Backtest ────────────────────────────────────────────────────────
+TRADING_DAYS_PER_YEAR: int = 252
+# Round-trip cost applied on every position change, in basis points.
+# 5 bps is a realistic blended estimate for liquid Indian equities
+# (brokerage + STT + slippage on a switch).
+BACKTEST_COST_BPS: float = 5.0
+# How each regime maps to market exposure for the long/flat strategy.
+# 1.0 = fully invested, 0.0 = in cash. Crisis and Bearish sit out.
+REGIME_EXPOSURE: dict[str, float] = {
+    'Bullish Trending': 1.0,
+    'Accumulation': 0.5,
+    'Bearish Trending': 0.0,
+    'Crisis': 0.0,
+}
