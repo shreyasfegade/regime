@@ -25,9 +25,11 @@ const BREATH = [{ f: .0008, a: 2.0, ph: 0 }, { f: .00095, a: 1.7, ph: 1.3 }, { f
 
 // ── App state ──────────────────────────────────────────────────────
 const S = {
-  particles: [], candles: [], probBands: [], regimeBlocks: [], dates: [],
+  particles: [], mesh: [], candles: [], probBands: [], regimeBlocks: [], dates: [],
   stateSeq: [], stateProbs: [], labelMap: {}, regime: 'Accumulation',
-  currency: { code: 'INR', symbol: '₹' }, backtest: null,
+  currency: { code: 'INR', symbol: '₹' },
+  bt: { insample: null, oos: null }, btMode: 'insample', btGeom: null, btHover: -1,
+  lastQuery: null,
   breathTime: 0, hoverCandle: -1, candleReveal: 99999, btReveal: 1,
   cfg: RP['Accumulation'], data: null, presets: [],
 };
@@ -41,7 +43,9 @@ const $ = id => document.getElementById(id);
 $('dt-end').value = new Date().toISOString().slice(0, 10);
 $('btn-go').onclick = () => loadData();
 $('ticker-input').onkeydown = e => { if (e.key === 'Enter') { closePicker(); loadData(); } };
+document.querySelectorAll('#bt-mode .seg-btn').forEach(b => b.onclick = () => switchBtMode(b.dataset.mode, b));
 initParticles();
+initMesh();
 initPicker();
 requestAnimationFrame(masterLoop);
 loadData();
@@ -49,19 +53,51 @@ loadData();
 // ── Master animation loop ──────────────────────────────────────────
 function masterLoop(ts) {
   S.breathTime = ts;
+  tickMesh(ts);
   tickParticles();
   drawChart();
   drawProbBands();
+  if (S.bt.insample) drawBacktest();
   requestAnimationFrame(masterLoop);
 }
 
 /* ── Theme re-tint: drive CSS accent from the active regime ─────────── */
 function setTheme(regime) {
   const c = RC[regime] || RC['Accumulation'];
-  const rgb = hexRgb(c);
   const root = document.documentElement.style;
   root.setProperty('--accent', c);
-  root.setProperty('--accent-rgb', rgb);
+  root.setProperty('--accent-rgb', hexRgb(c));
+}
+
+/* ── Aurora mesh backdrop ───────────────────────────────────────────── */
+function initMesh() {
+  S.mesh = BORDER.map((label, i) => ({
+    x: Math.random(), y: Math.random(),
+    vx: (Math.random() - .5) * .00006, vy: (Math.random() - .5) * .00006,
+    label,
+  }));
+}
+function tickMesh(ts) {
+  const c = $('mesh-canvas'), w = 220, h = 140;  // low-res, CSS-blurred
+  if (c.width !== w) { c.width = w; c.height = h; }
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+  ctx.globalCompositeOperation = 'lighter';
+  for (const b of S.mesh) {
+    b.x += b.vx; b.y += b.vy;
+    if (b.x < 0 || b.x > 1) b.vx *= -1;
+    if (b.y < 0 || b.y > 1) b.vy *= -1;
+    // Current regime's blob breathes brighter; others stay ambient.
+    const active = b.label === S.regime;
+    const rgb = RC[b.label] ? hexRgb(RC[b.label]) : '90,90,110';
+    const pulse = active ? .42 + Math.sin(ts * .0011) * .12 : .14;
+    const rad = (active ? 95 : 70) + Math.sin(ts * .0007 + b.x * 9) * 12;
+    const g = ctx.createRadialGradient(b.x * w, b.y * h, 0, b.x * w, b.y * h, rad);
+    g.addColorStop(0, `rgba(${rgb},${pulse})`);
+    g.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  }
+  ctx.globalCompositeOperation = 'source-over';
 }
 
 /* ── Particles ──────────────────────────────────────────────────────── */
@@ -119,14 +155,12 @@ function drawChart() {
   const yS = v => PAD.t + (1 - (v - yMin) / (yMax - yMin)) * chartH;
   const cw = Math.max(1, (chartW / n) * .68);
 
-  // Regime wash
   for (const b of S.regimeBlocks) {
     const x0 = xS(b.si), x1 = xS(b.ei), rgb = hexRgb(b.color);
     const g = ctx.createLinearGradient(0, PAD.t, 0, PAD.t + chartH);
     g.addColorStop(0, `rgba(${rgb},0)`); g.addColorStop(.55, `rgba(${rgb},.05)`); g.addColorStop(1, `rgba(${rgb},.16)`);
     ctx.fillStyle = g; ctx.fillRect(x0, PAD.t, Math.max(x1 - x0, 1), chartH);
   }
-  // Grid + Y axis
   ctx.strokeStyle = 'rgba(255,255,255,.045)'; ctx.lineWidth = 1;
   ctx.fillStyle = 'rgba(255,255,255,.32)'; ctx.font = "10px 'JetBrains Mono'"; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
   for (let i = 0; i <= 4; i++) {
@@ -134,14 +168,12 @@ function drawChart() {
     ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + chartW, y); ctx.stroke();
     ctx.fillText(fmtPrice(v, v < 100 ? 1 : 0), PAD.l - 8, y);
   }
-  // X axis
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   const step = Math.max(Math.floor(n / 8), 1);
   for (let i = 0; i < n; i += step) {
     const dt = new Date(S.dates[i]);
     ctx.fillText(dt.toLocaleDateString('en', { month: 'short', year: '2-digit' }), xS(i), PAD.t + chartH + 9);
   }
-  // Candles
   const vis = Math.min(Math.floor(S.candleReveal), n);
   for (let i = 0; i < vis; i++) {
     const c = S.candles[i], up = c.c >= c.o, color = up ? RC['Bullish Trending'] : RC['Bearish Trending'];
@@ -154,7 +186,6 @@ function drawChart() {
     ctx.globalAlpha = hov ? 1 : .9; ctx.fillRect(x - cw / 2, bt, cw, bh);
   }
   ctx.globalAlpha = 1;
-  // 20-day MA
   if (vis > 20) {
     const pts = [];
     for (let i = 19; i < vis; i++) { let s = 0; for (let j = i - 19; j <= i; j++) s += S.candles[j].c; pts.push({ x: xS(i), y: yS(s / 20) }); }
@@ -165,7 +196,6 @@ function drawChart() {
     if (pts.length > 1) { const p = pts[pts.length - 1]; ctx.lineTo(p.x, p.y); }
     ctx.stroke(); ctx.shadowBlur = 0;
   }
-  // Crosshair
   if (S.hoverCandle >= 0 && S.hoverCandle < n) {
     const x = xS(S.hoverCandle), cy = yS(S.candles[S.hoverCandle].c);
     ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
@@ -206,8 +236,9 @@ function drawProbBands() {
 }
 
 /* ── Backtest equity curve ──────────────────────────────────────────── */
+function activeBt() { return S.btMode === 'oos' ? S.bt.oos : S.bt.insample; }
 function drawBacktest() {
-  const bt = S.backtest; if (!bt) return;
+  const bt = activeBt(); if (!bt) return;
   const wrap = $('bt-canvas').parentElement;
   const ctx = sizeCanvas($('bt-canvas'), wrap.clientWidth, CH.bt);
   const W = wrap.clientWidth, H = CH.bt, P = { l: 58, r: 14, t: 16, b: 24 };
@@ -219,26 +250,22 @@ function drawBacktest() {
   const xS = i => P.l + (i / (n - 1)) * iw;
   const yS = v => P.t + (1 - (v - yMin) / (yMax - yMin)) * ih;
   const vis = Math.max(2, Math.floor(n * S.btReveal));
+  S.btGeom = { P, iw, ih, n, xS, yS };
 
-  // grid + multiplier axis
   ctx.strokeStyle = 'rgba(255,255,255,.045)'; ctx.fillStyle = 'rgba(255,255,255,.3)';
   ctx.font = "10px 'JetBrains Mono'"; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
   for (let i = 0; i <= 4; i++) { const y = P.t + ih * i / 4, v = yMax - (yMax - yMin) * i / 4; ctx.beginPath(); ctx.moveTo(P.l, y); ctx.lineTo(P.l + iw, y); ctx.stroke(); ctx.fillText(v.toFixed(1) + '×', P.l - 7, y); }
-  // baseline at 1.0×
   const y1 = yS(1); ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(P.l, y1); ctx.lineTo(P.l + iw, y1); ctx.stroke(); ctx.setLineDash([]);
 
-  // drawdown underlay (faint red, scaled into bottom band)
   const ddBand = ih * .26;
   ctx.beginPath(); ctx.moveTo(P.l, H - P.b);
   for (let i = 0; i < vis; i++) ctx.lineTo(xS(i), H - P.b + dd[i] * ddBand * 2.2);
   ctx.lineTo(xS(vis - 1), H - P.b); ctx.closePath();
   ctx.fillStyle = 'rgba(245,56,78,.12)'; ctx.fill();
 
-  // benchmark line
   ctx.strokeStyle = 'rgba(154,161,176,.55)'; ctx.lineWidth = 1.4; ctx.lineJoin = 'round';
   ctx.beginPath(); ctx.moveTo(xS(0), yS(be[0])); for (let i = 1; i < vis; i++) ctx.lineTo(xS(i), yS(be[i])); ctx.stroke();
 
-  // strategy area + line (accent)
   const acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4D8DF5';
   const rgb = hexRgb(acc);
   const g = ctx.createLinearGradient(0, P.t, 0, H - P.b);
@@ -248,12 +275,19 @@ function drawBacktest() {
   ctx.lineTo(xS(vis - 1), H - P.b); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
   ctx.strokeStyle = acc; ctx.lineWidth = 2; ctx.shadowColor = acc; ctx.shadowBlur = 9; ctx.lineJoin = 'round';
   ctx.beginPath(); ctx.moveTo(xS(0), yS(se[0])); for (let i = 1; i < vis; i++) ctx.lineTo(xS(i), yS(se[i])); ctx.stroke(); ctx.shadowBlur = 0;
-  // head dot
   const hx = xS(vis - 1), hy = yS(se[vis - 1]);
   ctx.beginPath(); ctx.arc(hx, hy, 3.4, 0, 6.2832); ctx.fillStyle = acc; ctx.shadowColor = acc; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0;
+
+  if (S.btHover >= 0 && S.btHover < vis) {
+    const x = xS(S.btHover);
+    ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(x, P.t); ctx.lineTo(x, H - P.b); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(x, yS(se[S.btHover]), 3, 0, 6.2832); ctx.fillStyle = acc; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, yS(be[S.btHover]), 3, 0, 6.2832); ctx.fillStyle = 'rgba(154,161,176,.9)'; ctx.fill();
+  }
 }
 
-/* ── Hover ──────────────────────────────────────────────────────────── */
+/* ── Hover: candlestick ─────────────────────────────────────────────── */
 $('chart-canvas').addEventListener('mousemove', e => {
   const r = e.currentTarget.getBoundingClientRect();
   const mx = e.clientX - r.left, n = S.candles.length; if (!n) return;
@@ -261,17 +295,36 @@ $('chart-canvas').addEventListener('mousemove', e => {
   S.hoverCandle = Math.max(0, Math.min(n - 1, idx));
   const c = S.candles[S.hoverCandle], si = S.stateSeq[S.hoverCandle], lbl = S.labelMap[String(si)] || '';
   const prob = S.stateProbs[S.hoverCandle] ? S.stateProbs[S.hoverCandle][si] : 0;
-  const tt = $('tooltip');
-  tt.innerHTML = `<div class="tt-r" style="color:${RC[lbl] || '#fff'}"><span>${lbl}</span><span>${(prob * 100).toFixed(0)}%</span></div>
+  showTip(e, `<div class="tt-r" style="color:${RC[lbl] || '#fff'}"><span>${lbl}</span><span>${(prob * 100).toFixed(0)}%</span></div>
     <div class="tt-d"><span class="tt-l">Date</span><span class="tt-v">${S.dates[S.hoverCandle]}</span></div>
     <div class="tt-d"><span class="tt-l">Open</span><span class="tt-v">${fmtPrice(c.o, 2)}</span></div>
     <div class="tt-d"><span class="tt-l">High</span><span class="tt-v">${fmtPrice(c.h, 2)}</span></div>
     <div class="tt-d"><span class="tt-l">Low</span><span class="tt-v">${fmtPrice(c.l, 2)}</span></div>
-    <div class="tt-d"><span class="tt-l">Close</span><span class="tt-v">${fmtPrice(c.c, 2)}</span></div>`;
-  tt.style.opacity = '1'; tt.style.left = Math.min(e.clientX + 18, innerWidth - 190) + 'px'; tt.style.top = Math.max(12, e.clientY - 120) + 'px';
+    <div class="tt-d"><span class="tt-l">Close</span><span class="tt-v">${fmtPrice(c.c, 2)}</span></div>`);
 });
 $('chart-canvas').addEventListener('mouseleave', () => { S.hoverCandle = -1; $('tooltip').style.opacity = '0'; });
-$('chart-canvas').style.cursor = 'crosshair';
+
+/* ── Hover: backtest equity ─────────────────────────────────────────── */
+$('bt-canvas').addEventListener('mousemove', e => {
+  const bt = activeBt(); if (!bt || !S.btGeom) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const { P, iw, n } = S.btGeom;
+  const idx = Math.round(((e.clientX - r.left - P.l) / iw) * (n - 1));
+  S.btHover = Math.max(0, Math.min(n - 1, idx));
+  const i = S.btHover, gain = (bt.strategy_equity[i] - 1) * 100, bgain = (bt.benchmark_equity[i] - 1) * 100;
+  showTip(e, `<div class="tt-r"><span>${bt.dates[i]}</span></div>
+    <div class="tt-d"><span class="tt-l">Strategy</span><span class="tt-v">${bt.strategy_equity[i].toFixed(2)}× (${gain >= 0 ? '+' : ''}${gain.toFixed(0)}%)</span></div>
+    <div class="tt-d"><span class="tt-l">Buy &amp; Hold</span><span class="tt-v">${bt.benchmark_equity[i].toFixed(2)}× (${bgain >= 0 ? '+' : ''}${bgain.toFixed(0)}%)</span></div>
+    <div class="tt-d"><span class="tt-l">Drawdown</span><span class="tt-v" style="color:var(--crisis)">${(bt.strategy_drawdown[i] * 100).toFixed(1)}%</span></div>`);
+});
+$('bt-canvas').addEventListener('mouseleave', () => { S.btHover = -1; $('tooltip').style.opacity = '0'; });
+
+function showTip(e, html) {
+  const tt = $('tooltip'); tt.innerHTML = html;
+  tt.style.opacity = '1';
+  tt.style.left = Math.min(e.clientX + 18, innerWidth - 200) + 'px';
+  tt.style.top = Math.max(12, e.clientY - 120) + 'px';
+}
 
 /* ── Ticker picker ──────────────────────────────────────────────────── */
 async function initPicker() {
@@ -300,7 +353,9 @@ function closePicker() { $('picker').classList.remove('open'); }
 async function loadData() {
   const btn = $('btn-go'), tk = $('ticker-input').value.trim().toUpperCase() || 'RELIANCE.NS';
   const st = $('dt-start').value, en = $('dt-end').value;
+  S.lastQuery = { tk, st, en };
   btn.textContent = 'Analyzing'; btn.classList.add('busy'); S.cfg = RP['loading'];
+  resetBtMode();
   gsap.to('#chart-canvas,#prob-canvas,#bt-canvas', { opacity: .12, duration: .3, ease: 'power2.in' });
   const scan = $('scan-line');
   gsap.fromTo(scan, { top: 0, opacity: .7 }, { top: CH.chart + 'px', opacity: 0, duration: .6, ease: 'none', onStart: () => scan.style.display = 'block', onComplete: () => scan.style.display = 'none' });
@@ -310,7 +365,7 @@ async function loadData() {
     if (d.error) throw new Error(d.error);
     S.data = d; S.dates = d.dates; S.stateSeq = d.state_sequence; S.stateProbs = d.state_probs;
     S.labelMap = d.label_map; S.regime = d.current_regime; S.currency = d.currency || S.currency;
-    S.backtest = d.backtest;
+    S.bt = { insample: d.backtest, oos: null };
     S.candles = d.ohlc.map(c => ({ o: c.o, h: c.h, l: c.l, c: c.c }));
     S.regimeBlocks = buildBlocks(d); S.probBands = buildProb(d);
     S.cfg = RP[d.current_regime] || RP['Accumulation'];
@@ -320,7 +375,6 @@ async function loadData() {
     renderLegend();
     gsap.to('#chart-canvas,#prob-canvas,#bt-canvas', { opacity: 1, duration: .6, ease: 'power2.out' });
 
-    // KPI hero
     const c = RC[d.current_regime] || '#4D8DF5', re = $('stat-regime-name');
     gsap.to(re, { opacity: 0, duration: .18, onComplete: () => { re.textContent = d.current_regime; re.style.color = c; gsap.to(re, { opacity: 1, duration: .35 }); } });
     $('stat-regime-sub').textContent = `${d.dates.length} sessions analyzed`;
@@ -332,27 +386,63 @@ async function loadData() {
     $('stat-cagr-sub').textContent = `B&H ${d.backtest.metrics.benchmark.cagr >= 0 ? '+' : ''}${d.backtest.metrics.benchmark.cagr}%`;
     const rc = $('regime-card'); gsap.to(rc, { borderLeftColor: c, duration: .5 }); rc.style.boxShadow = `inset 0 0 70px ${c}0d`;
 
-    // Candle cascade
     S.candleReveal = 0; gsap.to(S, { candleReveal: S.candles.length, duration: 1.25, ease: 'power1.inOut' });
-    // Backtest draw-on
-    S.btReveal = 0; renderBacktestMetrics(d.backtest);
-    gsap.to(S, { btReveal: 1, duration: 1.4, ease: 'power2.out', onUpdate: drawBacktest, delay: .3, onComplete: drawBacktest });
+    S.btReveal = 0; gsap.to(S, { btReveal: 1, duration: 1.4, ease: 'power2.out', delay: .3 });
+    renderBacktestMetrics(d.backtest, 'insample');
 
     renderTimeline(d); renderMatrix(d); renderStats(d); renderRing(d);
+    renderForwardEdge(d.analytics); renderCrisisGauge(d.analytics); renderDiagnostics(d.analytics);
+
     gsap.fromTo('.kpi', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .55, stagger: .07, ease: 'power3.out' });
     gsap.fromTo('.sb-sec', { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: .55, stagger: .1, ease: 'power3.out', delay: .2 });
     gsap.fromTo('#bt-panel', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .6, ease: 'power3.out', delay: .35 });
+    gsap.fromTo('.sig-panel', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .6, stagger: .12, ease: 'power3.out', delay: .5 });
     $('err-bar').style.display = 'none';
   } catch (err) {
-    $('err-bar').innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span>${err.message}</span>`;
-    $('err-bar').style.display = 'flex';
+    showError(err.message);
     gsap.to('#chart-canvas,#prob-canvas,#bt-canvas', { opacity: 1, duration: .3 });
   } finally { btn.textContent = 'Analyze'; btn.classList.remove('busy'); }
+}
+
+function showError(msg) {
+  $('err-bar').innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span>${msg}</span>`;
+  $('err-bar').style.display = 'flex';
 }
 
 function animC(id, target, suf, dec, pre = '') {
   const el = $(id); if (!el) return;
   gsap.fromTo({ v: 0 }, { v: target }, { duration: .95, ease: 'power4.out', onUpdate: function () { el.textContent = pre + this.targets()[0].v.toFixed(dec) + suf; } });
+}
+
+/* ── Walk-forward toggle ────────────────────────────────────────────── */
+function resetBtMode() {
+  S.btMode = 'insample';
+  document.querySelectorAll('#bt-mode .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'insample'));
+  $('bt-split').textContent = '';
+  $('bt-caveat-txt').textContent = 'In-sample view: regimes are fit over the full history. Switch to Walk-Forward for a true out-of-sample test that refits the model on past data only.';
+}
+async function switchBtMode(mode, btn) {
+  if (mode === S.btMode || !S.bt.insample) return;
+  if (mode === 'oos' && !S.bt.oos) {
+    btn.classList.add('loading');
+    try {
+      const { tk, st, en } = S.lastQuery;
+      const r = await fetch(`/api/walkforward?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}`);
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      S.bt.oos = d;
+    } catch (err) { showError(err.message); btn.classList.remove('loading'); return; }
+    btn.classList.remove('loading');
+  }
+  S.btMode = mode;
+  document.querySelectorAll('#bt-mode .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  const data = activeBt();
+  if (mode === 'oos') {
+    $('bt-split').textContent = `· live from ${data.split_date}`;
+    $('bt-caveat-txt').textContent = `Walk-forward out-of-sample: the model is refit on past data only and classifies forward. Live trading begins ${data.split_date}; everything shown is money the strategy could actually have made.`;
+  } else { resetBtMode(); }
+  renderBacktestMetrics(data, mode);
+  S.btReveal = 0; gsap.to(S, { btReveal: 1, duration: 1.0, ease: 'power2.out' });
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────── */
@@ -438,18 +528,85 @@ function renderRing(d) {
 }
 
 /* ── Backtest metrics grid ──────────────────────────────────────────── */
-function renderBacktestMetrics(bt) {
+function renderBacktestMetrics(bt, mode) {
   const s = bt.metrics.strategy, b = bt.metrics.benchmark, m = bt.metrics;
   const cells = [
     { l: 'Total Return', v: `${s.total_return >= 0 ? '+' : ''}${s.total_return}%`, sub: `B&H ${b.total_return}%`, cls: s.total_return >= 0 ? 'pos' : 'neg' },
     { l: 'CAGR', v: `${s.cagr >= 0 ? '+' : ''}${s.cagr}%`, sub: `B&H ${b.cagr}%`, cls: s.cagr >= 0 ? 'pos' : 'neg' },
     { l: 'Sharpe', v: s.sharpe.toFixed(2), sub: `B&H ${b.sharpe.toFixed(2)}`, cls: s.sharpe >= b.sharpe ? 'pos' : '' },
-    { l: 'Sortino', v: s.sortino.toFixed(2), sub: `B&H ${b.sortino.toFixed(2)}`, cls: s.sortino >= b.sortino ? 'pos' : '' },
     { l: 'Max Drawdown', v: `${s.max_drawdown}%`, sub: `B&H ${b.max_drawdown}%`, cls: s.max_drawdown >= b.max_drawdown ? 'pos' : 'neg' },
+    { l: 'Daily VaR 95%', v: `${s.var_95}%`, sub: `CVaR ${s.cvar_95}%`, cls: '' },
     { l: 'Time in Market', v: `${m.time_in_market}%`, sub: `${m.trades} switches`, cls: '' },
   ];
   $('bt-metrics').innerHTML = cells.map(c =>
     `<div class="bt-m"><div class="bt-m-lbl">${c.l}</div><div class="bt-m-val ${c.cls}">${c.v}</div><div class="bt-m-sub">${c.sub}</div></div>`
   ).join('');
+}
+
+/* ── Forward-return edge bars ───────────────────────────────────────── */
+function renderForwardEdge(a) {
+  const fe = a.forward_edge; $('edge-h').textContent = fe.horizon;
+  const el = $('edge-bars'); el.innerHTML = '';
+  const regimes = REGIME_SAFE_ORDER.filter(r => fe.by_regime[r]);
+  const maxAbs = Math.max(...regimes.map(r => Math.abs(fe.by_regime[r].mean)), 0.01);
+  regimes.forEach((label, i) => {
+    const v = fe.by_regime[label], mean = v.mean, c = RC[label];
+    const w = Math.min(Math.abs(mean) / maxAbs * 48, 48);
+    const row = document.createElement('div'); row.className = 'edge-row';
+    const pos = mean >= 0;
+    row.innerHTML = `<span class="edge-name"><span class="st-dot" style="background:${c}"></span>${SHORT[label]}</span>
+      <div class="edge-track"><div class="edge-zero"></div><div class="edge-fill" style="background:${pos ? RC['Bullish Trending'] : RC['Bearish Trending']};${pos ? `left:50%` : `left:${50 - w}%`}"></div></div>
+      <div><div class="edge-val" style="color:${pos ? RC['Bullish Trending'] : RC['Bearish Trending']}">${pos ? '+' : ''}${mean.toFixed(2)}%</div><div class="edge-win">${v.win_rate}% win</div></div>`;
+    el.appendChild(row);
+    const fill = row.querySelector('.edge-fill');
+    setTimeout(() => { fill.style.width = w + '%'; }, 120 + i * 90);
+  });
+}
+const REGIME_SAFE_ORDER = ['Bullish Trending', 'Accumulation', 'Bearish Trending', 'Crisis'];
+
+/* ── Crisis early-warning gauge ─────────────────────────────────────── */
+function renderCrisisGauge(a) {
+  const cw = a.crisis_warning, svg = $('crisis-gauge');
+  const frac = Math.min(cw.peak / 100, 1);
+  const sev = cw.peak < 12 ? RC['Bullish Trending'] : cw.peak < 35 ? '#E8A33A' : RC['Crisis'];
+  const r = 64, cx = 80, cy = 88, arcLen = Math.PI * r;
+  svg.innerHTML = `
+    <path d="M 16 88 A 64 64 0 0 1 144 88" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 16 88 A 64 64 0 0 1 144 88" fill="none" stroke="${sev}" stroke-width="11" stroke-linecap="round"
+      stroke-dasharray="${arcLen}" stroke-dashoffset="${arcLen}" style="filter:drop-shadow(0 0 5px ${sev});transition:stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)" id="cg-arc"/>
+    <text x="80" y="78" text-anchor="middle" fill="${sev}" font-family="var(--mono)" font-size="26" font-weight="700">${cw.current.toFixed(0)}%</text>
+    <text x="80" y="94" text-anchor="middle" fill="var(--txt-3)" font-family="var(--sans)" font-size="8.5" letter-spacing="1">CRISIS RISK NOW</text>`;
+  setTimeout(() => { const arc = $('cg-arc'); if (arc) arc.style.strokeDashoffset = arcLen * (1 - frac); }, 60);
+  $('crisis-foot').innerHTML = `Projected to <b style="color:${sev}">${cw.projected.toFixed(1)}%</b> within ${cw.horizon} sessions, peaking at ${cw.peak.toFixed(1)}%.`;
+  drawCrisisSpark(cw.trajectory, sev);
+}
+function drawCrisisSpark(traj, color) {
+  const cv = $('crisis-spark'), W = cv.parentElement.clientWidth - 148 - 8, H = 92;
+  if (W <= 0) return;
+  const ctx = sizeCanvas(cv, W, H), n = traj.length, rgb = hexRgb(color);
+  ctx.clearRect(0, 0, W, H);
+  const maxv = Math.max(...traj, 5), P = { t: 14, b: 16, l: 4, r: 4 };
+  const xS = i => P.l + i / (n - 1) * (W - P.l - P.r);
+  const yS = v => P.t + (1 - v / maxv) * (H - P.t - P.b);
+  ctx.beginPath(); ctx.moveTo(xS(0), H - P.b);
+  for (let i = 0; i < n; i++) ctx.lineTo(xS(i), yS(traj[i]));
+  ctx.lineTo(xS(n - 1), H - P.b); ctx.closePath();
+  const g = ctx.createLinearGradient(0, P.t, 0, H - P.b); g.addColorStop(0, `rgba(${rgb},.3)`); g.addColorStop(1, `rgba(${rgb},.02)`);
+  ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.shadowColor = color; ctx.shadowBlur = 6;
+  ctx.beginPath(); ctx.moveTo(xS(0), yS(traj[0])); for (let i = 1; i < n; i++) ctx.lineTo(xS(i), yS(traj[i])); ctx.stroke(); ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(255,255,255,.34)'; ctx.font = "9px 'JetBrains Mono'"; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText('now', xS(0), H - 12); ctx.textAlign = 'right'; ctx.fillText(`+${n - 1}d`, xS(n - 1), H - 12);
+}
+
+/* ── Model diagnostics line ─────────────────────────────────────────── */
+function renderDiagnostics(a) {
+  const g = a.diagnostics;
+  $('diag-line').innerHTML =
+    `<span>Model fit · <b>${g.n_samples.toLocaleString()}</b> obs</span>` +
+    `<span>Log-likelihood <b>${g.log_likelihood.toLocaleString()}</b></span>` +
+    `<span>AIC <b>${g.aic.toLocaleString()}</b></span>` +
+    `<span>BIC <b>${g.bic.toLocaleString()}</b></span>` +
+    `<span><b>${g.n_params}</b> parameters · 4 states</span>`;
 }
 })();

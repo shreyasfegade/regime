@@ -23,6 +23,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   transition:background 1.2s cubic-bezier(.22,1,.36,1)}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.18)}
+#mesh-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;filter:blur(46px) saturate(130%)}
 #particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9}
 
 /* ── Header ── */
@@ -132,8 +133,44 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .bt-m-sub{font-size:9.5px;color:var(--txt-3);margin-top:5px;font-family:var(--mono)}
 .bt-caveat{font-size:10px;color:var(--txt-3);padding:11px 18px;display:flex;align-items:center;gap:8px;line-height:1.5}
 .bt-caveat svg{flex-shrink:0;opacity:.6}
-#bt-canvas{display:block;width:100%}
+#bt-canvas{display:block;width:100%;cursor:crosshair}
 .pos{color:var(--bull)}.neg{color:var(--bear)}
+#bt-split{font-size:9.5px;color:var(--txt-3);font-family:var(--mono);margin-left:8px}
+
+/* ── Segmented control (In-Sample / Walk-Forward) ── */
+.seg{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:2px;gap:2px}
+.seg-btn{background:transparent;border:none;color:var(--txt-3);font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.02em;padding:6px 12px;border-radius:6px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap;position:relative}
+.seg-btn:hover{color:var(--txt-2)}
+.seg-btn.active{color:#fff;background:rgba(var(--accent-rgb),.85);box-shadow:0 2px 10px rgba(var(--accent-rgb),.3)}
+.seg-btn.loading{color:var(--txt-3);pointer-events:none}
+.seg-btn.loading::after{content:"";position:absolute;right:8px;top:50%;width:9px;height:9px;margin-top:-4.5px;border:1.5px solid rgba(255,255,255,.25);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Quant signal row ── */
+.quant-row{display:grid;grid-template-columns:1.35fr 1fr;gap:12px}
+.sig-panel{opacity:0;padding-bottom:14px}
+.sig-foot{font-size:10px;color:var(--txt-3);padding:8px 18px 0;line-height:1.5}
+.sig-foot em{color:var(--txt-2);font-style:normal}
+#edge-bars{padding:6px 18px 0;display:flex;flex-direction:column;gap:11px}
+.edge-row{display:grid;grid-template-columns:74px 1fr 58px;align-items:center;gap:10px}
+.edge-name{font-size:10.5px;font-weight:500;display:flex;align-items:center;gap:6px;color:var(--txt-2)}
+.edge-track{position:relative;height:18px;background:rgba(255,255,255,.03);border-radius:4px;overflow:hidden}
+.edge-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.14)}
+.edge-fill{position:absolute;top:3px;bottom:3px;border-radius:3px;width:0;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.edge-val{font-family:var(--mono);font-size:11px;text-align:right;font-weight:600}
+.edge-win{font-family:var(--mono);font-size:9px;color:var(--txt-3);text-align:right}
+.crisis-body{display:flex;align-items:center;gap:8px;padding:10px 18px 0}
+#crisis-gauge{width:148px;height:92px;flex-shrink:0}
+#crisis-spark{flex:1;height:92px;display:block}
+.diag{display:flex;gap:18px;padding:9px 18px 0;font-family:var(--mono);font-size:9.5px;color:var(--txt-3);flex-wrap:wrap}
+.diag b{color:var(--txt-2);font-weight:600}
+
+/* ── Skeleton shimmer ── */
+.shimmer{position:relative;overflow:hidden}
+.shimmer::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.05) 50%,transparent 80%);animation:shim 1.4s infinite}
+@keyframes shim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.reveal{opacity:0;transform:translateY(22px)}
+.reveal.in{opacity:1;transform:translateY(0);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
 
 /* ── Tooltip ── */
 #tooltip{position:fixed;background:rgba(14,17,23,.97);border:1px solid var(--border-hi);border-radius:var(--r);padding:11px 14px;
@@ -141,9 +178,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .tt-r{font-weight:600;margin-bottom:6px;font-family:var(--sans);font-size:12px;display:flex;justify-content:space-between;gap:10px}
 .tt-d{display:flex;justify-content:space-between;gap:14px;line-height:1.85}.tt-l{color:var(--txt-3)}.tt-v{color:var(--txt)}
 
-@media(max-width:1080px){.main{grid-template-columns:1fr}.sidebar{flex-direction:row;flex-wrap:wrap}.sb-sec{flex:1;min-width:240px}.bt-metrics{grid-template-columns:repeat(3,1fr)}.kpi-row{grid-template-columns:1fr 1fr}}
+@media(max-width:1080px){.main{grid-template-columns:1fr}.sidebar{flex-direction:row;flex-wrap:wrap}.sb-sec{flex:1;min-width:240px}.bt-metrics{grid-template-columns:repeat(3,1fr)}.kpi-row{grid-template-columns:1fr 1fr}.quant-row{grid-template-columns:1fr}}
 </style>
 </head><body>
+<canvas id="mesh-canvas"></canvas>
 <canvas id="particle-canvas"></canvas>
 
 <div class="header">
@@ -192,19 +230,36 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="panel bt-panel" id="bt-panel">
       <div class="bt-head">
         <div>
-          <div class="bt-title">Backtest · Regime Rotation</div>
+          <div class="bt-title">Backtest · Regime Rotation <span id="bt-split"></span></div>
           <div class="bt-desc">Hold long in Bullish (100%) and Accumulation (50%); move to cash in Bearish and Crisis. Positions act on the prior day's regime with realistic switching costs.</div>
         </div>
-        <div class="bt-legend">
-          <span class="lg"><span class="lg-dot" style="background:var(--accent)"></span>Strategy</span>
-          <span class="lg"><span class="lg-dot" style="background:var(--txt-3)"></span>Buy &amp; Hold</span>
+        <div class="seg" id="bt-mode">
+          <button class="seg-btn active" data-mode="insample">In-Sample</button>
+          <button class="seg-btn" data-mode="oos">Walk-Forward · OOS</button>
         </div>
       </div>
       <canvas id="bt-canvas"></canvas>
       <div class="bt-metrics" id="bt-metrics"></div>
       <div class="bt-caveat">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
-        <span id="bt-caveat-txt">Regimes are fit in-sample over the full history — this is a diagnostic of the regime concept, not an out-of-sample track record.</span>
+        <span id="bt-caveat-txt">In-sample view: regimes are fit over the full history. Switch to Walk-Forward for a true out-of-sample test that refits the model on past data only.</span>
+      </div>
+      <div class="diag" id="diag-line"></div>
+    </div>
+
+    <div class="quant-row">
+      <div class="panel sig-panel" id="edge-panel">
+        <div class="panel-head">Forward-Return Edge · next <span id="edge-h">5</span> sessions</div>
+        <div id="edge-bars"></div>
+        <div class="sig-foot">The average return that <em>follows</em> each regime — the test of whether the classification carries predictive signal, not just hindsight.</div>
+      </div>
+      <div class="panel sig-panel" id="crisis-panel">
+        <div class="panel-head">Crisis Early-Warning</div>
+        <div class="crisis-body">
+          <svg id="crisis-gauge" viewBox="0 0 160 100"></svg>
+          <canvas id="crisis-spark"></canvas>
+        </div>
+        <div class="sig-foot" id="crisis-foot">Probability of rotating into Crisis, propagated through the transition matrix.</div>
       </div>
     </div>
   </div>
