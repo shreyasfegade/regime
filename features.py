@@ -45,6 +45,18 @@ def engineer_features(
     return features_array, dates_index, scaler
 
 
+def raw_feature_matrix(df: pd.DataFrame) -> tuple[np.ndarray, pd.DatetimeIndex]:
+    """
+    Return the trimmed, *un-normalized* feature matrix and its date index.
+
+    Used by the walk-forward backtest, which must standardize each training
+    window on its own statistics (rather than the whole-history scaler) to
+    keep the out-of-sample test honest.
+    """
+    trimmed = _trim_warmup(_compute_raw_features(df))
+    return trimmed.values, trimmed.index
+
+
 def _compute_raw_features(df: pd.DataFrame) -> pd.DataFrame:
     """Compute all 5 raw features from the OHLCV DataFrame."""
     close = df['Close']

@@ -139,6 +139,11 @@ def _performance(returns: np.ndarray, years: float) -> dict:
 
     win_rate = float(np.mean(returns[returns != 0] > 0) * 100) if np.any(returns != 0) else 0.0
 
+    # Historical daily tail risk (positive numbers = loss magnitude).
+    var95 = float(-np.percentile(returns, 5))
+    tail = returns[returns <= -var95]
+    cvar95 = float(-np.mean(tail)) if len(tail) > 0 else var95
+
     return {
         'total_return': round(total_return * 100, 1),
         'cagr': round(cagr * 100, 2),
@@ -148,6 +153,86 @@ def _performance(returns: np.ndarray, years: float) -> dict:
         'max_drawdown': round(max_dd * 100, 1),
         'calmar': round(float(calmar), 2),
         'win_rate': round(win_rate, 1),
+        'var_95': round(var95 * 100, 2),
+        'cvar_95': round(cvar95 * 100, 2),
+    }
+
+
+def run_walkforward(
+    raw_features: np.ndarray,
+    dates,
+    close: np.ndarray,
+    label_states_fn,
+    fit_hmm_fn,
+    min_train: int = 504,
+    step: int = 126,
+) -> dict | None:
+    """
+    Walk-forward, out-of-sample backtest — the credibility upgrade over the
+    in-sample run. The HMM is refit on an expanding trailing window every
+    `step` trading days (≈ quarterly); each forward block is classified by a
+    model that has only ever seen data *before* that block, and each training
+    window is standardized on its own statistics. Positions still act on the
+    prior day's regime and pay switching costs.
+
+    Returns None when there isn't enough history (need > min_train + step).
+    Otherwise returns equity curves and metrics over the out-of-sample span,
+    plus the split date where live trading begins.
+
+    Args:
+        raw_features:    (n, d) un-normalized feature matrix.
+        dates:           DatetimeIndex aligned with raw_features/close.
+        close:           (n,) close prices.
+        label_states_fn: model.label_states (injected to avoid import cycle).
+        fit_hmm_fn:      model.fit_hmm (injected to avoid import cycle).
+    """
+    raw = np.asarray(raw_features, dtype=float)
+    close = np.asarray(close, dtype=float)
+    n = len(close)
+    if n <= min_train + step:
+        return None
+
+    target = np.zeros(n)
+    t = min_train
+    while t < n:
+        end = min(t + step, n)
+        train = raw[:t]
+        mu = train.mean(axis=0)
+        sd = train.std(axis=0); sd[sd == 0] = 1.0
+        model = fit_hmm_fn((train - mu) / sd)
+        lbl = label_states_fn(model)
+        states = model.predict((raw[:end] - mu) / sd)[t:end]
+        for k, s in enumerate(states):
+            target[t + k] = REGIME_EXPOSURE.get(lbl[int(s)], 0.0)
+        t = end
+
+    daily_ret = np.zeros(n)
+    daily_ret[1:] = close[1:] / close[:-1] - 1.0
+    position = np.zeros(n)
+    position[1:] = target[:-1]  # one-bar lag
+    turnover = np.abs(np.diff(position, prepend=position[0]))
+    cost = turnover * (BACKTEST_COST_BPS / 10_000.0)
+    strat_ret = position * daily_ret - cost
+
+    sl = slice(min_train, n)
+    s_ret, b_ret = strat_ret[sl], daily_ret[sl]
+    s_eq = np.cumprod(1.0 + s_ret)
+    b_eq = np.cumprod(1.0 + b_ret)
+    years = max((dates[n - 1] - dates[min_train]).days / 365.25, 1e-9)
+
+    return {
+        'split_date': dates[min_train].strftime('%Y-%m-%d'),
+        'dates': [d.strftime('%Y-%m-%d') for d in dates[sl]],
+        'strategy_equity': [round(float(v), 4) for v in s_eq],
+        'benchmark_equity': [round(float(v), 4) for v in b_eq],
+        'strategy_drawdown': [round(float(v), 4) for v in _drawdown_series(s_eq)],
+        'metrics': {
+            'strategy': _performance(s_ret, years),
+            'benchmark': _performance(b_ret, years),
+            'time_in_market': round(float(np.mean(position[sl])) * 100, 1),
+            'trades': int(np.sum(turnover[sl] > 1e-9)),
+            'years': round(float(years), 2),
+        },
     }
 
 
