@@ -1,0 +1,13 @@
+# Vercel only serves the static/ frontend (see vercel.json outputDirectory).
+# Keep the Python backend, data cache, and demo assets out of the upload.
+*.py
+scripts/
+cache/
+__pycache__/
+demo_frames/
+demo.gif
+Dockerfile
+Procfile
+render.yaml
+requirements.txt
+.dockerignore

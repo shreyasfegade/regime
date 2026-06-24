@@ -79,7 +79,7 @@ pip install -r requirements.txt
 python -m uvicorn server:app --port 8050
 ```
 
-Open **http://localhost:8050**. Defaults to `RELIANCE.NS`; try `^NSEI`, `INFY.NS`, `HDFCBANK.NS`, `TATAMOTORS.NS`, or a US name like `AAPL`. The picker fills in exchange suffixes for you.
+Open **http://localhost:8050**. The dashboard paints instantly from a precomputed example cache, then you can type any symbol for a live fit. Defaults to `RELIANCE.NS`; the **Instant examples** chips (NIFTY 50, SENSEX, S&P 500, Apple) load with zero wait. Try `^NSEI`, `INFY.NS`, `HDFCBANK.NS`, or a US name like `AAPL` — the picker fills in exchange suffixes for you.
 
 **Docker (one command):**
 
@@ -87,9 +87,25 @@ Open **http://localhost:8050**. Defaults to `RELIANCE.NS`; try `^NSEI`, `INFY.NS
 docker build -t regime . && docker run -p 8050:8050 regime
 ```
 
-**One-click cloud:** push to GitHub and point [Render](https://render.com) at the repo — the included [`render.yaml`](render.yaml) blueprint provisions everything. A `Procfile` and `Dockerfile` cover Railway / Fly / Heroku-style hosts too.
+## Deploy the live demo — Vercel (frontend) + Railway (backend)
 
-> **Can it deploy to Vercel as-is?** Not cleanly. REGIME is a persistent FastAPI server, and each analysis fits an HMM on the fly (~10–25s) — that exceeds Vercel's serverless function timeout (10s on Hobby), and the `scikit-learn`/`scipy`/`hmmlearn` stack pushes the bundle past the size limit. Vercel is built for fast, stateless functions and static sites; REGIME wants a box that stays warm. **Use Render / Railway / Fly / Docker** (all configured here) — each runs the server as-is in a couple of clicks.
+REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Railway**. The frontend calls `/api/*`, which Vercel proxies to Railway (configured in [`vercel.json`](vercel.json)) — so there's no CORS to manage and no API URL baked into the JavaScript.
+
+**1. Backend → Railway**
+
+- New Railway project → *Deploy from GitHub repo* → pick this repo.
+- Railway auto-detects the [`Dockerfile`](Dockerfile) (or the [`Procfile`](Procfile)) and injects `$PORT`. No environment variables are required — REGIME has **no secrets** (it reads only public Yahoo Finance data).
+- After the first deploy, copy the public URL, e.g. `https://regime-production.up.railway.app`.
+
+**2. Frontend → Vercel**
+
+- Edit [`vercel.json`](vercel.json) and replace `REPLACE-WITH-YOUR-RAILWAY-BACKEND.up.railway.app` with your Railway host. Commit.
+- New Vercel project → import this repo. No build command, no framework — Vercel serves the `static/` directory (set in `vercel.json`) and proxies `/api/*` to Railway.
+- Deploy. The site loads instantly from the committed example cache; live ticker queries hit Railway.
+
+> The committed [`cache/`](cache) holds precomputed analyses for the showcase tickers, so first paint is sub-second **and** survives a Yahoo Finance outage. Regenerate it any time with `python scripts/build_cache.py` (no API key needed).
+
+> **Why not the whole app on Vercel?** Each live analysis fits an HMM on the fly (~10–25s), which exceeds Vercel's serverless timeout, and the `scikit-learn`/`scipy`/`hmmlearn` stack overflows the bundle limit. The server wants a box that stays warm — that's Railway. Render / Fly / Heroku work too (`render.yaml`, `Procfile`, `Dockerfile` all included).
 
 ## About the backtest
 
@@ -118,8 +134,13 @@ regime/
 ├── model.py           # HMM fit, Viterbi decode, state labeling, regime stats
 ├── backtest.py        # In-sample + walk-forward backtests, performance metrics
 ├── analytics.py       # Forward edge, crisis early-warning, model diagnostics
-├── server.py          # FastAPI endpoints
-├── Dockerfile · render.yaml · Procfile   # frictionless deploy
+├── server.py          # FastAPI endpoints (+ cache-aware /api/analyze, /api/examples)
+├── cache.py           # Precomputed example cache (instant first paint + resilience)
+├── cache/             # Committed analysis payloads for the showcase tickers
+├── scripts/
+│   └── build_cache.py # Regenerate the cache from live yfinance data (no key)
+├── vercel.json        # Vercel static-frontend config + /api proxy to Railway
+├── Dockerfile · render.yaml · Procfile   # frictionless backend deploy
 └── requirements.txt
 ```
 
