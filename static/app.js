@@ -47,8 +47,10 @@ document.querySelectorAll('#bt-mode .seg-btn').forEach(b => b.onclick = () => sw
 initParticles();
 initMesh();
 initPicker();
+initExamples();
+initIntro();
 requestAnimationFrame(masterLoop);
-loadData();
+loadData(true);  // first paint: prefer the precomputed cache for an instant dashboard
 
 // ── Master animation loop ──────────────────────────────────────────
 function masterLoop(ts) {
@@ -349,8 +351,38 @@ function renderPicker(q) {
 function openPicker() { $('picker').classList.add('open'); }
 function closePicker() { $('picker').classList.remove('open'); }
 
+/* ── Example chips (instant, precomputed) ───────────────────────────── */
+async function initExamples() {
+  let examples = [];
+  try { const r = await fetch('/api/examples'); examples = (await r.json()).examples || []; } catch { examples = []; }
+  const bar = $('example-chips'); if (!bar) return;
+  if (!examples.length) { bar.style.display = 'none'; return; }
+  bar.innerHTML = '<span class="ex-lbl">Instant examples</span>' + examples.map(e => {
+    const c = RC[e.current_regime] || '#4D8DF5';
+    return `<button class="ex-chip" data-sym="${e.symbol || e.ticker}" title="${e.blurb || ''}">
+      <span class="ex-dot" style="background:${c}"></span>${e.name}
+      <span class="ex-mkt">${e.market}</span></button>`;
+  }).join('');
+  bar.querySelectorAll('.ex-chip').forEach(el => el.onclick = () => {
+    $('ticker-input').value = el.dataset.sym;
+    loadData(true);  // examples load instantly from cache
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ── First-visit explainer ──────────────────────────────────────────── */
+function initIntro() {
+  const card = $('intro'); if (!card) return;
+  const dismiss = () => { card.classList.remove('on'); try { localStorage.setItem('regime_intro_seen', '1'); } catch {} };
+  $('intro-close').onclick = dismiss;
+  $('intro-cta').onclick = dismiss;
+  $('intro-help').onclick = () => card.classList.add('on');
+  let seen = false; try { seen = localStorage.getItem('regime_intro_seen') === '1'; } catch {}
+  if (!seen) card.classList.add('on');
+}
+
 /* ── Load + orchestrate ─────────────────────────────────────────────── */
-async function loadData() {
+async function loadData(preferCache = false) {
   const btn = $('btn-go'), tk = $('ticker-input').value.trim().toUpperCase() || 'RELIANCE.NS';
   const st = $('dt-start').value, en = $('dt-end').value;
   S.lastQuery = { tk, st, en };
@@ -359,8 +391,13 @@ async function loadData() {
   gsap.to('#chart-canvas,#prob-canvas,#bt-canvas', { opacity: .12, duration: .3, ease: 'power2.in' });
   const scan = $('scan-line');
   gsap.fromTo(scan, { top: 0, opacity: .7 }, { top: CH.chart + 'px', opacity: 0, duration: .6, ease: 'none', onStart: () => scan.style.display = 'block', onComplete: () => scan.style.display = 'none' });
+  // A live fit (fetch + 4-state HMM) takes ~10-20s on a cold ticker. When we're
+  // not preferring the cache, surface a clear "working" overlay so the wait
+  // never looks like a frozen screen. Cached loads return instantly, so skip it.
+  if (!preferCache) showLoading(tk);
   try {
-    const r = await fetch(`/api/analyze?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}`);
+    const mode = preferCache ? 'prefer' : 'auto';
+    const r = await fetch(`/api/analyze?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}&cache=${mode}`);
     const d = await r.json();
     if (d.error) throw new Error(d.error);
     S.data = d; S.dates = d.dates; S.stateSeq = d.state_sequence; S.stateProbs = d.state_probs;
@@ -401,7 +438,16 @@ async function loadData() {
   } catch (err) {
     showError(err.message);
     gsap.to('#chart-canvas,#prob-canvas,#bt-canvas', { opacity: 1, duration: .3 });
-  } finally { btn.textContent = 'Analyze'; btn.classList.remove('busy'); }
+  } finally { btn.textContent = 'Analyze'; btn.classList.remove('busy'); hideLoading(); }
+}
+
+function showLoading(tk) {
+  const el = $('chart-loading'); if (!el) return;
+  el.querySelector('.cl-ticker').textContent = tk;
+  el.classList.add('on');
+}
+function hideLoading() {
+  const el = $('chart-loading'); if (el) el.classList.remove('on');
 }
 
 function showError(msg) {
