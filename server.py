@@ -19,6 +19,7 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 from analytics import crisis_early_warning, forward_return_edge, model_diagnostics
 from backtest import run_backtest, run_walkforward
+from cache import list_examples, load_cached
 from config import DEFAULT_START, DEFAULT_TICKER, REGIME_COLORS, TICKER_PRESETS
 from data import currency_for, fetch_ohlcv, normalize_ticker
 from features import engineer_features, raw_feature_matrix
@@ -47,10 +48,31 @@ async def root() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/app.js")
+async def app_js() -> FileResponse:
+    """Serve the frontend script at the repo-root-relative path the HTML uses.
+
+    The page references `app.js` relatively so the same markup works whether the
+    static frontend is served by this backend (Railway) or by Vercel's static
+    hosting. The legacy `/static/app.js` mount below still works too.
+    """
+    return FileResponse(STATIC_DIR / "app.js", media_type="application/javascript")
+
+
 @app.get("/api/presets")
 async def presets() -> JSONResponse:
     """Return the curated ticker presets for the UI picker."""
     return JSONResponse(content={"presets": TICKER_PRESETS})
+
+
+@app.get("/api/examples")
+async def examples() -> JSONResponse:
+    """Return curated showcase tickers that have a precomputed cache payload.
+
+    Powers the instant example chips on the frontend — each loads from cache in
+    milliseconds rather than triggering a live fetch + HMM fit.
+    """
+    return JSONResponse(content={"examples": list_examples()})
 
 
 @app.get("/api/analyze")
@@ -58,17 +80,39 @@ async def analyze(
     ticker: str = Query(default=DEFAULT_TICKER),
     start: str = Query(default=DEFAULT_START),
     end: str = Query(default=None),
+    cache: str = Query(default="auto"),
 ) -> JSONResponse:
-    """Run the full regime analysis pipeline and return JSON."""
+    """Run the full regime analysis pipeline and return JSON.
+
+    `cache` controls how the precomputed showcase cache is used:
+      - "prefer": return the cached payload immediately if one exists (instant
+        first paint and example chips). Falls through to a live fit otherwise.
+      - "auto" (default): run live; if the live pipeline fails (e.g. Yahoo
+        Finance is down) and a cached payload exists for this ticker, serve it
+        so the demo degrades gracefully instead of erroring.
+    """
     if end is None:
         end = datetime.now().strftime("%Y-%m-%d")
 
+    norm = normalize_ticker(ticker)
+
+    if cache == "prefer":
+        cached = load_cached(norm)
+        if cached is not None:
+            return JSONResponse(content=cached)
+
     try:
-        result = _run_pipeline(normalize_ticker(ticker), start, end)
+        result = _run_pipeline(norm, start, end)
         return JSONResponse(content=result)
     except ValueError as exc:
+        cached = load_cached(norm)
+        if cached is not None:
+            return JSONResponse(content=cached)
         return JSONResponse(status_code=400, content={"error": str(exc)})
     except Exception:
+        cached = load_cached(norm)
+        if cached is not None:
+            return JSONResponse(content=cached)
         return JSONResponse(
             status_code=500,
             content={"error": "Something went wrong. Check your connection and try again."},
