@@ -7,6 +7,10 @@
 ![Canvas API](https://img.shields.io/badge/Canvas_API-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
+### ▶ [Live demo → regime-omega.vercel.app](https://regime-omega.vercel.app)
+
+Loads instantly from a precomputed cache; type any ticker (e.g. `INFY.NS`, `AAPL`) for a live fit.
+
 ![REGIME dashboard](demo.gif)
 
 ---
@@ -89,19 +93,20 @@ docker build -t regime . && docker run -p 8050:8050 regime
 
 ## Deploy the live demo — Vercel (frontend) + Railway (backend)
 
-REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Railway**. The frontend calls `/api/*`, which Vercel proxies to Railway (configured in [`vercel.json`](vercel.json)) — so there's no CORS to manage and no API URL baked into the JavaScript.
+REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Railway**. The frontend calls `/api/*`, which Vercel proxies to Railway (configured in [`static/vercel.json`](static/vercel.json)) — so there's no CORS to manage and no API URL baked into the JavaScript.
+
+Live: **[regime-omega.vercel.app](https://regime-omega.vercel.app)** (frontend) → `regime-production-5c6d.up.railway.app` (backend).
 
 **1. Backend → Railway**
 
-- New Railway project → *Deploy from GitHub repo* → pick this repo.
-- Railway auto-detects the [`Dockerfile`](Dockerfile) (or the [`Procfile`](Procfile)) and injects `$PORT`. No environment variables are required — REGIME has **no secrets** (it reads only public Yahoo Finance data).
-- After the first deploy, copy the public URL, e.g. `https://regime-production.up.railway.app`.
+- New Railway project → *Deploy from GitHub repo* → pick this repo (root). Railway auto-detects the [`Dockerfile`](Dockerfile) and injects `$PORT`. No environment variables are required — REGIME has **no secrets** (it reads only public Yahoo Finance data).
+- After the first deploy, run `railway domain` (or use the dashboard) and copy the public URL.
 
 **2. Frontend → Vercel**
 
-- Edit [`vercel.json`](vercel.json) and replace `REPLACE-WITH-YOUR-RAILWAY-BACKEND.up.railway.app` with your Railway host. Commit.
-- New Vercel project → import this repo. No build command, no framework — Vercel serves the `static/` directory (set in `vercel.json`) and proxies `/api/*` to Railway.
-- Deploy. The site loads instantly from the committed example cache; live ticker queries hit Railway.
+- Edit [`static/vercel.json`](static/vercel.json) and replace the `destination` host with your Railway URL. Commit.
+- Deploy the **`static/` directory** as the Vercel project root (CLI: `cd static && vercel --prod`; or in the dashboard set **Root Directory** to `static`). Vercel detects no framework and serves the static files, proxying `/api/*` to Railway. Deploying from `static/` keeps Vercel from mistaking the repo-root Python files for a backend.
+- The site loads instantly from the committed example cache; live ticker queries hit Railway.
 
 > The committed [`cache/`](cache) holds precomputed analyses for the showcase tickers, so first paint is sub-second **and** survives a Yahoo Finance outage. Regenerate it any time with `python scripts/build_cache.py` (no API key needed).
 
@@ -139,7 +144,7 @@ regime/
 ├── cache/             # Committed analysis payloads for the showcase tickers
 ├── scripts/
 │   └── build_cache.py # Regenerate the cache from live yfinance data (no key)
-├── vercel.json        # Vercel static-frontend config + /api proxy to Railway
+├── static/vercel.json # Vercel static-frontend config + /api proxy to Railway
 ├── Dockerfile · render.yaml · Procfile   # frictionless backend deploy
 └── requirements.txt
 ```
