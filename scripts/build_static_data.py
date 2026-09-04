@@ -7,13 +7,18 @@ disappears), which would leave the demo with a live page and no data. This
 script writes the parts of the API that never need a live fit into plain JSON
 next to the frontend:
 
-    static/data/presets.json          ← /api/presets
-    static/data/examples.json         ← /api/examples
-    static/data/analyze/<SLUG>.json   ← /api/analyze for each showcase ticker
+    static/data/presets.json              ← /api/presets
+    static/data/examples.json             ← /api/examples
+    static/data/analyze/<SLUG>.json       ← /api/analyze for each showcase ticker
+    static/data/walkforward/<SLUG>.json   ← /api/walkforward, ditto
 
-`app.js` reads these first and only calls `/api/*` for a live fit, so the
+`app.js` reads these first and only calls the backend for a live fit, so the
 dashboard paints real data instantly and never depends on the backend being
-awake. Regenerate with `python scripts/build_static_data.py` after
+awake. The walk-forward payloads matter most: refitting the HMM on a rolling
+schedule takes minutes on a free instance, far past any gateway timeout, so
+the toggle would simply never resolve for a visitor without them.
+
+Regenerate with `python scripts/build_static_data.py` after
 `scripts/build_cache.py`, and commit the result.
 """
 
@@ -24,8 +29,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from cache import EXAMPLES, _slug, load_cached, list_examples  # noqa: E402
-from config import TICKER_PRESETS  # noqa: E402
+from datetime import datetime  # noqa: E402
+
+from backtest import run_walkforward  # noqa: E402
+from cache import EXAMPLES, _slug, list_examples, load_cached  # noqa: E402
+from config import DEFAULT_START, TICKER_PRESETS  # noqa: E402
+from data import fetch_ohlcv, normalize_ticker  # noqa: E402
+from features import raw_feature_matrix  # noqa: E402
+from model import fit_hmm, label_states  # noqa: E402
 
 OUT = ROOT / "static" / "data"
 
@@ -48,6 +59,27 @@ def main() -> None:
             print(f"  skip {ex['ticker']} — no cache file")
             continue
         write(OUT / "analyze" / f"{_slug(ex['ticker'])}.json", payload)
+
+    end = datetime.now().strftime("%Y-%m-%d")
+    for ex in EXAMPLES:
+        ticker = normalize_ticker(ex["ticker"])
+        out = OUT / "walkforward" / f"{_slug(ex['ticker'])}.json"
+        if out.exists():
+            print(f"  keep {out.name} — delete it to refit")
+            continue
+        print(f"  walk-forward {ticker} (refits on a rolling schedule, slow)…", flush=True)
+        try:
+            df = fetch_ohlcv(ticker, DEFAULT_START, end)
+            raw, dates_index = raw_feature_matrix(df)
+            close = df.loc[dates_index, "Close"].values
+            result = run_walkforward(raw, dates_index, close, label_states, fit_hmm)
+        except Exception as exc:  # noqa: BLE001 — report and continue
+            print(f"  FAIL {ticker}: {exc}")
+            continue
+        if result is None:
+            print(f"  skip {ticker} — history too short for a walk-forward")
+            continue
+        write(out, result)
 
     print("Done.")
 

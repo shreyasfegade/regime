@@ -93,7 +93,7 @@ docker build -t regime . && docker run -p 8050:8050 regime
 
 ## Deploy the live demo — Vercel (frontend) + Render (backend)
 
-REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Render**. The frontend calls `/api/*`, which Vercel proxies to Render (configured in [`static/vercel.json`](static/vercel.json)) — so there's no CORS to manage and no API URL baked into the JavaScript.
+REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Render**. [`static/vercel.json`](static/vercel.json) proxies `/api/*` to the backend for short calls; a live fit takes 30-60s on a free instance — longer than Vercel's proxy will hold a rewritten request open — so `app.js` sends those straight to the backend origin (`BACKEND` at the top of the data layer, with CORS open on the server). Change the host in both places when you deploy your own.
 
 Live: **[regime-omega.vercel.app](https://regime-omega.vercel.app)** (frontend) → `regime-api-eu56.onrender.com` (backend).
 
@@ -104,11 +104,11 @@ Live: **[regime-omega.vercel.app](https://regime-omega.vercel.app)** (frontend) 
 
 **2. Frontend → Vercel**
 
-- Edit [`static/vercel.json`](static/vercel.json) and replace the `destination` host with your backend URL. Commit.
+- Replace the backend host in [`static/vercel.json`](static/vercel.json) (`rewrites[0].destination`) and in [`static/app.js`](static/app.js) (`const BACKEND`). Commit.
 - Deploy the **`static/` directory** as the Vercel project root (CLI: `cd static && vercel --prod`; or in the dashboard set **Root Directory** to `static`). Vercel detects no framework and serves the static files, proxying `/api/*` to Render. Deploying from `static/` keeps Vercel from mistaking the repo-root Python files for a backend.
 - The site loads instantly from the committed static data bundle; live ticker queries hit Render.
 
-> **The demo does not depend on the backend being awake.** [`static/data/`](static/data) holds the ticker presets, the example-chip metadata, and the five precomputed showcase analyses as plain JSON. `app.js` reads those first, so first paint is sub-second even on a cold (or dead) backend, and only a live fit for a non-showcase ticker touches `/api`. Regenerate the bundle with `python scripts/build_cache.py && python scripts/build_static_data.py` (no API key needed) and commit it.
+> **The demo does not depend on the backend being awake.** [`static/data/`](static/data) holds the ticker presets, the example-chip metadata, and — for each of the five showcase tickers — both the full analysis and the walk-forward out-of-sample test, as plain JSON. `app.js` reads those first, so first paint is sub-second and the Walk-Forward toggle resolves instantly even on a cold (or dead) backend; only a query for a non-showcase ticker touches the API. Regenerate the bundle with `python scripts/build_cache.py && python scripts/build_static_data.py` (no API key needed) and commit it.
 
 > **Why not the whole app on Vercel?** Each live analysis fits an HMM on the fly (~10–25s), which exceeds Vercel's serverless timeout, and the `scikit-learn`/`scipy`/`hmmlearn` stack overflows the bundle limit. The server wants a box that stays warm. Render / Railway / Fly / Heroku all work (`render.yaml`, `Procfile`, `Dockerfile` are included). Note that a free-tier box sleeps when idle — the static bundle above is what keeps the demo instant regardless.
 

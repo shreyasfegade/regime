@@ -335,6 +335,16 @@ function showTip(e, html) {
    precomputed showcase analyses — is committed under `static/data/`, so the
    dashboard paints real data instantly and stays alive even if the backend is
    cold or gone. A live fit for any other ticker still goes to `/api`. */
+/* A live fit takes 30-60s on the free backend, which is longer than Vercel's
+   proxy gateway will hold a rewritten request open — routed through `/api/*`
+   it gets dropped mid-fit. So live calls go straight to the backend origin
+   (its CORS policy is open). When the page is served BY the backend itself
+   (local dev, or the Render URL directly), same-origin is correct and the
+   hardcoded host is not used. The `/api/*` rewrite in vercel.json stays as a
+   working fallback for anything short. */
+const BACKEND = 'https://regime-api-eu56.onrender.com';
+const API = /(^|\.)onrender\.com$|^localhost$|^127\.0\.0\.1$/.test(location.hostname) ? '' : BACKEND;
+
 function cacheSlug(ticker) {
   return String(ticker).toUpperCase().replace(/\^/g, 'IDX_').replace(/[.\-]/g, '_');
 }
@@ -361,7 +371,7 @@ async function firstOf(urls, timeoutMs) {
 
 /* ── Ticker picker ──────────────────────────────────────────────────── */
 async function initPicker() {
-  try { S.presets = (await firstOf(['/data/presets.json', '/api/presets'], 8000)).presets || []; } catch { S.presets = []; }
+  try { S.presets = (await firstOf(['/data/presets.json', API + '/api/presets'], 8000)).presets || []; } catch { S.presets = []; }
   renderPicker('');
   const input = $('ticker-input');
   input.addEventListener('focus', () => { renderPicker(input.value); openPicker(); });
@@ -385,7 +395,7 @@ function closePicker() { $('picker').classList.remove('open'); }
 /* ── Example chips (instant, precomputed) ───────────────────────────── */
 async function initExamples() {
   let examples = [];
-  try { examples = (await firstOf(['/data/examples.json', '/api/examples'], 8000)).examples || []; } catch { examples = []; }
+  try { examples = (await firstOf(['/data/examples.json', API + '/api/examples'], 8000)).examples || []; } catch { examples = []; }
   const bar = $('example-chips'); if (!bar) return;
   if (!examples.length) { bar.style.display = 'none'; return; }
   bar.innerHTML = '<span class="ex-lbl">Instant examples</span>' + examples.map(e => {
@@ -428,7 +438,7 @@ async function loadData(preferCache = false) {
   if (!preferCache) showLoading(tk);
   try {
     const mode = preferCache ? 'prefer' : 'auto';
-    const api = `/api/analyze?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}&cache=${mode}`;
+    const api = `${API}/api/analyze?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}&cache=${mode}`;
     const local = STATIC_TICKERS.has(tk) ? `/data/analyze/${cacheSlug(tk)}.json` : null;
     // Showcase tickers: serve the committed payload first (instant, and it
     // works with the backend asleep). Everything else needs a live fit, with
@@ -508,8 +518,12 @@ async function switchBtMode(mode, btn) {
     btn.classList.add('loading');
     try {
       const { tk, st, en } = S.lastQuery;
-      const r = await fetch(`/api/walkforward?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}`);
-      const d = await r.json();
+      // A walk-forward refits the HMM on a rolling schedule — minutes on a
+      // free instance, past any gateway timeout. The showcase tickers ship
+      // precomputed so the toggle resolves instantly; anything else refits live.
+      const wfApi = `${API}/api/walkforward?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}`;
+      const wfLocal = STATIC_TICKERS.has(tk) ? `/data/walkforward/${cacheSlug(tk)}.json` : null;
+      const d = await firstOf(wfLocal ? [wfLocal, wfApi] : [wfApi]);
       if (d.error) throw new Error(d.error);
       S.bt.oos = d;
     } catch (err) { showError(err.message); btn.classList.remove('loading'); return; }
