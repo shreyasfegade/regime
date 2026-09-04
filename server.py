@@ -76,13 +76,20 @@ async def examples() -> JSONResponse:
 
 
 @app.get("/api/analyze")
-async def analyze(
+def analyze(
     ticker: str = Query(default=DEFAULT_TICKER),
     start: str = Query(default=DEFAULT_START),
     end: str = Query(default=None),
     cache: str = Query(default="auto"),
 ) -> JSONResponse:
     """Run the full regime analysis pipeline and return JSON.
+
+    Declared `def`, not `async def`, on purpose: the pipeline (yfinance fetch +
+    HMM fit) is fully synchronous and takes 10-25s. As a coroutine it would
+    block the event loop for that whole time, so health checks and every other
+    request would stall — on a managed host that reads as an unhealthy instance
+    and gets the process restarted mid-request. A sync handler is run in
+    FastAPI's threadpool instead, keeping the loop free.
 
     `cache` controls how the precomputed showcase cache is used:
       - "prefer": return the cached payload immediately if one exists (instant
@@ -120,7 +127,7 @@ async def analyze(
 
 
 @app.get("/api/walkforward")
-async def walkforward(
+def walkforward(
     ticker: str = Query(default=DEFAULT_TICKER),
     start: str = Query(default=DEFAULT_START),
     end: str = Query(default=None),
@@ -129,6 +136,8 @@ async def walkforward(
     Out-of-sample walk-forward backtest. Heavier than /api/analyze (it refits
     the HMM on a rolling schedule), so it's a separate, opt-in endpoint the UI
     calls only when the user asks for it.
+
+    Sync (not `async def`) for the same reason as /api/analyze — see there.
     """
     if end is None:
         end = datetime.now().strftime("%Y-%m-%d")

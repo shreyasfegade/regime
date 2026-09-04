@@ -4,7 +4,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://regime-production-5c6d.up.railway.app/api/:path*"
+      "destination": "https://regime-api-eu56.onrender.com/api/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/data/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800" }
+      ]
     }
   ]
 }

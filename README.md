@@ -91,26 +91,26 @@ Open **http://localhost:8050**. The dashboard paints instantly from a precompute
 docker build -t regime . && docker run -p 8050:8050 regime
 ```
 
-## Deploy the live demo — Vercel (frontend) + Railway (backend)
+## Deploy the live demo — Vercel (frontend) + Render (backend)
 
-REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Railway**. The frontend calls `/api/*`, which Vercel proxies to Railway (configured in [`static/vercel.json`](static/vercel.json)) — so there's no CORS to manage and no API URL baked into the JavaScript.
+REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Render**. The frontend calls `/api/*`, which Vercel proxies to Render (configured in [`static/vercel.json`](static/vercel.json)) — so there's no CORS to manage and no API URL baked into the JavaScript.
 
-Live: **[regime-omega.vercel.app](https://regime-omega.vercel.app)** (frontend) → `regime-production-5c6d.up.railway.app` (backend).
+Live: **[regime-omega.vercel.app](https://regime-omega.vercel.app)** (frontend) → `regime-api-eu56.onrender.com` (backend).
 
-**1. Backend → Railway**
+**1. Backend → Render**
 
-- New Railway project → *Deploy from GitHub repo* → pick this repo (root). Railway auto-detects the [`Dockerfile`](Dockerfile) and injects `$PORT`. No environment variables are required — REGIME has **no secrets** (it reads only public Yahoo Finance data).
-- After the first deploy, run `railway domain` (or use the dashboard) and copy the public URL.
+- New Render **Blueprint** → pick this repo. Render reads [`render.yaml`](render.yaml) and provisions a free Python web service (`pip install -r requirements.txt`, `uvicorn server:app --host 0.0.0.0 --port $PORT`, health check on `/api/presets`). No environment variables are required — REGIME has **no secrets** (it reads only public Yahoo Finance data).
+- Copy the service's public URL once the first deploy goes live. `autoDeploy` is on, so every push to `main` redeploys.
 
 **2. Frontend → Vercel**
 
-- Edit [`static/vercel.json`](static/vercel.json) and replace the `destination` host with your Railway URL. Commit.
-- Deploy the **`static/` directory** as the Vercel project root (CLI: `cd static && vercel --prod`; or in the dashboard set **Root Directory** to `static`). Vercel detects no framework and serves the static files, proxying `/api/*` to Railway. Deploying from `static/` keeps Vercel from mistaking the repo-root Python files for a backend.
-- The site loads instantly from the committed example cache; live ticker queries hit Railway.
+- Edit [`static/vercel.json`](static/vercel.json) and replace the `destination` host with your backend URL. Commit.
+- Deploy the **`static/` directory** as the Vercel project root (CLI: `cd static && vercel --prod`; or in the dashboard set **Root Directory** to `static`). Vercel detects no framework and serves the static files, proxying `/api/*` to Render. Deploying from `static/` keeps Vercel from mistaking the repo-root Python files for a backend.
+- The site loads instantly from the committed static data bundle; live ticker queries hit Render.
 
-> The committed [`cache/`](cache) holds precomputed analyses for the showcase tickers, so first paint is sub-second **and** survives a Yahoo Finance outage. Regenerate it any time with `python scripts/build_cache.py` (no API key needed).
+> **The demo does not depend on the backend being awake.** [`static/data/`](static/data) holds the ticker presets, the example-chip metadata, and the five precomputed showcase analyses as plain JSON. `app.js` reads those first, so first paint is sub-second even on a cold (or dead) backend, and only a live fit for a non-showcase ticker touches `/api`. Regenerate the bundle with `python scripts/build_cache.py && python scripts/build_static_data.py` (no API key needed) and commit it.
 
-> **Why not the whole app on Vercel?** Each live analysis fits an HMM on the fly (~10–25s), which exceeds Vercel's serverless timeout, and the `scikit-learn`/`scipy`/`hmmlearn` stack overflows the bundle limit. The server wants a box that stays warm — that's Railway. Render / Fly / Heroku work too (`render.yaml`, `Procfile`, `Dockerfile` all included).
+> **Why not the whole app on Vercel?** Each live analysis fits an HMM on the fly (~10–25s), which exceeds Vercel's serverless timeout, and the `scikit-learn`/`scipy`/`hmmlearn` stack overflows the bundle limit. The server wants a box that stays warm. Render / Railway / Fly / Heroku all work (`render.yaml`, `Procfile`, `Dockerfile` are included). Note that a free-tier box sleeps when idle — the static bundle above is what keeps the demo instant regardless.
 
 ## About the backtest
 
@@ -144,7 +144,7 @@ regime/
 ├── cache/             # Committed analysis payloads for the showcase tickers
 ├── scripts/
 │   └── build_cache.py # Regenerate the cache from live yfinance data (no key)
-├── static/vercel.json # Vercel static-frontend config + /api proxy to Railway
+├── static/vercel.json # Vercel static-frontend config + /api proxy to Render
 ├── Dockerfile · render.yaml · Procfile   # frictionless backend deploy
 └── requirements.txt
 ```

@@ -328,9 +328,40 @@ function showTip(e, html) {
   tt.style.top = Math.max(12, e.clientY - 120) + 'px';
 }
 
+/* ── Data layer: static bundle first, live API second ───────────────── */
+/* The frontend is a static site; `/api/*` is proxied to a free-tier Python
+   backend that sleeps when idle and takes ~50s to wake. Everything that does
+   not need a live fit — the ticker presets, the example chips, and the five
+   precomputed showcase analyses — is committed under `static/data/`, so the
+   dashboard paints real data instantly and stays alive even if the backend is
+   cold or gone. A live fit for any other ticker still goes to `/api`. */
+function cacheSlug(ticker) {
+  return String(ticker).toUpperCase().replace(/\^/g, 'IDX_').replace(/[.\-]/g, '_');
+}
+const STATIC_TICKERS = new Set(['RELIANCE.NS', '^NSEI', '^BSESN', '^GSPC', 'AAPL']);
+
+async function getJSON(url, timeoutMs) {
+  const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const t = timeoutMs && ctl ? setTimeout(() => ctl.abort(), timeoutMs) : null;
+  try {
+    const r = await fetch(url, ctl ? { signal: ctl.signal } : undefined);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { if (t) clearTimeout(t); }
+}
+
+/* Try each URL in order; return the first that yields JSON. */
+async function firstOf(urls, timeoutMs) {
+  let last;
+  for (const u of urls) {
+    try { return await getJSON(u, timeoutMs); } catch (e) { last = e; }
+  }
+  throw last || new Error('No data source available');
+}
+
 /* ── Ticker picker ──────────────────────────────────────────────────── */
 async function initPicker() {
-  try { const r = await fetch('/api/presets'); S.presets = (await r.json()).presets || []; } catch { S.presets = []; }
+  try { S.presets = (await firstOf(['/data/presets.json', '/api/presets'], 8000)).presets || []; } catch { S.presets = []; }
   renderPicker('');
   const input = $('ticker-input');
   input.addEventListener('focus', () => { renderPicker(input.value); openPicker(); });
@@ -354,7 +385,7 @@ function closePicker() { $('picker').classList.remove('open'); }
 /* ── Example chips (instant, precomputed) ───────────────────────────── */
 async function initExamples() {
   let examples = [];
-  try { const r = await fetch('/api/examples'); examples = (await r.json()).examples || []; } catch { examples = []; }
+  try { examples = (await firstOf(['/data/examples.json', '/api/examples'], 8000)).examples || []; } catch { examples = []; }
   const bar = $('example-chips'); if (!bar) return;
   if (!examples.length) { bar.style.display = 'none'; return; }
   bar.innerHTML = '<span class="ex-lbl">Instant examples</span>' + examples.map(e => {
@@ -397,8 +428,12 @@ async function loadData(preferCache = false) {
   if (!preferCache) showLoading(tk);
   try {
     const mode = preferCache ? 'prefer' : 'auto';
-    const r = await fetch(`/api/analyze?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}&cache=${mode}`);
-    const d = await r.json();
+    const api = `/api/analyze?ticker=${encodeURIComponent(tk)}&start=${st}&end=${en}&cache=${mode}`;
+    const local = STATIC_TICKERS.has(tk) ? `/data/analyze/${cacheSlug(tk)}.json` : null;
+    // Showcase tickers: serve the committed payload first (instant, and it
+    // works with the backend asleep). Everything else needs a live fit, with
+    // the committed payload as a last-resort fallback if the API is down.
+    const d = await firstOf(local && preferCache ? [local, api] : local ? [api, local] : [api]);
     if (d.error) throw new Error(d.error);
     S.data = d; S.dates = d.dates; S.stateSeq = d.state_sequence; S.stateProbs = d.state_probs;
     S.labelMap = d.label_map; S.regime = d.current_regime; S.currency = d.currency || S.currency;
