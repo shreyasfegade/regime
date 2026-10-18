@@ -322,6 +322,7 @@ def _symbol(s: str) -> str:
 
 
 def _tidy_name(s: str) -> str:
+    s = re.sub(r'\s*\[[^\]]*\]', '', s)          # former names: 'Trent Ltd [Lakme Ltd]'
     s = re.sub(r'\s+', ' ', s).strip()
     if s.isupper():
         # Shouting names: title-case words, keep short acronyms (ITC, LIC, IST).

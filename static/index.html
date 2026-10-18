@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>REGIME — hidden market regimes for Indian stocks</title>
-<meta name="description" content="Today's market regime, its history and how it has traded, from a 4-state Gaussian hidden Markov model.">
-<meta property="og:title" content="REGIME — hidden market regimes for Indian stocks">
+<title>REGIME — hidden market regimes for the NIFTY 50</title>
+<meta name="description" content="Which hidden regime each NIFTY 50 stock is in today, how market breadth has moved over ten years, and a map of every stock by sector.">
+<meta property="og:title" content="REGIME — hidden market regimes for the NIFTY 50">
 <meta property="og:description" content="Today's regime, ten years of regime history, robustness checks and a cost-aware backtest for every NIFTY 50 stock.">
 <meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#F5F2EA">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -15,7 +16,7 @@
 <link rel="preload" href="/fonts/newsreader-var.woff2" as="font" type="font/woff2" crossorigin>
 <script>try{var t=localStorage.getItem('regime-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="stylesheet" href="/css/regime.css">
-<script type="module">import { initShell } from '/js/shell.js'; initShell();</script>
+<script type="module" src="/js/market.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -38,20 +39,18 @@
 </header>
 
 <main id="main" class="wrap" tabindex="-1">
+  <h1 class="visually-hidden">REGIME: the NIFTY 50 by hidden market regime</h1>
   <div id="notices"></div>
-  <section class="state">
-    <p class="kicker">REGIME</p>
-    <h1 class="title">Hidden market regimes for the NIFTY 50</h1>
-    <p class="dek">Search above for any NIFTY 50 stock, or start with an index.</p>
-    <p class="notice" id="coverage"><b>Only NIFTY 50 stocks are covered.</b> Every stock gets a full multi-start model fit, walk-forward refits and robustness checks; keeping to the 50 largest, most liquid names keeps that complete and refreshed every week.</p>
-    <ul aria-label="Indices">
-      <li><a href="/stock/NIFTY50"><span>NIFTY 50</span><span class="mono muted">^NSEI</span></a></li>
-      <li><a href="/stock/SENSEX"><span>S&amp;P BSE SENSEX</span><span class="mono muted">^BSESN</span></a></li>
-      <li><a href="/stock/NIFTYBANK"><span>NIFTY Bank</span><span class="mono muted">^NSEBANK</span></a></li>
-      <li><a href="/stock/RELIANCE"><span>Reliance Industries</span><span class="mono muted">RELIANCE</span></a></li>
-    </ul>
-  </section>
+  <div id="page" aria-live="polite" aria-busy="true">
+    <div class="state">
+      <p class="kicker">The market today</p>
+      <p class="loading-line">Loading the regime index…</p>
+      <div class="skeleton" style="height:320px;margin-top:24px"></div>
+      <noscript><p class="dek" style="margin-top:16px">The market map is drawn in the browser and needs JavaScript. The <a href="/methodology">methodology</a> and <a href="/how-it-works">explainer</a> read without it.</p></noscript>
+    </div>
+  </div>
 </main>
+
 <footer class="colophon">
   <div class="wrap">
     <div>

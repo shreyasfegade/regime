@@ -37,7 +37,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 44,GRASIM,Grasim Industries Ltd,INE047A01021,GRASIM,GRASIM,L,Construction Materials,NSE,2025-12-31
 45,SBILIFE,SBI Life Insurance Company Ltd,INE123W01016,SBILIFE,SBILIFE,L,Financial Services,NSE,2025-12-31
 48,EICHERMOT,Eicher Motors Ltd,INE066A01021,EICHERMOT,EICHERMOT,L,Automobile and Auto Components,NSE,2025-12-31
-49,TRENT,Trent Ltd [Lakme Ltd],INE849A01020,TRENT,TRENT,L,Consumer Services,NSE,2025-12-31
+49,TRENT,Trent Ltd,INE849A01020,TRENT,TRENT,L,Consumer Services,NSE,2025-12-31
 50,HINDALCO,Hindalco Industries Ltd,INE038A01020,HINDALCO,HINDALCO,L,Metals & Mining,NSE,2025-12-31
 52,HDFCLIFE,Hdfc Life Insurance Company Ltd,INE795G01014,HDFCLIFE,HDFCLIFE,L,Financial Services,NSE,2025-12-31
 60,TECHM,Tech Mahindra Ltd,INE669C01036,TECHM,TECHM,L,Information Technology,NSE,2025-12-31

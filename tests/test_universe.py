@@ -112,3 +112,9 @@ def test_members_list_restricts_universe_matching_isin_or_symbol():
     assert [r['slug'] for r in rows] == ['RELIANCE', 'M-M']
     assert rows[1]['isin'] == 'INE101A01099'
     assert rows[1]['sector'] == 'Automobile and Auto Components' and rows[1]['rank'] == 2
+
+
+def test_names_drop_former_names_and_shouting():
+    from regime.universe import _tidy_name
+    assert _tidy_name('Trent Ltd [Lakme Ltd]') == 'Trent Ltd'
+    assert _tidy_name('RELIANCE  INDUSTRIES LIMITED') == 'Reliance Industries Ltd'
