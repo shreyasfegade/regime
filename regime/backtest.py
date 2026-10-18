@@ -1,7 +1,8 @@
 """
 REGIME — Backtesting Engine
 Turns the regime classification into a tradable signal and measures how it
-would have performed against simply buying and holding.
+would have performed against simply buying and holding, under the frictions
+a retail investor in India actually faces.
 
 Strategy — "Regime Rotation":
     Each regime maps to a target market exposure (config.REGIME_EXPOSURE):
@@ -9,123 +10,142 @@ Strategy — "Regime Rotation":
         Accumulation     →  50% invested
         Bearish Trending →   0% (cash)
         Crisis           →   0% (cash)
-    The position for day t is decided by the regime observed at the close of
-    day t-1, so the strategy only ever acts on information it already had —
-    a one-bar execution lag that removes immediate lookahead. A round-trip
-    cost (config.BACKTEST_COST_BPS) is charged whenever exposure changes.
 
-Honest caveat (surfaced in the UI and README):
-    The HMM is fit once over the full history, so the *regime labels* are
-    in-sample. This is a research/diagnostic backtest of the regime concept,
-    not a walk-forward out-of-sample trading record. The one-bar lag and
-    costs make it fair, not predictive.
+Execution:
+    The regime is read at the close of day t and the rebalance is filled at
+    the OPEN of day t+lag (lag 1 for the headline strategy). Overnight gaps
+    are earned at the old weight, the session after the fill at the new one.
+    Every rebalance pays Zerodha's delivery charges plus slippage
+    (regime.costs).
+
+Two views share this engine:
+    • In-sample   — regimes from one fit over the full history. A diagnostic:
+                    the labels have seen the whole series.
+    • Walk-forward — the HMM is refit every WF_STEP sessions on past data only,
+                    each window standardised on its own statistics, and every
+                    out-of-sample day is classified from forward-filtered
+                    probabilities, so no label uses a later observation.
+
+Overfitting is measured, not assumed away: the headline strategy is reported
+with the Probabilistic Sharpe Ratio against buy-and-hold's Sharpe and with
+the Deflated Sharpe Ratio across every variant evaluated (config.TRIAL_*).
 """
 
+from statistics import NormalDist
+
 import numpy as np
-import pandas as pd
 
-from config import (
-    BACKTEST_COST_BPS,
+from regime.config import (
+    PRIMARY_SEED,
     REGIME_EXPOSURE,
+    REGIME_ORDER,
     TRADING_DAYS_PER_YEAR,
+    TRIAL_EXPOSURES,
+    TRIAL_LAGS,
+    WF_MIN_TRAIN,
+    WF_STEP,
 )
+from regime.costs import COMPONENTS, rebalance_cost_fraction
+from regime.model import decode, filtered_posteriors, fit_hmm
+
+HEADLINE_EXPOSURE: tuple[float, ...] = tuple(REGIME_EXPOSURE[l] for l in REGIME_ORDER)
+EULER_GAMMA: float = 0.5772156649015329
+_N = NormalDist()
 
 
-def run_backtest(
+# ─── Execution ───────────────────────────────────────────────────────
+
+def simulate(
+    open_: np.ndarray,
     close: np.ndarray,
-    dates: pd.DatetimeIndex,
-    state_sequence: np.ndarray,
-    label_map: dict[int, str],
+    regimes: np.ndarray,
+    exposure: tuple[float, ...] = HEADLINE_EXPOSURE,
+    lag: int = 1,
+    start: int = 0,
+    exchange: str = 'NSE',
+    cap: str = 'L',
 ) -> dict:
     """
-    Run the regime-rotation backtest and package results for the API.
+    Simulate the rotation strategy from day `start` to the end.
 
     Args:
-        close:          (n,) close prices aligned with state_sequence.
-        dates:          DatetimeIndex aligned with close.
-        state_sequence: (n,) HMM state index per day.
-        label_map:      state_index → regime label.
+        open_, close: (n,) prices.
+        regimes:      (n,) regime index per day; values before `start` are
+                      ignored (use -1 for "no signal").
+        exposure:     target weight per regime, in REGIME_ORDER.
+        lag:          sessions between the signal close and the fill open.
+        start:        first day of the evaluation window.
 
     Returns:
-        dict with strategy/benchmark equity curves, per-strategy metrics,
-        and the drawdown series for the strategy.
+        dict of daily arrays over [start, n): strategy and benchmark
+        returns, weights held after each open, turnover, and the cost
+        drag per component (fractions of portfolio value).
     """
+    open_ = np.asarray(open_, dtype=float)
     close = np.asarray(close, dtype=float)
+    regimes = np.asarray(regimes)
     n = len(close)
+    exp_arr = np.asarray(exposure, dtype=float)
 
-    daily_ret = np.zeros(n)
-    daily_ret[1:] = close[1:] / close[:-1] - 1.0
+    # target[t] = weight wanted after seeing the close of day t.
+    target = np.zeros(n)
+    valid = regimes >= 0
+    target[valid] = exp_arr[regimes[valid]]
+    target[:start] = 0.0
 
-    # Target exposure from yesterday's regime (one-bar lag, no lookahead).
-    target = np.array(
-        [REGIME_EXPOSURE.get(label_map[int(s)], 0.0) for s in state_sequence]
-    )
-    position = np.zeros(n)
-    position[1:] = target[:-1]  # act on day t using regime known at t-1 close
+    # held[t] = weight in force from the open of day t to the next open.
+    held = np.zeros(n)
+    if lag < n:
+        held[lag:] = target[:n - lag]
+    held[:start + lag] = 0.0  # nothing can be filled before the first signal
 
-    # Transaction cost charged on the day exposure changes.
-    cost = np.zeros(n)
-    turnover = np.abs(np.diff(position, prepend=position[0]))
-    cost = turnover * (BACKTEST_COST_BPS / 10_000.0)
+    m = n - start
+    strat = np.zeros(m)
+    costs = {c: np.zeros(m) for c in COMPONENTS}
+    turnover = np.zeros(m)
+    equity = 1.0
+    prev_w = 0.0
+    for i in range(1, m):
+        t = start + i
+        overnight = prev_w * (open_[t] / close[t - 1] - 1.0)
+        w = held[t]
+        cost = rebalance_cost_fraction(prev_w, w, equity * (1 + overnight), exchange, cap)
+        intraday = w * (close[t] / open_[t] - 1.0)
+        growth = (1.0 + overnight) * (1.0 - cost['total']) * (1.0 + intraday)
+        strat[i] = growth - 1.0
+        for c in COMPONENTS:
+            costs[c][i] = cost[c]
+        turnover[i] = abs(w - prev_w)
+        equity *= growth
+        prev_w = w
 
-    strat_ret = position * daily_ret - cost
-    strat_equity = np.cumprod(1.0 + strat_ret)
-    bench_equity = np.cumprod(1.0 + daily_ret)
-
-    metrics = _compute_metrics(
-        strat_ret, daily_ret, position, dates, turnover,
-    )
-    drawdown = _drawdown_series(strat_equity)
-
-    return {
-        'dates': [d.strftime('%Y-%m-%d') for d in dates],
-        'strategy_equity': [round(float(v), 4) for v in strat_equity],
-        'benchmark_equity': [round(float(v), 4) for v in bench_equity],
-        'strategy_drawdown': [round(float(v), 4) for v in drawdown],
-        'metrics': metrics,
-        'cost_bps': BACKTEST_COST_BPS,
-    }
-
-
-def _compute_metrics(
-    strat_ret: np.ndarray,
-    bench_ret: np.ndarray,
-    position: np.ndarray,
-    dates: pd.DatetimeIndex,
-    turnover: np.ndarray,
-) -> dict:
-    """Compute the full metrics block for strategy and benchmark."""
-    years = max((dates[-1] - dates[0]).days / 365.25, 1e-9)
-
-    strat = _performance(strat_ret, years)
-    bench = _performance(bench_ret, years)
-
-    # A "trade" is any day the position changed by a meaningful amount.
-    trades = int(np.sum(turnover > 1e-9))
-    exposure = float(np.mean(position))
+    bench = np.zeros(m)
+    bench[1:] = close[start + 1:] / close[start:-1] - 1.0
+    entry = rebalance_cost_fraction(0.0, 1.0, 1.0, exchange, cap)['total']
+    bench[0] = -entry  # buy-and-hold pays to get in, once
 
     return {
-        'years': round(float(years), 2),
         'strategy': strat,
         'benchmark': bench,
-        'excess_cagr': round(strat['cagr'] - bench['cagr'], 2),
-        'time_in_market': round(exposure * 100, 1),
-        'trades': trades,
+        'weights': held[start:],
+        'turnover': turnover,
+        'costs': costs,
     }
 
 
-def _performance(returns: np.ndarray, years: float) -> dict:
+# ─── Metrics ─────────────────────────────────────────────────────────
+
+def performance(returns: np.ndarray, years: float) -> dict:
     """Standard performance stats for a daily return stream."""
+    returns = np.asarray(returns, dtype=float)
     equity = np.cumprod(1.0 + returns)
     total_return = float(equity[-1] - 1.0)
     cagr = float(equity[-1] ** (1.0 / years) - 1.0) if equity[-1] > 0 else -1.0
 
-    ann_vol = float(np.std(returns, ddof=1) * np.sqrt(TRADING_DAYS_PER_YEAR))
+    std = float(np.std(returns, ddof=1))
+    ann_vol = std * np.sqrt(TRADING_DAYS_PER_YEAR)
     mean_daily = float(np.mean(returns))
-    sharpe = (
-        mean_daily / np.std(returns, ddof=1) * np.sqrt(TRADING_DAYS_PER_YEAR)
-        if np.std(returns, ddof=1) > 0 else 0.0
-    )
+    sharpe = mean_daily / std * np.sqrt(TRADING_DAYS_PER_YEAR) if std > 0 else 0.0
 
     downside = returns[returns < 0]
     downside_std = float(np.std(downside, ddof=1)) if len(downside) > 1 else 0.0
@@ -134,10 +154,11 @@ def _performance(returns: np.ndarray, years: float) -> dict:
         if downside_std > 0 else 0.0
     )
 
-    max_dd = float(np.min(_drawdown_series(equity)))
+    max_dd = float(np.min(drawdown_series(equity)))
     calmar = cagr / abs(max_dd) if max_dd < 0 else 0.0
 
-    win_rate = float(np.mean(returns[returns != 0] > 0) * 100) if np.any(returns != 0) else 0.0
+    active = returns[returns != 0]
+    win_rate = float(np.mean(active > 0) * 100) if len(active) else 0.0
 
     # Historical daily tail risk (positive numbers = loss magnitude).
     var95 = float(-np.percentile(returns, 5))
@@ -147,7 +168,7 @@ def _performance(returns: np.ndarray, years: float) -> dict:
     return {
         'total_return': round(total_return * 100, 1),
         'cagr': round(cagr * 100, 2),
-        'volatility': round(ann_vol * 100, 1),
+        'volatility': round(float(ann_vol) * 100, 1),
         'sharpe': round(float(sharpe), 2),
         'sortino': round(float(sortino), 2),
         'max_drawdown': round(max_dd * 100, 1),
@@ -158,85 +179,182 @@ def _performance(returns: np.ndarray, years: float) -> dict:
     }
 
 
+def drawdown_series(equity: np.ndarray) -> np.ndarray:
+    """Drawdown (<= 0) at each point relative to the running peak."""
+    running_max = np.maximum.accumulate(equity)
+    return equity / running_max - 1.0
+
+
+def sharpe_per_period(returns: np.ndarray) -> float:
+    """Non-annualised Sharpe ratio (mean / std of per-period returns)."""
+    returns = np.asarray(returns, dtype=float)
+    std = float(np.std(returns, ddof=1))
+    return float(np.mean(returns)) / std if std > 0 else 0.0
+
+
+def psr_from_moments(sr: float, sr_star: float, t: int, skew: float, kurt: float) -> float:
+    """PSR from a per-period Sharpe, sample length, skew and Pearson kurtosis."""
+    denom = 1.0 - skew * sr + (kurt - 1.0) / 4.0 * sr ** 2
+    if t < 3 or denom <= 0:
+        return 0.5
+    return float(_N.cdf((sr - sr_star) * np.sqrt(t - 1) / np.sqrt(denom)))
+
+
+def probabilistic_sharpe(returns: np.ndarray, sr_star: float) -> float:
+    """
+    Probabilistic Sharpe Ratio (Bailey & López de Prado, 2012): the
+    probability that the true per-period Sharpe exceeds `sr_star`, given the
+    sample length, skewness and kurtosis of the returns.
+    """
+    returns = np.asarray(returns, dtype=float)
+    std = float(np.std(returns))
+    if len(returns) < 3 or std == 0:
+        return 0.5
+    z = (returns - returns.mean()) / std
+    return psr_from_moments(sharpe_per_period(returns), sr_star, len(returns),
+                            float(np.mean(z ** 3)), float(np.mean(z ** 4)))
+
+
+def expected_max_sharpe(trial_srs: list[float]) -> float:
+    """
+    Expected maximum per-period Sharpe among N unskilled trials with the
+    observed cross-trial variance (Bailey & López de Prado, 2014, eq. 2).
+    """
+    if len(trial_srs) < 2:
+        return 0.0
+    return expected_max_sharpe_from_var(float(np.var(trial_srs, ddof=1)), len(trial_srs))
+
+
+def expected_max_sharpe_from_var(var: float, n: int) -> float:
+    return float(np.sqrt(var)) * (
+        (1 - EULER_GAMMA) * _N.inv_cdf(1 - 1.0 / n)
+        + EULER_GAMMA * _N.inv_cdf(1 - 1.0 / (n * np.e))
+    )
+
+
+def deflated_sharpe(returns: np.ndarray, trial_srs: list[float]) -> float:
+    """Deflated Sharpe Ratio: PSR against the expected maximum trial Sharpe."""
+    return probabilistic_sharpe(returns, expected_max_sharpe(trial_srs))
+
+
+# ─── Backtests ───────────────────────────────────────────────────────
+
+def run_backtest(
+    open_: np.ndarray,
+    close: np.ndarray,
+    dates,
+    regimes: np.ndarray,
+    start: int = 0,
+    exchange: str = 'NSE',
+    cap: str = 'L',
+) -> dict:
+    """
+    Run the headline strategy and every trial variant over [start, n) and
+    package curves, metrics, costs and the overfitting statistics.
+    """
+    sim = simulate(open_, close, regimes, HEADLINE_EXPOSURE, 1, start, exchange, cap)
+    n = len(close)
+    years = max((dates[n - 1] - dates[start]).days / 365.25, 1e-9)
+
+    trials = []
+    for exposure in TRIAL_EXPOSURES:
+        for lag in TRIAL_LAGS:
+            r = simulate(open_, close, regimes, exposure, lag, start, exchange, cap)['strategy']
+            trials.append({
+                'exposure': list(exposure),
+                'lag': lag,
+                'sharpe': round(sharpe_per_period(r) * np.sqrt(TRADING_DAYS_PER_YEAR), 3),
+                '_sr': sharpe_per_period(r),
+            })
+    trial_srs = [t.pop('_sr') for t in trials]
+
+    s_ret, b_ret = sim['strategy'], sim['benchmark']
+    strat = performance(s_ret, years)
+    bench = performance(b_ret, years)
+    cost_drag = {
+        c: round(float(np.sum(sim['costs'][c])) / years * 100, 3) for c in COMPONENTS
+    }
+    cost_drag['total'] = round(sum(cost_drag.values()), 3)
+
+    return {
+        'start': dates[start].strftime('%Y-%m-%d'),
+        'strategy_equity': np.cumprod(1.0 + s_ret),
+        'benchmark_equity': np.cumprod(1.0 + b_ret),
+        'metrics': {
+            'years': round(float(years), 2),
+            'strategy': strat,
+            'benchmark': bench,
+            'excess_cagr': round(strat['cagr'] - bench['cagr'], 2),
+            'time_in_market': round(float(np.mean(sim['weights'])) * 100, 1),
+            'trades': int(np.sum(sim['turnover'] > 1e-9)),
+            'turnover_per_year': round(float(np.sum(sim['turnover'])) / years, 2),
+            'cost_drag_pct_per_year': cost_drag,
+            'psr_vs_buy_hold': round(probabilistic_sharpe(s_ret, sharpe_per_period(b_ret)), 4),
+            'dsr': round(deflated_sharpe(s_ret, trial_srs), 4),
+            'n_trials': len(trials),
+            'trials': trials,
+        },
+    }
+
+
 def run_walkforward(
     raw_features: np.ndarray,
-    dates,
-    close: np.ndarray,
-    label_states_fn,
-    fit_hmm_fn,
-    min_train: int = 504,
-    step: int = 126,
+    full_regimes: np.ndarray,
+    min_train: int = WF_MIN_TRAIN,
+    step: int = WF_STEP,
 ) -> dict | None:
     """
-    Walk-forward, out-of-sample backtest — the credibility upgrade over the
-    in-sample run. The HMM is refit on an expanding trailing window every
-    `step` trading days (≈ quarterly); each forward block is classified by a
-    model that has only ever seen data *before* that block, and each training
-    window is standardized on its own statistics. Positions still act on the
-    prior day's regime and pay switching costs.
+    Walk-forward regime classification — the credibility test for the
+    in-sample labels. The HMM is refit on an expanding window every `step`
+    sessions (~6 months); each window is standardised on its own statistics,
+    warm-started from the previous window's model (which only saw earlier
+    data) and compared against a fresh start, the better fit winning.
+
+    Every day in the block that follows a refit is classified by the argmax
+    of the forward-filtered probabilities, which use observations up to that
+    day only.
+
+    As a by-product, each window model's labels on its own training span are
+    compared with the full-history labels for refit stability.
 
     Returns None when there isn't enough history (need > min_train + step).
-    Otherwise returns equity curves and metrics over the out-of-sample span,
-    plus the split date where live trading begins.
-
-    Args:
-        raw_features:    (n, d) un-normalized feature matrix.
-        dates:           DatetimeIndex aligned with raw_features/close.
-        close:           (n,) close prices.
-        label_states_fn: model.label_states (injected to avoid import cycle).
-        fit_hmm_fn:      model.fit_hmm (injected to avoid import cycle).
+    Otherwise {split, regimes (n,) with -1 before the split, windows}.
     """
     raw = np.asarray(raw_features, dtype=float)
-    close = np.asarray(close, dtype=float)
-    n = len(close)
+    n = len(raw)
     if n <= min_train + step:
         return None
 
-    target = np.zeros(n)
+    regimes = np.full(n, -1, dtype=int)
+    windows = []
+    warm = None
     t = min_train
     while t < n:
         end = min(t + step, n)
         train = raw[:t]
         mu = train.mean(axis=0)
-        sd = train.std(axis=0); sd[sd == 0] = 1.0
-        model = fit_hmm_fn((train - mu) / sd)
-        lbl = label_states_fn(model)
-        states = model.predict((raw[:end] - mu) / sd)[t:end]
-        for k, s in enumerate(states):
-            target[t + k] = REGIME_EXPOSURE.get(lbl[int(s)], 0.0)
+        sd = train.std(axis=0)
+        sd[sd == 0] = 1.0
+        x_train = (train - mu) / sd
+
+        candidates = [decode(fit_hmm(x_train, seed=PRIMARY_SEED), x_train)]
+        if warm is not None:
+            try:
+                candidates.append(decode(fit_hmm(x_train, init=warm), x_train))
+            except (ValueError, np.linalg.LinAlgError):
+                pass
+        fit = max(candidates, key=lambda f: f.log_likelihood)
+        warm = {'transmat': fit.transmat, 'means': fit.means, 'covars': fit.covars}
+
+        windows.append({
+            'agreement': float(np.mean(fit.regimes == full_regimes[:t])),
+            'days': t,
+        })
+
+        x_upto = (raw[:end] - mu) / sd
+        filt = filtered_posteriors(fit.model, x_upto)[:, fit.perm]
+        regimes[t:end] = np.argmax(filt[t:end], axis=1)
         t = end
 
-    daily_ret = np.zeros(n)
-    daily_ret[1:] = close[1:] / close[:-1] - 1.0
-    position = np.zeros(n)
-    position[1:] = target[:-1]  # one-bar lag
-    turnover = np.abs(np.diff(position, prepend=position[0]))
-    cost = turnover * (BACKTEST_COST_BPS / 10_000.0)
-    strat_ret = position * daily_ret - cost
+    return {'split': min_train, 'regimes': regimes, 'windows': windows}
 
-    sl = slice(min_train, n)
-    s_ret, b_ret = strat_ret[sl], daily_ret[sl]
-    s_eq = np.cumprod(1.0 + s_ret)
-    b_eq = np.cumprod(1.0 + b_ret)
-    years = max((dates[n - 1] - dates[min_train]).days / 365.25, 1e-9)
-
-    return {
-        'split_date': dates[min_train].strftime('%Y-%m-%d'),
-        'dates': [d.strftime('%Y-%m-%d') for d in dates[sl]],
-        'strategy_equity': [round(float(v), 4) for v in s_eq],
-        'benchmark_equity': [round(float(v), 4) for v in b_eq],
-        'strategy_drawdown': [round(float(v), 4) for v in _drawdown_series(s_eq)],
-        'metrics': {
-            'strategy': _performance(s_ret, years),
-            'benchmark': _performance(b_ret, years),
-            'time_in_market': round(float(np.mean(position[sl])) * 100, 1),
-            'trades': int(np.sum(turnover[sl] > 1e-9)),
-            'years': round(float(years), 2),
-        },
-    }
-
-
-def _drawdown_series(equity: np.ndarray) -> np.ndarray:
-    """Drawdown (<= 0) at each point relative to the running peak."""
-    running_max = np.maximum.accumulate(equity)
-    return equity / running_max - 1.0
