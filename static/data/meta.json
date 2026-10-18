@@ -1,0 +1,22 @@
+{
+ "asof": "2026-10-16",
+ "compute_seconds": 160.8,
+ "excluded": 9,
+ "file_bytes": {
+  "count": 58,
+  "max": 39060,
+  "mean": 33539,
+  "total": 1945302
+ },
+ "generated_at": "2026-10-18T23:23:15Z",
+ "stale": 0,
+ "universe": {
+  "covered": 50,
+  "indices": 8,
+  "list_date": "2025-12-31",
+  "name": "NIFTY 50",
+  "size": 50,
+  "source": "NSE NIFTY 50 constituents, ranked by AMFI average market capitalisation"
+ },
+ "v": 2
+}
