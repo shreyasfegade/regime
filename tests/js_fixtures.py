@@ -7,11 +7,13 @@ static/js/decode.js must decode the same file to the same numbers.
 """
 
 import json
+import logging
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
+logging.getLogger('hmmlearn').setLevel(logging.ERROR)
 
 from regime.analysis import analyze  # noqa: E402
 from regime.encode import (  # noqa: E402
@@ -37,8 +39,15 @@ def build() -> tuple[str, str]:
     return to_json(payload), json.dumps(expected, separators=(',', ':'))
 
 
+def build_explainer() -> str:
+    from regime.pipeline import explainer_payload
+    df, _ = synthetic_ohlcv(400, seed=8)
+    return explainer_payload(analyze(df, seeds=(42,)), {'slug': 'SYN', 'name': 'Synthetic'})
+
+
 if __name__ == '__main__':
     OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / 'explainer.json').write_text(build_explainer(), encoding='utf-8')
     ticker, expected = build()
     (OUT / 'ticker.json').write_text(ticker, encoding='utf-8')
     (OUT / 'expected.json').write_text(expected, encoding='utf-8')

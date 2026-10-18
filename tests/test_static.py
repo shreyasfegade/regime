@@ -69,8 +69,9 @@ def test_only_regime_hues_are_used():
 
 
 def test_js_fixtures_are_current():
-    from tests.js_fixtures import build
+    from tests.js_fixtures import build, build_explainer
     ticker, expected = build()
+    assert json.loads((ROOT / 'tests' / 'js' / 'fixtures' / 'explainer.json').read_text()) == json.loads(build_explainer())
     fx = ROOT / 'tests' / 'js' / 'fixtures'
     assert json.loads((fx / 'ticker.json').read_text()) == json.loads(ticker), 'run python tests/js_fixtures.py'
     assert json.loads((fx / 'expected.json').read_text()) == json.loads(expected)
