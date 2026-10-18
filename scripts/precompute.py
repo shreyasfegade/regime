@@ -5,7 +5,7 @@ Full local run (fetch, fit, write, merge):
     python scripts/precompute.py --workers 4
 
 One shard of a parallel run (the weekly workflow runs 16), then the merge:
-    python scripts/precompute.py --shard 3 --of 16 --out build/shard-3 --no-merge
+    python scripts/precompute.py --shard 1 --of 2 --out build/shard-3 --no-merge
     python scripts/precompute.py --merge-only
 
 Offline, with synthetic markets instead of Yahoo Finance:
