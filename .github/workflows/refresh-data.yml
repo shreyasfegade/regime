@@ -1,0 +1,146 @@
+name: Refresh market data
+
+# Re-fits every ticker and commits fresh data to main. Runs weekly after
+# the Friday close, whenever the model or pipeline code changes on main, and
+# on demand. The site only ever serves data that passed validation: if any
+# step fails, nothing is committed and the last good data stays live.
+on:
+  schedule:
+    - cron: '17 2 * * 6'        # Saturday 02:17 UTC (07:47 IST)
+  push:
+    branches: [main]
+    paths:
+      - 'regime/**'
+      - 'scripts/precompute.py'
+      - 'scripts/validate_data.py'
+      - 'requirements.txt'
+      - '.github/workflows/refresh-data.yml'
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: 'Comma-separated slugs to refresh (blank = everything)'
+        required: false
+        default: ''
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  SHARDS: 16
+  PYTHONUNBUFFERED: '1'
+
+jobs:
+  universe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Pick up a newer AMFI list if one has been published
+        run: python scripts/build_universe.py || echo "Universe check failed; keeping the committed universe."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: universe
+          path: data/universe.csv
+          retention-days: 3
+
+  shard:
+    needs: universe
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: universe
+          path: data
+      - name: Fit shard ${{ matrix.shard }}
+        run: |
+          python scripts/precompute.py --shard ${{ matrix.shard }} --of $SHARDS \
+            --out build/shard --prev static/data --workers 2 --no-merge \
+            ${{ github.event.inputs.tickers && format('--tickers {0}', github.event.inputs.tickers) || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ matrix.shard }}
+          path: build/shard
+          include-hidden-files: true
+          retention-days: 3
+
+  merge:
+    needs: [universe, shard]
+    if: always() && needs.universe.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          path: build
+      - name: Overlay fresh files on the last good data
+        run: |
+          cp static/data/meta.json build/previous-meta.json 2>/dev/null || true
+          cp build/universe/universe.csv data/universe.csv
+          mkdir -p static/data/t static/data/_status
+          for d in build/shard-*; do
+            [ -d "$d/t" ] && cp "$d"/t/*.json static/data/t/ 2>/dev/null || true
+            [ -d "$d/_status" ] && cp "$d"/_status/*.json static/data/_status/ 2>/dev/null || true
+            [ -f "$d/explainer.json" ] && cp "$d/explainer.json" static/data/explainer.json || true
+          done
+          echo "shards with output: $(ls -d build/shard-* 2>/dev/null | wc -l) of $SHARDS"
+      - name: Merge
+        run: python scripts/precompute.py --merge-only
+      - name: Validate
+        run: python scripts/validate_data.py --previous build/previous-meta.json
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add static/data data/universe.csv
+          if [ -z "$(git diff --cached --name-only | grep -v '^static/data/meta.json$')" ]; then
+            echo 'No new data; nothing to commit.'; exit 0
+          fi
+          ASOF=$(python -c "import json;print(json.load(open('static/data/meta.json'))['asof'])")
+          git commit -q -m "Refresh market data (as of $ASOF)"
+          for i in 1 2 3 4; do
+            git pull --rebase -q origin main && git push origin HEAD:main && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
+      - name: Summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY" || true
+          import json
+          m = json.load(open('static/data/meta.json'))
+          u = m['universe']
+          print(f"### Data as of {m['asof']}\n")
+          print(f"- {u['covered']} of {u['size']} stocks and {u['indices']} indices covered")
+          print(f"- {m['excluded']} excluded, {m['stale']} carried over from an earlier run")
+          ex = json.load(open('static/data/excluded.json'))['rows'][:15]
+          if ex:
+              print('\n| Excluded | Reason |\n|---|---|')
+              for e in ex:
+                  print(f"| {e['slug']} | {e['reason'][:90]} |")
+          PY
