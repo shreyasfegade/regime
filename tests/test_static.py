@@ -75,3 +75,39 @@ def test_js_fixtures_are_current():
     fx = ROOT / 'tests' / 'js' / 'fixtures'
     assert json.loads((fx / 'ticker.json').read_text()) == json.loads(ticker), 'run python tests/js_fixtures.py'
     assert json.loads((fx / 'expected.json').read_text()) == json.loads(expected)
+
+
+PAGES = ['index.html', 'stock.html', 'how-it-works.html', 'methodology.html', '404.html']
+
+
+@pytest.mark.parametrize('page', PAGES)
+def test_pages_have_title_description_and_landmarks(page):
+    html = (STATIC / page).read_text(encoding='utf-8')
+    assert re.search(r'<title>[^<]+— REGIME|<title>REGIME — ', html)
+    assert '<meta name="description"' in html
+    for tag in ('<header class="masthead">', '<main id="main"', '<footer', 'class="skip"', 'lang="en-IN"'):
+        assert tag in html, f'{page}: {tag}'
+
+
+def test_internal_links_resolve():
+    targets = {'/', '/how-it-works', '/methodology'}
+    for page in PAGES:
+        html = (STATIC / page).read_text(encoding='utf-8')
+        for href in re.findall(r'href="(/[^"#?]*)', html):
+            if href.startswith(('/stock/', '/css/', '/fonts/', '/favicon')) or href in targets:
+                continue
+            assert (STATIC / href.lstrip('/')).exists(), f'{page} links to missing {href}'
+
+
+def test_methodology_cost_table_matches_config():
+    from regime import config
+    html = (STATIC / 'methodology.html').read_text(encoding='utf-8')
+    c = config.COSTS
+    expected = [
+        f"{c['stt'] * 100:g}%", f"{c['txn_nse'] * 100:.5f}% NSE", f"{c['txn_bse'] * 100:.5f}% BSE",
+        f"₹{c['sebi'] * 1e7:g} per crore", f"{c['stamp_buy'] * 100:.3f}%", f"{c['gst'] * 100:g}%",
+        f"₹{c['dp_per_sell']:.2f}", '18 Oct 2026',
+    ] + [f"{v:g} bps" for v in config.SLIPPAGE_BPS.values()]
+    for s in expected:
+        assert s in html, f'methodology.html is missing {s!r}; keep it in step with regime/config.py'
+    assert config.COST_SCHEDULE_DATE == '2026-10-18'

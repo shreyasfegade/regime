@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methodology — REGIME</title>
+<meta name="description" content="How REGIME works: the NIFTY 50 universe, the 4-state Gaussian hidden Markov model, walk-forward testing, robustness checks, Zerodha cost assumptions and the Deflated Sharpe Ratio.">
+<meta property="og:title" content="Methodology — REGIME">
+<meta property="og:description" content="Model, data, robustness checks and backtest assumptions behind REGIME.">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F5F2EA">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/newsreader-var.woff2" as="font" type="font/woff2" crossorigin>
+<script>try{var t=localStorage.getItem('regime-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/css/regime.css">
+<script type="module" src="/js/methodology.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="/">REGIME<span>hidden market states, India</span></a>
+    <div class="search" role="search">
+      <label class="visually-hidden" for="q">Search stocks and indices</label>
+      <input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="q-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search the NIFTY 50">
+      <kbd aria-hidden="true">/</kbd>
+      <ul id="q-list" role="listbox" aria-label="Matching stocks and indices" hidden></ul>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="/">Market</a>
+      <a href="/how-it-works">How it works</a>
+      <a href="/methodology" aria-current="page">Methodology</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch colour theme">Dark</button>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+  <div id="notices"></div>
+  <header class="article-head">
+    <p class="kicker">Methodology</p>
+    <h1 class="headline">How REGIME works</h1>
+    <p class="dek">What is covered, what the model is, how the numbers on each page are computed, and the assumptions behind the backtest. Every figure on the site comes from the files described here; nothing is computed on a server.</p>
+  </header>
+
+  <div class="doc">
+    <nav class="toc" aria-label="On this page">
+      <p class="kicker">On this page</p>
+      <ol>
+        <li><a href="#coverage">Coverage</a></li>
+        <li><a href="#regimes">The four regimes</a></li>
+        <li><a href="#reading">Reading a stock page</a></li>
+        <li><a href="#model">The model</a></li>
+        <li><a href="#walk-forward">Walk-forward testing</a></li>
+        <li><a href="#robustness">Robustness checks</a></li>
+        <li><a href="#backtest">Backtest and costs</a></li>
+        <li><a href="#overfitting">Overfitting checks</a></li>
+        <li><a href="#data">Data and refresh</a></li>
+        <li><a href="#exclusions">Exclusions</a></li>
+        <li><a href="#limits">Limits</a></li>
+      </ol>
+    </nav>
+
+    <article class="prose">
+      <section id="coverage" aria-labelledby="h-coverage">
+        <h2 id="h-coverage">Coverage: the NIFTY 50 only</h2>
+        <p><b>Only NIFTY 50 stocks are covered.</b> Every stock gets a full multi-start model fit, walk-forward refits and robustness checks, and keeping to the 50 largest, most liquid names keeps that complete and refreshed every week. A wider universe would mean either a much longer weekly run or cutting the checks that make the labels trustworthy.</p>
+        <p>The list is NSE's official NIFTY 50 constituents. Each stock's market-cap band and rank come from AMFI's half-yearly average market capitalisation list (<span data-fill="list-date">the latest list</span>), and its sector from NSE's industry classification. Alongside the stocks are <span data-fill="indices">eight</span> indices, each with its own model. Search covers exactly these and nothing else.</p>
+        <div id="covered" class="covered"></div>
+      </section>
+
+      <section id="regimes" aria-labelledby="h-regimes">
+        <h2 id="h-regimes">The four regimes, in plain English</h2>
+        <dl class="regime-guide">
+          <div><dt><span class="sw r0" aria-hidden="true"></span>Bullish Trending</dt><dd>Prices drift upwards and day-to-day swings stay contained. Historically the calmest way up.</dd></div>
+          <div><dt><span class="sw r1" aria-hidden="true"></span>Accumulation</dt><dd>Little net movement and unusually low volatility. Often a pause or a base before the next move.</dd></div>
+          <div><dt><span class="sw r2" aria-hidden="true"></span>Bearish Trending</dt><dd>Prices drift downwards with wider swings than in a bull trend. An orderly decline.</dd></div>
+          <div><dt><span class="sw r3" aria-hidden="true"></span>Crisis</dt><dd>The most volatile state the model finds: large, fast moves, mostly down. Rare, but it is where drawdowns happen.</dd></div>
+        </dl>
+        <p>The model finds four states without names; REGIME names them from each state's centre. The state with the highest average volatility is Crisis. Of the remaining three, the one with the lowest volatility and smallest absolute drift is Accumulation. The last two are split by average return into Bullish and Bearish. Because the rule is the same everywhere, a regime means the same kind of market on every page, though the actual levels of return and volatility differ by stock.</p>
+      </section>
+
+      <section id="reading" aria-labelledby="h-reading">
+        <h2 id="h-reading">Reading a stock page</h2>
+        <p><b>Confidence</b> is the model's probability for today's regime, from the forward filter: it uses only data up to today. 90% means the model would be surprised if the day belonged anywhere else, not that a price move is 90% likely.</p>
+        <p><b>Expected sessions left</b> is 1 ÷ (1 − p), where p is the chance of staying in the current regime for one more session. A hidden Markov model is memoryless, so this number does not change with how long the regime has already run. The median past spell, shown next to it, is the empirical counterpart.</p>
+        <p><b>Timeline bands and the calendar</b> show the Viterbi path: the single most likely sequence of regimes given the whole history. That is hindsight, and it is labelled as such. <b>The posterior ribbon</b> shows the smoothed probability of each regime on each day.</p>
+        <p><b>What came next</b> (forward returns by regime) and the <b>crisis early warning</b> (today's probabilities pushed forward through the transition matrix) are descriptions of the fitted model, not forecasts.</p>
+      </section>
+
+      <section id="model" aria-labelledby="h-model">
+        <h2 id="h-model">The model</h2>
+        <p>Each stock and index gets its own 4-state Gaussian hidden Markov model with full covariance matrices, fitted with the Baum–Welch (EM) algorithm in hmmlearn to about ten years of daily data. There are five features per day, each standardised over the stock's history:</p>
+        <div class="table-scroll"><table class="table">
+          <thead><tr><th>Feature</th><th>Definition</th></tr></thead>
+          <tbody>
+            <tr><td>Log return</td><td>ln(close<sub>t</sub> ÷ close<sub>t−1</sub>)</td></tr>
+            <tr><td>5-day volatility</td><td>standard deviation of the last 5 log returns</td></tr>
+            <tr><td>20-day volatility</td><td>standard deviation of the last 20 log returns</td></tr>
+            <tr><td>Volume z-score</td><td>volume against its 20-day mean and standard deviation (0 where volume is missing or constant, as for some indices)</td></tr>
+            <tr><td>10-day momentum</td><td>ln(close<sub>t</sub> ÷ close<sub>t−10</sub>)</td></tr>
+          </tbody>
+        </table></div>
+        <p>EM finds a local optimum, so every full-history fit runs from five random starts (seeds 42, 7, 1234, 2024 and 99) plus a warm start from last week's parameters, for up to 200 iterations each. The fit with the highest log-likelihood wins. Warm starts keep week-to-week changes small; the random starts keep the result from depending on last week.</p>
+      </section>
+
+      <section id="walk-forward" aria-labelledby="h-wf">
+        <h2 id="h-wf">Walk-forward testing</h2>
+        <p>The out-of-sample view refits the model every 126 sessions (about six months) on all data up to that point, starting after a minimum of 504 sessions (about two years) of training. Each refit labels the next six months with the forward filter, which uses only data up to each day. Nothing in that path could have looked ahead.</p>
+        <p>Stocks with less than about three years of history have no walk-forward view; the page says so.</p>
+      </section>
+
+      <section id="robustness" aria-labelledby="h-robust">
+        <h2 id="h-robust">Robustness checks</h2>
+        <p><b>Seed stability</b> is the share of days on which each of the other random starts gives the same regime label as the winning fit, averaged over the starts. Labels are compared after naming, so the arbitrary order of states inside each fit doesn't matter.</p>
+        <p><b>Refit stability</b> compares each walk-forward model's labels on its own training window with the full-history labels for the same days, weighted by window length. It asks whether a model fitted on less data would have told the same story.</p>
+        <p><b>BIC by number of states</b> fits 2 to 6 states and reports which the Bayesian information criterion prefers. It often prefers five or six, partly because the features overlap in time (a 20-day volatility shares 19 days with yesterday's), which BIC treats as independent evidence. REGIME keeps four everywhere and shows where BIC disagrees.</p>
+        <p class="formula">Confidence score = 100 × (posterior × seed stability × refit stability)<sup>1/3</sup></p>
+        <p>A geometric mean means one weak part pulls the score down hard: a confident posterior from an unstable model is not a confident call. Where a component is missing (no walk-forward), the score uses the other two and says so.</p>
+      </section>
+
+      <section id="backtest" aria-labelledby="h-bt">
+        <h2 id="h-bt">Backtest and costs</h2>
+        <p>The strategy is long-or-flat: 100% invested in Bullish, 50% in Accumulation, cash in Bearish and Crisis, earning nothing in cash. The regime is read at the close of day t and traded at the open of day t+1. That day's return is the overnight move at the old weight plus the open-to-close move at the new weight. The headline view uses walk-forward labels; the in-sample view is shown for comparison and is labelled as optimistic.</p>
+        <p>Every change in exposure pays Zerodha's equity-delivery charges, as published on <span class="num">18 Oct 2026</span>, plus an assumed slippage:</p>
+        <div class="table-scroll"><table class="table" id="costs">
+          <thead><tr><th>Charge</th><th>Rate</th><th>Applied to</th></tr></thead>
+          <tbody>
+            <tr><td>Brokerage</td><td class="num">₹0</td><td>delivery trades</td></tr>
+            <tr><td>Securities transaction tax</td><td class="num">0.1%</td><td>buy and sell value</td></tr>
+            <tr><td>Exchange transaction charge</td><td class="num">0.00307% NSE · 0.00375% BSE</td><td>buy and sell value</td></tr>
+            <tr><td>SEBI turnover fee</td><td class="num">₹10 per crore</td><td>buy and sell value</td></tr>
+            <tr><td>Stamp duty</td><td class="num">0.015%</td><td>buy value</td></tr>
+            <tr><td>GST</td><td class="num">18%</td><td>brokerage + exchange charge + SEBI fee</td></tr>
+            <tr><td>Depository (DP) charge</td><td class="num">₹15.34</td><td>each day with a sale, on ₹10 lakh notional</td></tr>
+            <tr><td>Slippage (assumption)</td><td class="num">5 bps large · 10 bps mid · 20 bps small · 5 bps index</td><td>each side, by AMFI cap band</td></tr>
+          </tbody>
+          <caption>Indices are backtested as if held through an index ETF, with the same schedule. The slippage figures are assumptions, not measurements.</caption>
+        </table></div>
+        <p>Metrics are computed from daily returns and annualised with 252 sessions: CAGR, volatility, Sharpe and Sortino (zero risk-free rate), maximum drawdown, Calmar, and one-day 95% VaR and CVaR. Cost drag is reported per component as a share of capital per year.</p>
+      </section>
+
+      <section id="overfitting" aria-labelledby="h-of">
+        <h2 id="h-of">Overfitting checks</h2>
+        <p>Six variants are evaluated for every ticker: three exposure maps (Accumulation at 50%, 100% or 0%) times two signal lags (fill one or two sessions after the signal). Reporting only the best of several variants overstates it, so REGIME reports the headline variant with two corrections, after Bailey and López de Prado (2014):</p>
+        <p><b>Probabilistic Sharpe ratio vs buy-and-hold</b>: the probability that the strategy's true Sharpe ratio exceeds buy-and-hold's, given the length of the record and the skew and fat tails of its returns.</p>
+        <p><b>Deflated Sharpe ratio</b>: the same probability, with the bar raised to the Sharpe ratio the best of six unskilled variants would be expected to reach by luck, given how much the six varied. A value below 95% means the result is not distinguishable from selection luck.</p>
+        <p>Both are reported for the walk-forward and the in-sample series. On many stocks the honest answer is that the strategy did not beat buy-and-hold after costs, and the page says so.</p>
+      </section>
+
+      <section id="data" aria-labelledby="h-data">
+        <h2 id="h-data">Data and refresh</h2>
+        <p>Prices are daily open, high, low, close and volume from Yahoo Finance, adjusted for splits and dividends, about ten years per ticker. A scheduled job runs every Saturday morning (India time), after Friday's close, and whenever the model code changes. It rebuilds the universe from the current NIFTY 50 list, fetches prices in batches with retries and exponential backoff, refits every ticker, and checks the result before publishing:</p>
+        <ul class="list">
+          <li>enough stocks covered (at least 45 of 50), every file readable and under 50 KB, and the index consistent with the files;</li>
+          <li>a ticker that fails this week keeps last week's file, marked with its own date;</li>
+          <li>if the checks fail, nothing is published and the site keeps serving the last good data. A notice appears on every page if the data is more than ten days old.</li>
+        </ul>
+        <p>Each ticker's file holds its full daily history in a compact encoding, about 35 KB. The data as published is as of <span data-fill="asof">the latest refresh</span>.</p>
+      </section>
+
+      <section id="exclusions" aria-labelledby="h-ex">
+        <h2 id="h-ex">Exclusions</h2>
+        <p>Tickers that were tried and could not be analysed this week, with the reason. They come back automatically when the problem clears.</p>
+        <div id="excluded"><p class="pending">Loading the exclusions list…</p></div>
+      </section>
+
+      <section id="limits" aria-labelledby="h-limits">
+        <h2 id="h-limits">Limits</h2>
+        <p>REGIME describes; it doesn't predict. The regimes are statistical summaries of past returns, volatility and volume, fitted to each stock separately, so the same name can mean somewhat different market conditions on two stocks. The transition probabilities are averages over a decade. In-sample views use hindsight. Prices from a free data source can have gaps or errors; the pipeline drops tickers with too much missing data, but cannot catch every bad print.</p>
+        <p><b>Research, not investment advice.</b> Nothing here is a recommendation to buy or sell any security. Past regimes do not promise future returns.</p>
+      </section>
+    </article>
+  </div>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <div>
+      <p>REGIME classifies each day into one of four hidden regimes with a Gaussian hidden Markov model fitted to that stock's own history. Prices: Yahoo Finance daily data. Universe: the NIFTY 50 constituents (NSE), ranked by AMFI's market-cap list. Data as of <span data-asof>—</span>, refreshed weekly.</p>
+      <p>Research, not investment advice. Past regimes do not promise future returns.</p>
+    </div>
+    <div><p><a href="/">The market today</a> · <a href="/how-it-works">How an HMM sees the market</a></p></div>
+  </div>
+</footer>
+<div class="tip" id="tip" hidden></div>
+</body>
+</html>

@@ -357,6 +357,31 @@ button.sort:hover { color: var(--ink); }
 .limits { padding-top: 32px; }
 .limits h2 { margin-top: 0; }
 
+/* ── Methodology ────────────────────────────────────────────────────── */
+.doc { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 56px; padding: 32px 0 24px; }
+.toc { position: sticky; top: 24px; align-self: start; font-size: 13px; }
+.toc ol { list-style: none; margin-top: 10px; border-top: 1px solid var(--rule); }
+.toc a { display: block; padding: 7px 0; border-bottom: 1px solid var(--rule); text-decoration: none; color: var(--ink-2); }
+.toc a:hover { color: var(--ink); }
+.doc .prose { max-width: 74ch; }
+.doc .prose > section { padding-bottom: 12px; scroll-margin-top: 16px; }
+.doc .prose > section:first-child h2 { margin-top: 0; }
+.prose .table { font-family: var(--sans); margin: 1em 0 1.4em; }
+.prose .list { margin: .6em 0 1em 1.2em; }
+.prose .list li + li { margin-top: .4em; }
+.formula { font: 400 16px/1.5 var(--mono); border-left: 3px solid var(--ink); padding: 8px 14px; background: var(--paper-2); }
+.regime-guide { margin: 1em 0; border-top: 1px solid var(--rule-ink); }
+.regime-guide > div { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.regime-guide dt { font: 500 15px var(--sans); }
+.regime-guide dd { font-size: 17px; color: var(--ink-2); margin-top: 2px; }
+.covered { font-family: var(--sans); font-size: 14px; margin-top: 1.2em; }
+.covered h3 { margin: 1.2em 0 .5em; }
+.covered .cols { columns: 3 200px; column-gap: 28px; margin: 0; list-style: none; }
+.covered li { break-inside: avoid; padding: 4px 0; border-bottom: 1px solid var(--rule); }
+.covered li a { text-decoration: none; }
+.covered li a:hover { text-decoration: underline; }
+.covered .mono { font-size: 11px; margin-left: 4px; }
+
 /* ── Responsive ─────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .today { grid-template-columns: 1fr; gap: 24px; }
@@ -367,6 +392,9 @@ button.sort:hover { color: var(--ink); }
   .index-strip li:nth-child(odd) { border-right: 1px solid var(--rule); }
   .map-row { grid-template-columns: 1fr; gap: 6px; }
   .map-key { padding-top: 0; }
+  .doc { grid-template-columns: 1fr; gap: 24px; }
+  .toc { position: static; }
+  .toc ol { columns: 2; column-gap: 20px; }
 }
 @media (max-width: 640px) {
   body { font-size: 15px; }
