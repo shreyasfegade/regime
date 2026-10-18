@@ -1,11 +1,12 @@
 """
 REGIME — Universe
-The stocks REGIME covers: the top UNIVERSE_SIZE companies by average market
-capitalisation in AMFI's half-yearly classification list (the list SEBI
-uses to define large, mid and small caps), plus the indices in config.
+The stocks REGIME covers: the constituents of the NIFTY 50 (NSE's official
+list, config.UNIVERSE_MEMBERS_URL), with each company's rank and large/mid/
+small band taken from AMFI's half-yearly market-cap classification list (the
+list SEBI uses to define the bands), plus the indices in config.
 
 Sectors come from NSE's index constituent lists (the Industry column, keyed
-by ISIN). Companies outside those lists are classified from Yahoo Finance's
+by ISIN). Any company outside those lists is classified from Yahoo Finance's
 sector and industry, mapped onto the same NSE taxonomy, and marked as such.
 """
 
@@ -240,15 +241,31 @@ def make_slugs(companies: list[dict]) -> None:
 
 
 def build_universe(xlsx: bytes, list_stamp: str, industry_csvs: list[str],
-                   yahoo_lookup=None, n: int = UNIVERSE_SIZE) -> list[dict]:
+                   yahoo_lookup=None, n: int = UNIVERSE_SIZE,
+                   members_csv: str | None = None) -> list[dict]:
     """
     Assemble the universe rows.
 
-    yahoo_lookup(symbol) → (sector, industry) is called only for companies
-    missing from the NSE lists; it may raise, in which case the company is
-    left Unclassified.
+    members_csv, an NSE index constituent list, restricts the universe to
+    that index's members (matched by ISIN). yahoo_lookup(symbol) →
+    (sector, industry) is called only for companies missing from the NSE
+    lists; it may raise, in which case the company is left Unclassified.
     """
     companies = parse_amfi(xlsx, n)
+    if members_csv is not None:
+        # Match by ISIN, falling back to the NSE symbol: an ISIN changes on a
+        # split or face-value change, and AMFI's list can lag behind it.
+        rows = list(csv.DictReader(io.StringIO(members_csv.lstrip('\ufeff'))))
+        by_isin = {r['ISIN Code'].strip().upper(): r for r in rows}
+        by_sym = {r['Symbol'].strip().upper(): r for r in rows}
+        kept = []
+        for c in companies:
+            m = by_isin.get(c['isin']) or (by_sym.get(c['nse']) if c['nse'] else None)
+            if m:
+                c['isin'] = m['ISIN Code'].strip().upper()  # current ISIN, for the sector join
+                kept.append(c)
+        companies = kept
+        industry_csvs = [members_csv, *industry_csvs]
     industries: dict[str, str] = {}
     for text in industry_csvs:
         industries.update(parse_industry_csv(text))

@@ -101,3 +101,14 @@ def test_bse_only_slug_yields_to_an_nse_symbol():
     rows = [{'nse': 'ABC', 'bse': 'ABC', 'isin': 'X1'}, {'nse': '', 'bse': 'ABC', 'isin': 'X2'}]
     make_slugs(rows)
     assert [r['slug'] for r in rows] == ['ABC', 'ABC-BSE']
+
+
+def test_members_list_restricts_universe_matching_isin_or_symbol():
+    # M&M is a member under a new ISIN (as after a split); Reliance by ISIN.
+    members = ('Company Name,Industry,Symbol,Series,ISIN Code\n'
+               'Reliance Industries Ltd.,Oil Gas & Consumable Fuels,RELIANCE,EQ,INE002A01018\n'
+               'Mahindra & Mahindra Ltd.,Automobile and Auto Components,M&M,EQ,INE101A01099\n')
+    rows = build_universe(amfi_xlsx(ROWS), '31Dec2025', [], None, members_csv=members)
+    assert [r['slug'] for r in rows] == ['RELIANCE', 'M-M']
+    assert rows[1]['isin'] == 'INE101A01099'
+    assert rows[1]['sector'] == 'Automobile and Auto Components' and rows[1]['rank'] == 2

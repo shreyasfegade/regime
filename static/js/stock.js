@@ -10,7 +10,7 @@ import { Figure, linkCursors, palette, sizeCanvas } from './figure.js';
 import { CAP, date, frac, num, pct, price, signedNum } from './format.js';
 import { renderCalendar, calendarHeight, calendarIndexAt, calendarLayout } from './calendar.js';
 import { renderEquity } from './equity.js';
-import { rank } from './search.js';
+import { COVERAGE_REASON, rank } from './search.js';
 import { initShell } from './shell.js';
 import { renderBic, renderCrisis, renderSpark } from './small.js';
 import { indexAtX, renderRibbon, renderTimeline } from './timeline.js';
@@ -60,9 +60,9 @@ async function renderMissing(slug, index) {
   const near = index && slug ? rank(index.items, slug.slice(0, 4)).slice(0, 5) : [];
   page.innerHTML = `<section class="state">
     <p class="kicker">Not covered</p>
-    <h1 class="title">${slug ? `${esc(slug)} isn't in the REGIME universe` : 'No stock selected'}</h1>
-    ${excluded ? `<p class="dek"><b>${esc(excluded.name)}</b> is in AMFI's top ${u ? u.size.toLocaleString('en-IN') : '1,500'}, but has no analysis: ${esc(excluded.reason)}.</p>`
-      : `<p class="dek">REGIME covers ${u ? `${u.covered.toLocaleString('en-IN')} of AMFI's top ${u.size.toLocaleString('en-IN')} companies by market cap (list of ${date(u.list_date)}) and ${u.indices} indices` : 'AMFI\'s top 1,500 companies and the main indices'}. Search above for one of them.</p>`}
+    <h1 class="title">${slug ? `${esc(slug)} isn't covered` : 'No stock selected'}</h1>
+    ${excluded ? `<p class="dek"><b>${esc(excluded.name)}</b> is tracked, but has no analysis: ${esc(excluded.reason)}.</p>` : ''}
+    <p class="dek"${excluded ? ' style="margin-top:10px"' : ''}>${COVERAGE_REASON}${u ? ` That is ${u.covered} stocks and ${u.indices} indices.` : ''}</p>
     ${near.length ? `<ul aria-label="Similar names">${near.map(n => `<li><a href="/stock/${encodeURIComponent(n.slug)}"><span>${sw(n.regime)}${esc(n.name)}</span><span class="mono muted">${esc(n.slug)}</span></a></li>`).join('')}</ul>` : ''}
     <div class="actions"><a class="btn ghost" href="/">Browse the Regime Map</a><a class="btn ghost" href="/methodology#coverage">What's covered</a></div>
   </section>`;

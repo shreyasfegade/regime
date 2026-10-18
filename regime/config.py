@@ -98,15 +98,18 @@ SLIPPAGE_BPS: dict[str, float] = {'L': 5.0, 'M': 10.0, 'S': 20.0, 'I': 5.0}
 NOTIONAL_INR: float = 1_000_000.0
 
 # ─── Universe ────────────────────────────────────────────────────────
-UNIVERSE_SIZE: int = 1500
+# REGIME covers the NIFTY 50 constituents (NSE's official list), ranked and
+# banded by AMFI's market-cap classification. Every stock gets a full
+# multi-start fit, walk-forward refits and robustness checks; keeping the
+# universe to the NIFTY 50 keeps the weekly refresh to a few minutes.
+UNIVERSE_NAME: str = 'NIFTY 50'
+UNIVERSE_MEMBERS_URL: str = 'https://niftyindices.com/IndexConstituent/ind_nifty50list.csv'
+UNIVERSE_SIZE: int = 1500           # AMFI ranks parsed before filtering to members
+MIN_COVERED: int = 45               # validation floor for a publishable run
 AMFI_URL: str = (
     'https://www.amfiindia.com/Themes/Theme1/downloads/'
     'AverageMarketCapitalization{stamp}.xlsx'
 )
-INDUSTRY_LISTS: list[str] = [
-    'https://niftyindices.com/IndexConstituent/ind_niftytotalmarket_list.csv',
-    'https://niftyindices.com/IndexConstituent/ind_niftymicrocap250_list.csv',
-]
 CAP_BANDS: dict[str, str] = {'Large Cap': 'L', 'Mid Cap': 'M', 'Small Cap': 'S'}
 
 # Indices tracked alongside the stocks. Only those Yahoo carries with at

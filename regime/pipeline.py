@@ -29,7 +29,8 @@ import numpy as np
 import pandas as pd
 
 from regime.config import (
-    DATA_YEARS, EXPLAINER_SLUG, FETCH_BATCH, INDICES, MAX_FILE_BYTES, REGIME_ORDER, WARN_FILE_BYTES,
+    DATA_YEARS, EXPLAINER_SLUG, FETCH_BATCH, INDICES, MAX_FILE_BYTES, REGIME_ORDER, UNIVERSE_NAME,
+    WARN_FILE_BYTES,
 )
 from regime.data import clean_ohlcv, download_batch, pick_longer
 
@@ -260,7 +261,8 @@ def merge(data_dir: str, jobs: list[dict], list_date: str, now: datetime | None 
     excluded.sort(key=lambda e: (e['kind'] != 'stock', e['rank'] or 0, e['slug']))
 
     universe = {
-        'source': 'AMFI average market capitalisation list',
+        'name': UNIVERSE_NAME,
+        'source': 'NSE NIFTY 50 constituents, ranked by AMFI average market capitalisation',
         'list_date': list_date,
         'size': len(stocks),
         'covered': len(covered_stocks),

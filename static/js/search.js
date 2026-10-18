@@ -2,10 +2,12 @@
    only find what REGIME covers, and says so when a query misses. */
 
 import { loadExcluded, loadIndex } from './data.js';
-import { date } from './format.js';
 
 const ALIASES = { NIFTY: 'NIFTY50', 'NIFTY 50': 'NIFTY50', BANKNIFTY: 'NIFTYBANK', 'NIFTY BANK': 'NIFTYBANK', SENSEX: 'SENSEX' };
 const MAX = 12;
+
+/** Why the universe is small. One sentence, used wherever coverage comes up. */
+export const COVERAGE_REASON = 'Only NIFTY 50 stocks are covered: every stock gets a full multi-start model fit, walk-forward refits and robustness checks, and keeping to the 50 largest, most liquid names keeps that complete and refreshed every week.';
 const CAP_SHORT = { L: 'Large', M: 'Mid', S: 'Small', I: 'Index' };
 
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -39,9 +41,8 @@ export function mountSearch(root) {
   loadIndex().then(idx => {
     index = idx;
     const u = idx.universe;
-    input.placeholder = `Search ${u.covered.toLocaleString('en-IN')} stocks + ${u.indices} indices`;
-    input.setAttribute('aria-description',
-      `Covers ${u.covered} of AMFI's top ${u.size} companies by market cap (list of ${date(u.list_date)}) and ${u.indices} indices.`);
+    input.placeholder = `Search the NIFTY 50 + ${u.indices} indices`;
+    input.setAttribute('aria-description', `Covers the ${u.covered} NIFTY 50 stocks and ${u.indices} indices only.`);
     items = idx.items;
   }).catch(() => { input.placeholder = 'Search unavailable — data did not load'; });
 
@@ -69,10 +70,9 @@ export function mountSearch(root) {
         const ex = await loadExcluded();
         const qq = q.trim().toUpperCase();
         const miss = ex.rows.find(e => e.slug === qq || (e.sym || '').toUpperCase() === qq || e.name.toUpperCase().includes(qq));
-        if (miss) note = `<b>${esc(miss.name)}</b> is in the universe but has no analysis: ${esc(miss.reason)}. `;
+        if (miss) note = `<b>${esc(miss.name)}</b> is tracked but has no analysis: ${esc(miss.reason)}. `;
       } catch { /* exclusions are optional here */ }
-      const u = index ? index.universe : null;
-      list.innerHTML = `<li class="empty" role="presentation">${note}No match in the REGIME universe${u ? ` — AMFI's top ${u.size.toLocaleString('en-IN')} companies by market cap (list of ${date(u.list_date)}) and ${u.indices} indices` : ''}. <a href="/methodology#coverage">What's covered</a></li>`;
+      list.innerHTML = `<li class="empty" role="presentation">${note}No match. ${COVERAGE_REASON} <a href="/methodology#coverage">What's covered</a></li>`;
     }
     options = [...list.querySelectorAll('[role="option"]')];
     options.forEach((o, i) => {

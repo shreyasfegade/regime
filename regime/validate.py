@@ -7,7 +7,7 @@ problems; an empty list means the data may be published.
 import json
 from pathlib import Path
 
-from regime.config import MAX_FILE_BYTES
+from regime.config import MAX_FILE_BYTES, MIN_COVERED
 
 REQUIRED_TICKER_KEYS: set[str] = {
     'v', 'slug', 'asof', 'n', 'dates', 'px', 'post', 'vit', 'today', 'stats',
@@ -16,7 +16,7 @@ REQUIRED_TICKER_KEYS: set[str] = {
 REQUIRED_FILES: tuple[str, ...] = ('index.json', 'breadth.json', 'meta.json', 'excluded.json')
 
 
-def validate(data: Path, previous: dict | None = None, min_covered: int = 1000) -> list[str]:
+def validate(data: Path, previous: dict | None = None, min_covered: int = MIN_COVERED) -> list[str]:
     problems: list[str] = []
     for name in REQUIRED_FILES:
         if not (data / name).exists():

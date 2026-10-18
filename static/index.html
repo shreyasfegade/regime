@@ -6,7 +6,7 @@
 <title>REGIME — hidden market regimes for Indian stocks</title>
 <meta name="description" content="Today's market regime, its history and how it has traded, from a 4-state Gaussian hidden Markov model.">
 <meta property="og:title" content="REGIME — hidden market regimes for Indian stocks">
-<meta property="og:description" content="Today's regime, ten years of regime history, robustness checks and a cost-aware backtest for 1,500 Indian stocks.">
+<meta property="og:description" content="Today's regime, ten years of regime history, robustness checks and a cost-aware backtest for every NIFTY 50 stock.">
 <meta property="og:image" content="/og.png">
 <meta name="theme-color" content="#F5F2EA">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -24,7 +24,7 @@
     <a class="wordmark" href="/">REGIME<span>hidden market states, India</span></a>
     <div class="search" role="search">
       <label class="visually-hidden" for="q">Search stocks and indices</label>
-      <input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="q-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search stocks and indices">
+      <input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="q-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search the NIFTY 50">
       <kbd aria-hidden="true">/</kbd>
       <ul id="q-list" role="listbox" aria-label="Matching stocks and indices" hidden></ul>
     </div>
@@ -41,8 +41,9 @@
   <div id="notices"></div>
   <section class="state">
     <p class="kicker">REGIME</p>
-    <h1 class="title">Hidden market regimes for AMFI's top 1,500 Indian stocks</h1>
-    <p class="dek">Search above for any stock in the universe, or start with an index.</p>
+    <h1 class="title">Hidden market regimes for the NIFTY 50</h1>
+    <p class="dek">Search above for any NIFTY 50 stock, or start with an index.</p>
+    <p class="notice" id="coverage"><b>Only NIFTY 50 stocks are covered.</b> Every stock gets a full multi-start model fit, walk-forward refits and robustness checks; keeping to the 50 largest, most liquid names keeps that complete and refreshed every week.</p>
     <ul aria-label="Indices">
       <li><a href="/stock/NIFTY50"><span>NIFTY 50</span><span class="mono muted">^NSEI</span></a></li>
       <li><a href="/stock/SENSEX"><span>S&amp;P BSE SENSEX</span><span class="mono muted">^BSESN</span></a></li>
@@ -54,7 +55,7 @@
 <footer class="colophon">
   <div class="wrap">
     <div>
-      <p>REGIME classifies each day into one of four hidden regimes with a Gaussian hidden Markov model fitted to that stock's own history. Prices: Yahoo Finance daily data. Universe: AMFI's market-cap classification list. Data as of <span data-asof>—</span>, refreshed weekly.</p>
+      <p>REGIME classifies each day into one of four hidden regimes with a Gaussian hidden Markov model fitted to that stock's own history. Prices: Yahoo Finance daily data. Universe: the NIFTY 50 constituents (NSE), ranked by AMFI's market-cap list. Data as of <span data-asof>—</span>, refreshed weekly.</p>
       <p>Research, not investment advice. Past regimes do not promise future returns.</p>
     </div>
     <div><p><a href="/methodology">Methodology</a> · <a href="/how-it-works">How an HMM sees the market</a></p></div>

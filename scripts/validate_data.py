@@ -25,12 +25,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('--data', default=str(ROOT / 'static' / 'data'))
     ap.add_argument('--previous', default=None, help='meta.json of the data currently live')
-    ap.add_argument('--min-covered', type=int, default=1000)
+    ap.add_argument('--min-covered', type=int, default=None)
     args = ap.parse_args()
     previous = None
     if args.previous and Path(args.previous).exists():
         previous = json.loads(Path(args.previous).read_text(encoding='utf-8'))
-    problems = validate(Path(args.data), previous, args.min_covered)
+    problems = validate(Path(args.data), previous, *([args.min_covered] if args.min_covered else []))
     if problems:
         print(f'{len(problems)} problem(s):')
         for p in problems[:50]:

@@ -112,8 +112,8 @@ def test_run_writes_files_and_logs_failures(built):
     assert sorted(f.stem for f in (out / 't').glob('*.json')) == ['AAA', 'BBB', 'CCC-BSE']
     failed = [s for s in statuses if not s['ok']]
     assert [s['slug'] for s in failed] == ['DDD']
-    assert meta['universe'] == {'source': 'AMFI average market capitalisation list', 'list_date': '2025-12-31',
-                                'size': 4, 'covered': 3, 'indices': 0}
+    u = meta['universe']
+    assert (u['name'], u['list_date'], u['size'], u['covered'], u['indices']) == ('NIFTY 50', '2025-12-31', 4, 3, 0)
     excluded = json.loads((out / 'excluded.json').read_text())['rows']
     assert [e['slug'] for e in excluded] == ['DDD'] and excluded[0]['reason']
     assert not (out / '_status').exists()

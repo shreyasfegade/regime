@@ -1,11 +1,11 @@
 """
-REGIME — build data/universe.csv from the newest AMFI market-cap list.
+REGIME — build data/universe.csv: today's NIFTY 50 constituents, with rank
+and market-cap band from the newest AMFI classification list.
 
-    python scripts/build_universe.py            # rebuild if AMFI has a newer list
-    python scripts/build_universe.py --force    # rebuild regardless
+    python scripts/build_universe.py
 
-Exit code 0 either way; prints whether the universe changed, so the weekly
-workflow can decide whether to commit it.
+Cheap (two downloads), so the weekly refresh rebuilds it every time and
+picks up index rebalances as well as new AMFI lists.
 """
 
 import argparse
@@ -17,9 +17,9 @@ sys.path.insert(0, str(ROOT))
 
 import requests  # noqa: E402
 
-from regime.config import INDUSTRY_LISTS  # noqa: E402
+from regime.config import UNIVERSE_MEMBERS_URL  # noqa: E402
 from regime.universe import (  # noqa: E402
-    build_universe, fetch_latest_amfi, read_universe, stamp_to_iso, write_universe,
+    build_universe, fetch_latest_amfi, stamp_to_iso, write_universe,
 )
 
 OUT = ROOT / 'data' / 'universe.csv'
@@ -41,32 +41,22 @@ def yahoo_lookup(symbol: str) -> tuple[str | None, str | None]:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--force', action='store_true')
-    args = ap.parse_args()
-
+    argparse.ArgumentParser(description=__doc__).parse_args()
     stamp, xlsx = fetch_latest_amfi(get)
     list_date = stamp_to_iso(stamp)
-    if OUT.exists() and not args.force:
-        current = read_universe(OUT)
-        if current and current[0]['list_date'] == list_date:
-            print(f'unchanged: universe already uses the AMFI list of {list_date}')
-            return
-
-    csvs = []
-    for url in INDUSTRY_LISTS:
-        status, body = get(url)
-        if status == 200:
-            csvs.append(body.decode('utf-8', errors='replace'))
-        else:
-            print(f'warning: could not fetch {url} ({status})')
-    rows = build_universe(xlsx, stamp, csvs, yahoo_lookup)
+    status, body = get(UNIVERSE_MEMBERS_URL)
+    if status != 200:
+        raise SystemExit(f'could not fetch the index constituent list ({status})')
+    rows = build_universe(xlsx, stamp, [], yahoo_lookup,
+                          members_csv=body.decode('utf-8', errors='replace'))
+    if len(rows) < 50:
+        print(f'warning: only {len(rows)} constituents matched the AMFI list')
     OUT.parent.mkdir(exist_ok=True)
     write_universe(OUT, rows)
     by_source = {}
     for r in rows:
         by_source[r['sector_source']] = by_source.get(r['sector_source'], 0) + 1
-    print(f'changed: {len(rows)} companies from the AMFI list of {list_date}; sectors {by_source}')
+    print(f'{len(rows)} companies; AMFI list of {list_date}; sectors {by_source}')
 
 
 if __name__ == '__main__':

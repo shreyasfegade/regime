@@ -3,7 +3,7 @@ REGIME — Data Fetching & Validation
 Fetches daily OHLCV for NSE/BSE equities and indices from Yahoo Finance in
 batches, retrying with exponential backoff, and validates each series for
 completeness. Failures are reported per symbol, never raised for the batch,
-so one bad ticker cannot stop a 1,500-ticker run.
+so one bad ticker cannot stop the whole run.
 
 yfinance ticker conventions this module understands:
     RELIANCE.NS   NSE-listed equity
