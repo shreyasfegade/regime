@@ -335,9 +335,11 @@ button.sort:hover { color: var(--ink); }
 .article-head .dek { font-size: 20px; max-width: 60ch; }
 .scrolly { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; }
 .steps { padding: 8px 0 40px; }
-.step { min-height: 78vh; padding: 36px 0; border-top: 1px solid var(--rule); opacity: .45; transition: opacity .2s; }
+.step { min-height: 78vh; padding: 36px 0 36px 18px; border-top: 1px solid var(--rule); box-shadow: inset 2px 0 0 var(--rule); transition: box-shadow .2s; }
 .step:first-child { border-top: 0; }
-.step.active, .how-inline .step { opacity: 1; }
+.step.active { box-shadow: inset 3px 0 0 var(--ink); }
+.step.active .step-n { color: var(--ink); }
+.how-inline .step { padding-left: 0; box-shadow: none; }
 .step h2 { margin-top: 4px; }
 .step-n { font: 500 12px var(--mono); color: var(--ink-3); }
 .prose .step-n + h2 { margin-top: 4px; }
