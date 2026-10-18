@@ -76,3 +76,30 @@ export function withStickiness(transmat, stay) {
     return row.map((p, j) => (j === i ? stay : (1 - stay) * p / off));
   });
 }
+
+/**
+ * Scale every switching probability by `f` (f < 1: stickier, f > 1: jumpier),
+ * keeping each row's mix of destinations as fitted. f is capped so that no
+ * diagonal goes negative.
+ */
+export function scaleSwitching(transmat, f) {
+  const maxF = Math.min(...transmat.map((row, i) => 1 / Math.max(1e-12, 1 - row[i])));
+  const g = Math.min(f, maxF);
+  return transmat.map((row, i) => row.map((p, j) => (j === i ? 0 : p * g))).map((row, i) => {
+    row[i] = 1 - row.reduce((s, p) => s + p, 0);
+    return row;
+  });
+}
+
+/** Most probable state per day, and how many times it changes. */
+export function argmaxPath(post) {
+  const path = new Int8Array(post.length);
+  let switches = 0;
+  for (let t = 0; t < post.length; t++) {
+    let best = 0;
+    for (let k = 1; k < post[t].length; k++) if (post[t][k] > post[t][best]) best = k;
+    path[t] = best;
+    if (t && best !== path[t - 1]) switches++;
+  }
+  return { path, switches };
+}

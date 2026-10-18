@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How an HMM sees the market — REGIME</title>
+<meta name="description" content="A step-by-step explainer of the hidden Markov model behind REGIME, drawn with ten years of real NIFTY 50 data, with a live forward filter you can adjust.">
+<meta property="og:title" content="How an HMM sees the market — REGIME">
+<meta property="og:description" content="Hidden states, transitions and live filtering, explained with ten years of NIFTY 50 data.">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F5F2EA">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/newsreader-var.woff2" as="font" type="font/woff2" crossorigin>
+<script>try{var t=localStorage.getItem('regime-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/css/regime.css">
+<script type="module" src="/js/how.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="/">REGIME<span>hidden market states, India</span></a>
+    <div class="search" role="search">
+      <label class="visually-hidden" for="q">Search stocks and indices</label>
+      <input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="q-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search the NIFTY 50">
+      <kbd aria-hidden="true">/</kbd>
+      <ul id="q-list" role="listbox" aria-label="Matching stocks and indices" hidden></ul>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="/">Market</a>
+      <a href="/how-it-works" aria-current="page">How it works</a>
+      <a href="/methodology">Methodology</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch colour theme">Dark</button>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+  <div id="notices"></div>
+  <header class="article-head">
+    <p class="kicker">Explainer · NIFTY 50, data to <span data-fill="asof">the latest weekly refresh</span></p>
+    <h1 class="headline">How an HMM sees the market</h1>
+    <p class="dek">A hidden Markov model never sees "bull" or "bear". It sees numbers, one day at a time, and guesses which of a few hidden states produced them. Here is that process, step by step, on ten years of the NIFTY 50.</p>
+    <p class="notice" id="how-status" role="status" hidden></p>
+  </header>
+
+  <div class="scrolly">
+    <div class="steps prose">
+      <section class="step" data-step="0" aria-labelledby="s1">
+        <p class="step-n">1</p>
+        <h2 id="s1">One line, ten years</h2>
+        <p>This is the NIFTY 50 from <span data-fill="start">a decade ago</span> to today: <span data-fill="sessions">about 2,500</span> trading sessions. Read as a single line it says "up, with interruptions".</p>
+        <p>The interruptions are the interesting part. A single average return or a single volatility figure for the whole decade describes no actual year in it.</p>
+        <div class="step-fig" hidden></div>
+      </section>
+
+      <section class="step" data-step="1" aria-labelledby="s2">
+        <p class="step-n">2</p>
+        <h2 id="s2">Calm and storm take turns</h2>
+        <p>Underneath the price is its volatility: how large the daily moves were over the previous 20 sessions, scaled to a year. The ten-year average is <span data-fill="vol-mean">the dashed line</span>, but the series spends very little time near it. It ranges from <span data-fill="vol-min">quiet</span> to <span data-fill="vol-max">extreme</span>.</p>
+        <p>Markets cluster: calm days follow calm days, wild days follow wild days. That persistence is what a regime model tries to capture.</p>
+        <div class="step-fig" hidden></div>
+      </section>
+
+      <section class="step" data-step="2" aria-labelledby="s3">
+        <p class="step-n">3</p>
+        <h2 id="s3">What the model actually sees</h2>
+        <p>REGIME gives the model five numbers per day: the log return, volatility over 5 and 20 sessions, a volume z-score (how unusual that day's volume was), and 10-day momentum. Each is standardised so no feature dominates by its units.</p>
+        <p>The model is never told what any day "was". It only sees these points and has to explain them.</p>
+        <div class="step-fig" hidden></div>
+      </section>
+
+      <section class="step" data-step="3" aria-labelledby="s4">
+        <p class="step-n">4</p>
+        <h2 id="s4">Four hidden states, each a cloud of days</h2>
+        <p>The model assumes every day was produced by one of four hidden states, and that each state has its own five-dimensional Gaussian: a centre and a shape. Fitting the model (the Baum–Welch algorithm) moves those centres and shapes until the observed days are as likely as possible.</p>
+        <p>The states arrive unnamed. REGIME names them afterwards from their centres: the highest-volatility state is <b class="r3">Crisis</b>, the quietest is <b class="r1">Accumulation</b>, and the other two split into <b class="r0">Bullish</b> and <b class="r2">Bearish</b> by their average return. On the NIFTY 50, Crisis covers <span data-fill="crisis-share">a small share</span> of all sessions.</p>
+        <div class="step-fig" hidden></div>
+      </section>
+
+      <section class="step" data-step="4" aria-labelledby="s5">
+        <p class="step-n">5</p>
+        <h2 id="s5">States are sticky</h2>
+        <p>The "Markov" part is a transition matrix: the chance of moving from each state to each other state on the next session. Fitted to the NIFTY 50, a Bullish day is followed by another Bullish day <span data-fill="stay-bull">most</span> of the time, which implies spells of about <span data-fill="spell-bull">several dozen</span> sessions. A Crisis day is followed by another <span data-fill="stay-crisis">most</span> of the time too, about <span data-fill="spell-crisis">a few dozen</span> sessions on average.</p>
+        <p>That stickiness is what turns a noisy day-by-day guess into regimes that last weeks. It is also memoryless: the expected time left in a state does not depend on how long it has already lasted.</p>
+        <div class="step-fig" hidden></div>
+      </section>
+
+      <section class="step" data-step="5" aria-labelledby="s6">
+        <p class="step-n">6</p>
+        <h2 id="s6">Filtering: updating a belief, one day at a time</h2>
+        <p>Given the fitted model, the forward algorithm walks through the days in order. Each morning it carries yesterday's belief forward through the transition matrix; each evening it weighs that against how well each state explains the day just seen. The result is a probability for each state, using only data up to that day.</p>
+        <p>That is exactly what is running in your browser now. With the fitted model, the most likely state changes <span data-fill="switch-fitted">a number of</span> times in ten years, about <span data-fill="switch-year">ten</span> a year.</p>
+        <div class="controls" id="controls" hidden>
+          <div class="control">
+            <label for="c-switch">How easily states switch</label>
+            <input type="range" id="c-switch" min="-1" max="1" step="0.05" value="0" aria-describedby="c-switch-out">
+            <p class="control-out"><output id="c-switch-out" for="c-switch">×1, as fitted</output> · <button type="button" class="link-btn" id="c-reset">reset</button></p>
+            <p class="small">Now: <b class="num" data-fill="switch-now">—</b> switches (<span data-fill="switch-now-year">—</span> a year), agreeing with the hindsight path on <b class="num" data-fill="agree-now">—</b> of days. A stickier model switches less but recognises a new regime later; past a point it starts to lurch instead.</p>
+          </div>
+          <div class="control">
+            <label for="c-day">Belief on a given day</label>
+            <input type="range" id="c-day" min="0" max="1" step="1" value="1" aria-describedby="c-day-out">
+            <p class="control-out"><output id="c-day-out" for="c-day">—</output> ·
+              <button type="button" class="link-btn" data-jump="2020-03-23">COVID crash</button> ·
+              <button type="button" class="link-btn" data-jump="2016-11-09">Demonetisation</button> ·
+              <button type="button" class="link-btn" data-jump="last">today</button></p>
+            <div class="bars" id="c-belief" role="img"></div>
+          </div>
+        </div>
+        <div class="step-fig" hidden></div>
+      </section>
+
+      <section class="step" data-step="6" aria-labelledby="s7">
+        <p class="step-n">7</p>
+        <h2 id="s7">Hindsight is cleaner than the live call</h2>
+        <p>Once all ten years are in, a second algorithm (Viterbi) finds the single most likely sequence of states for the whole history at once. It can use tomorrow's data to relabel today, so its path is smoother: <span data-fill="vit-switches">fewer</span> changes in total. The live, filtered call agrees with it on <span data-fill="agree">most</span> of days.</p>
+        <p>REGIME shows both on every stock page, and keeps them apart. The timeline bands and calendar use hindsight, because they describe the past. The backtest uses neither: it uses <a href="/methodology#walk-forward">walk-forward</a> models that were refitted only on data available at the time.</p>
+        <div class="step-fig" hidden></div>
+      </section>
+    </div>
+
+    <aside class="stage" id="stage" hidden aria-label="Figure for the current step">
+      <figure class="figure">
+        <div class="fig-head"><span class="fig-label">Fig. 1</span><p class="fig-title"></p><p class="fig-dek"></p></div>
+        <div class="fig-canvas"><canvas></canvas></div>
+        <div class="fig-foot"><span>Source: Yahoo Finance daily data for ^NSEI; REGIME 4-state Gaussian HMM.</span></div>
+      </figure>
+    </aside>
+  </div>
+
+  <section class="section prose limits" aria-labelledby="limits">
+    <h2 id="limits">What this is not</h2>
+    <p><b>It is not a forecast.</b> The model describes the state the market appears to be in. The transition matrix gives probabilities for tomorrow, but they are averages over the past decade, not a view on the next session.</p>
+    <p><b>The labels are a heuristic.</b> The model finds four clouds; the names come from a simple rule on their centres. On some stocks, two states are close and the names matter less than the numbers. The <a href="/methodology#robustness">robustness checks</a> on every stock page say how stable the split is.</p>
+    <p><b>Four is a choice.</b> An information criterion (BIC) often prefers five or six states, partly because the features overlap in time. REGIME keeps four everywhere so a regime means the same thing on every page, and says so where BIC disagrees.</p>
+    <p><b>In-sample pictures flatter.</b> Anything decoded with hindsight looks cleaner than what was knowable at the time. That is why the backtest is walk-forward and pays realistic costs, and why its result is often worse than buy-and-hold.</p>
+    <p>Research, not investment advice. The full model specification is in the <a href="/methodology">methodology</a>.</p>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <div>
+      <p>REGIME classifies each day into one of four hidden regimes with a Gaussian hidden Markov model fitted to that stock's own history. Prices: Yahoo Finance daily data. Universe: the NIFTY 50 constituents (NSE), ranked by AMFI's market-cap list. Data as of <span data-asof>—</span>, refreshed weekly.</p>
+      <p>Research, not investment advice. Past regimes do not promise future returns.</p>
+    </div>
+    <div><p><a href="/methodology">Methodology</a> · <a href="/">The market today</a></p></div>
+  </div>
+</footer>
+<div class="tip" id="tip" hidden></div>
+</body>
+</html>

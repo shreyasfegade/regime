@@ -36,3 +36,15 @@ test('stickiness keeps rows stochastic', () => {
   const t = withStickiness(ex.transmat, 0.8);
   t.forEach((row, i) => { assert.ok(Math.abs(row[i] - 0.8) < 1e-12); assert.ok(Math.abs(row.reduce((a, b) => a + b) - 1) < 1e-12); });
 });
+
+test('scaling switches: 1 is the fitted model, smaller is stickier, rows stay stochastic', async () => {
+  const { scaleSwitching, argmaxPath } = await import('../../static/js/hmm.js');
+  const same = scaleSwitching(ex.transmat, 1);
+  same.forEach((row, i) => row.forEach((p, j) => assert.ok(Math.abs(p - ex.transmat[i][j]) < 1e-12)));
+  const sticky = scaleSwitching(ex.transmat, 0.1), jumpy = scaleSwitching(ex.transmat, 1e6);
+  for (const t of [sticky, jumpy]) t.forEach(row => { assert.ok(Math.abs(row.reduce((a, b) => a + b) - 1) < 1e-12); row.forEach(p => assert.ok(p >= -1e-12)); });
+  sticky.forEach((row, i) => assert.ok(row[i] > ex.transmat[i][i]));
+  const n = m => argmaxPath(forwardFilter(xs, m, ex.means, ex.covars)).switches;
+  assert.ok(n(scaleSwitching(ex.transmat, 0.3)) <= n(ex.transmat));
+  assert.ok(n(ex.transmat) <= n(scaleSwitching(ex.transmat, 10)));
+});

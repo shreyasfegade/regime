@@ -329,6 +329,34 @@ button.sort:hover { color: var(--ink); }
 .market-table td a { text-decoration: none; }
 .market-table td a:hover { text-decoration: underline; }
 
+/* ── Explainer ──────────────────────────────────────────────────────── */
+.article-head { padding: 40px 0 28px; border-bottom: 1px solid var(--rule-ink); }
+.article-head .headline { margin: 12px 0 14px; max-width: 18ch; }
+.article-head .dek { font-size: 20px; max-width: 60ch; }
+.scrolly { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; }
+.steps { padding: 8px 0 40px; }
+.step { min-height: 78vh; padding: 36px 0; border-top: 1px solid var(--rule); opacity: .45; transition: opacity .2s; }
+.step:first-child { border-top: 0; }
+.step.active, .how-inline .step { opacity: 1; }
+.step h2 { margin-top: 4px; }
+.step-n { font: 500 12px var(--mono); color: var(--ink-3); }
+.prose .step-n + h2 { margin-top: 4px; }
+.stage { position: sticky; top: 24px; align-self: start; padding: 32px 0; }
+.how-inline .scrolly { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.how-inline .steps { max-width: none; }
+.how-inline .step { min-height: 0; }
+.how-inline .step > p, .how-inline .step > h2, .how-inline .controls { max-width: var(--measure); }
+.step-fig { margin-top: 24px; font-family: var(--sans); font-size: 15px; }
+.controls { display: grid; gap: 22px; margin: 22px 0 0; padding: 18px 0 4px; border-top: 1px solid var(--rule-ink); font: 400 14px/1.5 var(--sans); }
+.control label { display: block; font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 6px; }
+.control input[type='range'] { width: 100%; accent-color: var(--ink); height: 32px; margin: 0; }
+.control-out { font: 400 13px var(--mono); color: var(--ink-2); margin: 2px 0 8px; }
+.control .bar-row { grid-template-columns: 96px 1fr 48px; }
+.link-btn { border: 0; background: none; padding: 4px 0; min-height: 32px; font: inherit; color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule-2); text-underline-offset: 3px; cursor: pointer; }
+.link-btn:hover { text-decoration-color: currentColor; }
+.limits { padding-top: 32px; }
+.limits h2 { margin-top: 0; }
+
 /* ── Responsive ─────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .today { grid-template-columns: 1fr; gap: 24px; }
