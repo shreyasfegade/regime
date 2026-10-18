@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from config import (
+from regime.config import (
     MOMENTUM_WINDOW,
     VOLATILITY_WINDOW_LONG,
     VOLATILITY_WINDOW_SHORT,
@@ -72,9 +72,7 @@ def _compute_raw_features(df: pd.DataFrame) -> pd.DataFrame:
         window=VOLATILITY_WINDOW_LONG
     ).std()
 
-    vol_mean = volume.rolling(window=VOLUME_ZSCORE_WINDOW).mean()
-    vol_std = volume.rolling(window=VOLUME_ZSCORE_WINDOW).std()
-    volume_zscore = (volume - vol_mean) / vol_std
+    volume_zscore = volume_zscore_series(volume)
 
     momentum_10d = np.log(close / close.shift(MOMENTUM_WINDOW))
 
@@ -89,6 +87,23 @@ def _compute_raw_features(df: pd.DataFrame) -> pd.DataFrame:
         index=df.index,
     )
     return features
+
+
+def volume_zscore_series(volume: pd.Series) -> pd.Series:
+    """
+    Rolling z-score of volume, defined as 0 wherever it is undefined.
+
+    Indices on Yahoo (^NSEI, ^BSESN) often report zero or missing volume.
+    A flat window has zero standard deviation, which would make the z-score
+    NaN and, after the warm-up dropna, delete every row of the series. A
+    flat or missing window carries no volume information, so it scores 0.
+    """
+    volume = volume.astype(float).fillna(0.0)
+    vol_mean = volume.rolling(window=VOLUME_ZSCORE_WINDOW).mean()
+    vol_std = volume.rolling(window=VOLUME_ZSCORE_WINDOW).std()
+    z = (volume - vol_mean) / vol_std.where(vol_std > 1e-12)
+    z[vol_std.notna() & ~(vol_std > 1e-12)] = 0.0
+    return z
 
 
 def _trim_warmup(features: pd.DataFrame) -> pd.DataFrame:
