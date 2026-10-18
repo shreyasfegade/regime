@@ -7,113 +7,92 @@ Signal-quality and risk diagnostics that sit on top of the fitted HMM:
                             propagated through the transition matrix
   • model_diagnostics     — log-likelihood, AIC, BIC for model-selection rigor
 
-These turn REGIME from a descriptive classifier into something a quant can
-interrogate: every regime label comes with measured forward edge and a
-forward-looking tail-risk signal, not just a color.
+Every function takes regimes as indices in config.REGIME_ORDER.
 """
 
 import numpy as np
 
-from config import LABEL_CRISIS
+from regime.config import CRISIS_HORIZON, CRISIS_IDX, FORWARD_HORIZONS, REGIME_ORDER
+from regime.model import n_params
 
 
 def forward_return_edge(
     close: np.ndarray,
-    state_sequence: np.ndarray,
-    label_map: dict[int, str],
-    horizon: int = 5,
+    regimes: np.ndarray,
+    horizons: tuple[int, ...] = FORWARD_HORIZONS,
 ) -> dict:
     """
-    For each regime, measure the distribution of the *next* `horizon`-day
-    return conditioned on being in that regime today.
+    For each regime, the distribution of the *next* h-session return
+    conditioned on being in that regime today.
 
     This is the core "is the signal real?" test: a regime that classifies the
     past is only useful if, on average, what follows it differs by regime.
 
-    Returns dict: { horizon, by_regime: { label: {mean, median, win_rate,
-    samples, best, worst} } } with returns in percent.
+    Returns {str(h): [per-regime {mean, median, win_rate, samples} | None]}
+    with returns in percent, regimes in REGIME_ORDER.
     """
     close = np.asarray(close, dtype=float)
     n = len(close)
-    fwd = np.full(n, np.nan)
-    if n > horizon:
-        fwd[:n - horizon] = close[horizon:] / close[:n - horizon] - 1.0
-
-    by_regime: dict[str, dict] = {}
-    for state_idx, label in sorted(label_map.items(), key=lambda kv: kv[1]):
-        mask = (state_sequence == state_idx) & ~np.isnan(fwd)
-        vals = fwd[mask]
-        if len(vals) == 0:
-            continue
-        by_regime[label] = {
-            'mean': round(float(np.mean(vals)) * 100, 3),
-            'median': round(float(np.median(vals)) * 100, 3),
-            'win_rate': round(float(np.mean(vals > 0)) * 100, 1),
-            'samples': int(len(vals)),
-            'best': round(float(np.max(vals)) * 100, 2),
-            'worst': round(float(np.min(vals)) * 100, 2),
-        }
-    return {'horizon': horizon, 'by_regime': by_regime}
+    out: dict[str, list] = {}
+    for h in horizons:
+        fwd = np.full(n, np.nan)
+        if n > h:
+            fwd[:n - h] = close[h:] / close[:n - h] - 1.0
+        rows = []
+        for r in range(len(REGIME_ORDER)):
+            vals = fwd[(regimes == r) & ~np.isnan(fwd)]
+            if len(vals) == 0:
+                rows.append(None)
+                continue
+            rows.append({
+                'mean': round(float(np.mean(vals)) * 100, 3),
+                'median': round(float(np.median(vals)) * 100, 3),
+                'win_rate': round(float(np.mean(vals > 0)) * 100, 1),
+                'samples': int(len(vals)),
+            })
+        out[str(h)] = rows
+    return out
 
 
 def crisis_early_warning(
-    transition_matrix: list[list[float]],
+    transmat: np.ndarray,
     current_probs: np.ndarray,
-    label_map: dict[int, str],
-    horizon: int = 10,
+    horizon: int = CRISIS_HORIZON,
 ) -> dict:
     """
-    Propagate today's posterior state distribution forward through the HMM
-    transition matrix to estimate the probability of being in the Crisis
-    regime on each of the next `horizon` days.
+    Propagate today's posterior distribution (regime order) forward through
+    the transition matrix to estimate the probability of being in Crisis on
+    each of the next `horizon` sessions.
 
-    Returns dict: { current, projected (at horizon), peak, trajectory[] } as
-    probabilities in percent — a genuine forward-looking risk gauge.
+    Returns {horizon, current, projected, peak, trajectory[]} in percent.
     """
-    T = np.asarray(transition_matrix, dtype=float)
-    dist = np.asarray(current_probs, dtype=float)
-    dist = dist / dist.sum() if dist.sum() > 0 else dist
-
-    crisis_states = [i for i, lbl in label_map.items() if lbl == LABEL_CRISIS]
-    crisis_now = float(sum(dist[i] for i in crisis_states))
-
-    trajectory = [round(crisis_now * 100, 2)]
-    d = dist.copy()
+    T = np.asarray(transmat, dtype=float)
+    d = np.asarray(current_probs, dtype=float)
+    d = d / d.sum() if d.sum() > 0 else d
+    trajectory = [round(float(d[CRISIS_IDX]) * 100, 2)]
     for _ in range(horizon):
         d = d @ T
-        trajectory.append(round(float(sum(d[i] for i in crisis_states)) * 100, 2))
-
+        trajectory.append(round(float(d[CRISIS_IDX]) * 100, 2))
     return {
         'horizon': horizon,
-        'current': round(crisis_now * 100, 2),
+        'current': trajectory[0],
         'projected': trajectory[-1],
         'peak': round(max(trajectory), 2),
         'trajectory': trajectory,
     }
 
 
-def model_diagnostics(model, features: np.ndarray, n_states: int) -> dict:
+def model_diagnostics(log_likelihood: float, n_samples: int, n_dim: int, n_states: int) -> dict:
     """
-    Information-criteria diagnostics for the fitted Gaussian HMM.
-
-    AIC/BIC let you justify the choice of 4 states rather than asserting it —
-    lower is better, and BIC penalizes complexity more heavily. Parameter
-    count assumes full covariance matrices.
+    Information-criteria diagnostics for the fitted Gaussian HMM. AIC and
+    BIC (lower is better; BIC penalises complexity more heavily) let the
+    choice of states be justified rather than asserted.
     """
-    n_samples, n_dim = features.shape
-    log_likelihood = float(model.score(features))
-
-    # startprob (k-1) + transmat k*(k-1) + means k*d + full covars k*d*(d+1)/2
-    k, d = n_states, n_dim
-    n_params = (k - 1) + k * (k - 1) + k * d + k * d * (d + 1) // 2
-
-    aic = -2.0 * log_likelihood + 2.0 * n_params
-    bic = -2.0 * log_likelihood + n_params * np.log(n_samples)
-
+    k = n_params(n_states, n_dim)
     return {
         'log_likelihood': round(log_likelihood, 1),
-        'aic': round(float(aic), 1),
-        'bic': round(float(bic), 1),
-        'n_params': int(n_params),
+        'aic': round(-2.0 * log_likelihood + 2.0 * k, 1),
+        'bic': round(float(-2.0 * log_likelihood + k * np.log(n_samples)), 1),
+        'n_params': int(k),
         'n_samples': int(n_samples),
     }
