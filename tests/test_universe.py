@@ -61,10 +61,10 @@ def test_parse_takes_top_n_and_maps_columns():
     assert rows[2]['name'] == 'Fedders Holding Ltd'
 
 
-def test_slugs_are_url_safe_and_mark_bse_only():
+def test_slugs_are_url_safe_and_unique():
     rows = parse_amfi(amfi_xlsx(ROWS))
     make_slugs(rows)
-    assert [r['slug'] for r in rows] == ['RELIANCE', 'M-M', 'FEDDERSHOL-BSE', 'FOURTH']
+    assert [r['slug'] for r in rows] == ['RELIANCE', 'M-M', 'FEDDERSHOL', 'FOURTH']
 
 
 def test_sector_join_by_isin_then_yahoo_then_unclassified():
@@ -95,3 +95,9 @@ def test_yahoo_mapping(sector, industry, expect):
 
 def test_industry_csv_handles_bom():
     assert parse_industry_csv('﻿' + INDUSTRY) == {'INE002A01018': 'Oil Gas & Consumable Fuels'}
+
+
+def test_bse_only_slug_yields_to_an_nse_symbol():
+    rows = [{'nse': 'ABC', 'bse': 'ABC', 'isin': 'X1'}, {'nse': '', 'bse': 'ABC', 'isin': 'X2'}]
+    make_slugs(rows)
+    assert [r['slug'] for r in rows] == ['ABC', 'ABC-BSE']

@@ -50,6 +50,10 @@ def jobs_from_universe(universe: list[dict], include_indices: bool = True) -> li
             cands.append((f"{c['nse']}.NS", 'NSE'))
         if c.get('bse'):
             cands.append((f"{c['bse']}.BO", 'BSE'))
+            if not c.get('nse'):
+                # AMFI sometimes leaves the NSE symbol blank for companies
+                # listed on both exchanges; the BSE symbol usually matches.
+                cands.append((f"{c['bse']}.NS", 'NSE'))
         jobs.append({
             'slug': c['slug'], 'sym': c.get('nse') or c.get('bse'), 'name': c['name'],
             'sector': c['sector'], 'cap': c['cap'], 'rank': int(c['rank']),
@@ -83,8 +87,9 @@ def fetch_jobs(jobs: list[dict], start: str, downloader=None, sleep=time.sleep,
                batch: int = FETCH_BATCH):
     """
     Yield (job, df, exchange, symbol, reason) for every job. df is None when
-    every exchange failed, with the reason. Symbols are downloaded in batches;
-    a symbol missing from its batch gets one individual retry.
+    every exchange failed, with the reason. Symbols are downloaded in batches
+    (each batch retried with backoff); a symbol missing from a batch that
+    otherwise succeeded is usually delisted, so it gets one quick retry alone.
     """
     symbols = [s for j in jobs for s, _ in j['candidates']]
     frames: dict[str, pd.DataFrame] = {}
@@ -100,9 +105,9 @@ def fetch_jobs(jobs: list[dict], start: str, downloader=None, sleep=time.sleep,
             raw = frames.get(sym)
             if raw is None:
                 try:
-                    raw = download_batch([sym], start, downloader=downloader, sleep=sleep).get(sym)
-                except Exception as exc:  # noqa: BLE001
-                    reasons.append(f'{sym}: {_short(exc)}')
+                    raw = download_batch([sym], start, downloader=downloader, sleep=sleep, tries=2).get(sym)
+                except Exception:  # noqa: BLE001
+                    reasons.append(f'{sym}: no data on Yahoo Finance (delisted or renamed)')
                     continue
             try:
                 cleaned[sym] = clean_ohlcv(raw)

@@ -52,7 +52,8 @@ def with_retry(fn: Callable, tries: int = FETCH_TRIES, base: float = FETCH_BACKO
 
 
 def download_batch(symbols: list[str], start: str, end: str | None = None,
-                   downloader: Callable | None = None, sleep=time.sleep) -> dict[str, pd.DataFrame]:
+                   downloader: Callable | None = None, sleep=time.sleep,
+                   tries: int = FETCH_TRIES) -> dict[str, pd.DataFrame]:
     """
     Download several symbols in one request. Returns {symbol: raw frame} for
     every symbol that came back with rows; missing symbols are simply absent.
@@ -70,7 +71,7 @@ def download_batch(symbols: list[str], start: str, end: str | None = None,
             group_by='ticker', threads=True,
         )
 
-    data = with_retry(call, sleep=sleep, retry_if=lambda d: d is None or d.empty)
+    data = with_retry(call, tries=tries, sleep=sleep, retry_if=lambda d: d is None or d.empty)
     out: dict[str, pd.DataFrame] = {}
     for sym in symbols:
         try:
@@ -123,7 +124,8 @@ def clean_ohlcv(raw: pd.DataFrame) -> pd.DataFrame:
     min_rows = MIN_YEARS_DATA * 252
     if len(df) < min_rows:
         raise ValueError(
-            f'only {len(df)} sessions of history (needs {MIN_YEARS_DATA}+ years)'
+            f'only {len(df)} session{"" if len(df) == 1 else "s"} of history '
+            f'(needs {MIN_YEARS_DATA}+ years, {min_rows} sessions)'
         )
     return df
 

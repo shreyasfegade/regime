@@ -155,7 +155,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 154,GICRE,General Insurance Corporation of India,INE481Y01014,GICRE,GICRE,M,Financial Services,NSE,2025-12-31
 155,YESBANK,Yes Bank Ltd,INE528G01035,YESBANK,YESBANK,M,Financial Services,NSE,2025-12-31
 156,VMM,Vishal Mega Mart Ltd,INE01EA01019,VMM,VMM,M,Consumer Services,NSE,2025-12-31
-157,ABBOTINDIA-BSE,Abbott India Ltd,INE358A01014,,ABBOTINDIA,M,Healthcare,NSE,2025-12-31
+157,ABBOTINDIA,Abbott India Ltd,INE358A01014,,ABBOTINDIA,M,Healthcare,NSE,2025-12-31
 158,TORNTPOWER,Torrent Power Ltd,INE813H01021,TORNTPOWER,TORNTPOWER,M,Power,NSE,2025-12-31
 159,AUROPHARMA,Aurobindo Pharma Ltd,INE406A01037,AUROPHARMA,AUROPHARMA,M,Healthcare,NSE,2025-12-31
 160,NMDC,NMDC Ltd,INE584A01023,NMDC,NMDC,M,Metals & Mining,NSE,2025-12-31
@@ -212,7 +212,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 211,HEXT,Hexaware Technologies Ltd,INE093A01041,HEXT,HEXT,M,Information Technology,NSE,2025-12-31
 212,LTTS,L&T Technology Services Ltd,INE010V01017,LTTS,LTTS,M,Information Technology,NSE,2025-12-31
 213,VOLTAS,Voltas Ltd,INE226A01021,VOLTAS,VOLTAS,M,Consumer Durables,NSE,2025-12-31
-214,MCX-BSE,Multi Commodity Exchange of India Ltd,INE745G01035,,MCX,M,Financial Services,Yahoo,2025-12-31
+214,MCX,Multi Commodity Exchange of India Ltd,INE745G01035,,MCX,M,Financial Services,Yahoo,2025-12-31
 215,HUDCO,Housing &Urban Development Corporation Ltd,INE031A01017,HUDCO,HUDCO,M,Financial Services,NSE,2025-12-31
 216,360ONE,360 ONE WAM Ltd,INE466L01038,360ONE,360ONE,M,Financial Services,NSE,2025-12-31
 217,MAHABANK,Bank of maharashtra,INE457A01014,MAHABANK,MAHABANK,M,Financial Services,NSE,2025-12-31
@@ -276,7 +276,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 275,GRSE,Garden Reach Shipbuilders & Engineers Ltd,INE382Z01011,GRSE,GRSE,S,Capital Goods,NSE,2025-12-31
 276,MSUMI,Motherson Sumi Wiring India Ltd,INE0FS801015,MSUMI,MSUMI,S,Automobile and Auto Components,NSE,2025-12-31
 277,GUJGASLTD,Gujarat Gas Ltd,INE844O01030,GUJGASLTD,GUJGASLTD,S,Unclassified,none,2025-12-31
-278,ISEC-BSE,ICICI Securities Ltd,INE763G01038,,ISEC,S,Unclassified,none,2025-12-31
+278,ISEC,ICICI Securities Ltd,INE763G01038,,ISEC,S,Unclassified,none,2025-12-31
 279,IGL,Indraprashtha Gas Ltd,INE203G01027,IGL,IGL,S,Oil Gas & Consumable Fuels,NSE,2025-12-31
 280,SONACOMS,Sona BLW Precision Forgings Ltd,INE073K01018,SONACOMS,SONACOMS,S,Automobile and Auto Components,NSE,2025-12-31
 281,AEGISVOPAK,Aegis Vopak Terminals Ltd,INE0INX01018,AEGISVOPAK,AEGISVOPAK,S,Oil Gas & Consumable Fuels,NSE,2025-12-31
@@ -284,7 +284,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 283,TATATECH,Tata Technologies Ltd,INE142M01025,TATATECH,TATATECH,S,Information Technology,NSE,2025-12-31
 284,PINELABS,Pine Labs Ltd,INE15B701018,PINELABS,PINELABS,S,Financial Services,NSE,2025-12-31
 285,IKS,Inventurus Knowledge Solutions Ltd,INE115Q01022,IKS,IKS,S,Information Technology,NSE,2025-12-31
-286,ELITECON-BSE,Elitecon International Ltd,INE669R01026,,ELITECON,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
+286,ELITECON,Elitecon International Ltd,INE669R01026,,ELITECON,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 287,STARHEALTH,Star Health and Allied Insurance Company Ltd,INE575P01011,STARHEALTH,STARHEALTH,S,Financial Services,NSE,2025-12-31
 288,JBCHEPHARM,J.B. Chemicals & Pharmaceuticals Lt,INE572A01036,JBCHEPHARM,JBCHEPHARM,S,Unclassified,none,2025-12-31
 289,TVSHLTD,TVS Holdings Ltd,INE105A01035,TVSHLTD,TVSHLTD,S,Automobile and Auto Components,Yahoo,2025-12-31
@@ -296,7 +296,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 295,SYNGENE,Syngene International Ltd,INE398R01022,SYNGENE,SYNGENE,S,Healthcare,NSE,2025-12-31
 296,BANDHANBNK,Bandhan Bank Ltd,INE545U01014,BANDHANBNK,BANDHANBNK,S,Financial Services,NSE,2025-12-31
 297,EMCURE,Emcure Pharmaceuticals Ltd,INE168P01015,EMCURE,EMCURE,S,Healthcare,NSE,2025-12-31
-298,PEL-BSE,Piramal Enterprises Ltd,INE140A01024,,PEL,S,Unclassified,none,2025-12-31
+298,PEL,Piramal Enterprises Ltd,INE140A01024,,PEL,S,Unclassified,none,2025-12-31
 299,LALPATHLAB,Dr. Lal Pathlabs Ltd,INE600L01024,LALPATHLAB,LALPATHLAB,S,Healthcare,NSE,2025-12-31
 300,AMBER,Amber Enterprises India Ltd,INE371P01015,AMBER,AMBER,S,Consumer Durables,NSE,2025-12-31
 301,PPLPHARMA,Piramal Pharma Ltd,INE0DK501011,PPLPHARMA,PPLPHARMA,S,Healthcare,NSE,2025-12-31
@@ -318,9 +318,9 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 317,MANAPPURAM,Manappuram Finance Ltd,INE522D01027,MANAPPURAM,MANAPPURAM,S,Financial Services,NSE,2025-12-31
 318,PNBHOUSING,PNB Housing Finance Ltd,INE572E01012,PNBHOUSING,PNBHOUSING,S,Financial Services,NSE,2025-12-31
 319,BRIGADE,Brigade Enterprises Ltd,INE791I01019,BRIGADE,BRIGADE,S,Realty,NSE,2025-12-31
-320,BAYERCROP-BSE,Bayer CropScience Ltd,INE462A01022,,BAYERCROP,S,Chemicals,Yahoo,2025-12-31
+320,BAYERCROP,Bayer CropScience Ltd,INE462A01022,,BAYERCROP,S,Chemicals,Yahoo,2025-12-31
 321,ABSLAMC,Aditya Birla Sun Life AMC Ltd,INE404A01024,ABSLAMC,ABSLAMC,S,Financial Services,NSE,2025-12-31
-322,NSDL-BSE,National Securities Depository Ltd,INE301O01023,,NSDL,S,Financial Services,Yahoo,2025-12-31
+322,NSDL,National Securities Depository Ltd,INE301O01023,,NSDL,S,Financial Services,Yahoo,2025-12-31
 323,TIMKEN,Timken India Ltd,INE325A01013,TIMKEN,TIMKEN,S,Capital Goods,NSE,2025-12-31
 324,HSCL,Himadri Speciality Chemical Ltd,INE019C01026,HSCL,HSCL,S,Chemicals,NSE,2025-12-31
 325,FORCEMOT,Force Motors Ltd,INE451A01017,FORCEMOT,FORCEMOT,S,Automobile and Auto Components,NSE,2025-12-31
@@ -492,7 +492,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 491,EMBDL,Embassy Developments Ltd,INE069I01010,EMBDL,EMBDL,S,Realty,NSE,2025-12-31
 492,ELECON,Elecon Engineering Co.Ltd,INE205B01031,ELECON,ELECON,S,Capital Goods,NSE,2025-12-31
 493,JINDALSAW,Jindal Saw Ltd,INE324A01032,JINDALSAW,JINDALSAW,S,Capital Goods,NSE,2025-12-31
-494,IWEL-BSE,Inox Wind Energy Ltd,INE0FLR01028,,IWEL,S,Unclassified,none,2025-12-31
+494,IWEL,Inox Wind Energy Ltd,INE0FLR01028,,IWEL,S,Unclassified,none,2025-12-31
 495,WELSPUNLIV,Welspun Living Ltd,INE192B01031,WELSPUNLIV,WELSPUNLIV,S,Textiles,NSE,2025-12-31
 496,NSLNISP,NMDC Steel Ltd,INE0NNS01018,NSLNISP,NSLNISP,S,Metals & Mining,NSE,2025-12-31
 497,ACUTAAS,Acutaas Chemicals Ltd,INE00FF01025,ACUTAAS,ACUTAAS,S,Healthcare,NSE,2025-12-31
@@ -564,7 +564,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 563,ALKYLAMINE,Alkyl Amines Chemicals Ltd,INE150B01039,ALKYLAMINE,ALKYLAMINE,S,Chemicals,NSE,2025-12-31
 564,SHAILY,Shaily Engineering Plastics Ltd,INE151G01028,SHAILY,SHAILY,S,Consumer Durables,NSE,2025-12-31
 565,BANCOINDIA,Banco Products (India) Ltd,INE213C01025,BANCOINDIA,BANCOINDIA,S,Automobile and Auto Components,NSE,2025-12-31
-566,RRP-BSE,RRP Semiconductor Ltd,INE713N01013,,RRP,S,Information Technology,Yahoo,2025-12-31
+566,RRP,RRP Semiconductor Ltd,INE713N01013,,RRP,S,Information Technology,Yahoo,2025-12-31
 567,AVANTIFEED,Avanti Feeds Ltd,INE871C01038,AVANTIFEED,AVANTIFEED,S,Fast Moving Consumer Goods,NSE,2025-12-31
 568,IIFLCAPS,Iifl Capital Services Ltd,INE489L01022,IIFLCAPS,IIFLCAPS,S,Financial Services,NSE,2025-12-31
 569,SHAKTIPUMP,Shakti Pumps (India) Ltd,INE908D01010,SHAKTIPUMP,SHAKTIPUMP,S,Capital Goods,NSE,2025-12-31
@@ -582,7 +582,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 581,TDPOWERSYS,TD Power Systems Ltd,INE419M01027,TDPOWERSYS,TDPOWERSYS,S,Capital Goods,Yahoo,2025-12-31
 582,KPIGREEN,KPI Green Energy Ltd,INE542W01025,KPIGREEN,KPIGREEN,S,Power,NSE,2025-12-31
 583,TRANSRAILL,Transrail Lighting Ltd,INE454P01035,TRANSRAILL,TRANSRAILL,S,Capital Goods,NSE,2025-12-31
-584,KAMAHOLD-BSE,Kama Holdings Ltd,INE411F01010,,KAMAHOLD,S,Diversified,Yahoo,2025-12-31
+584,KAMAHOLD,Kama Holdings Ltd,INE411F01010,,KAMAHOLD,S,Diversified,Yahoo,2025-12-31
 585,BIRLACORPN,Birla Corporation Ltd,INE340A01012,BIRLACORPN,BIRLACORPN,S,Construction Materials,NSE,2025-12-31
 586,SAPPHIRE,Sapphire Foods India Ltd,INE806T01020,SAPPHIRE,SAPPHIRE,S,Consumer Services,NSE,2025-12-31
 587,MAPMYINDIA,C.E. Info Systems Ltd,INE0BV301023,MAPMYINDIA,MAPMYINDIA,S,Information Technology,NSE,2025-12-31
@@ -599,7 +599,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 598,BLUESTONE,BlueStone Jewellery and Lifestyle Ltd,INE304W01038,BLUESTONE,BLUESTONE,S,Consumer Durables,NSE,2025-12-31
 599,WABAG,VA Tech Wabag Ltd,INE956G01038,WABAG,WABAG,S,Utilities,NSE,2025-12-31
 600,TI,Tilaknagar Industries Ltd,INE133E01013,TI,TI,S,Fast Moving Consumer Goods,NSE,2025-12-31
-601,BENGALASM-BSE,Bengal & Assam Company Ltd,INE083K01017,,BENGALASM,S,Automobile and Auto Components,Yahoo,2025-12-31
+601,BENGALASM,Bengal & Assam Company Ltd,INE083K01017,,BENGALASM,S,Automobile and Auto Components,Yahoo,2025-12-31
 602,ALOKINDS,Alok Industries Ltd,INE270A01029,ALOKINDS,ALOKINDS,S,Textiles,Yahoo,2025-12-31
 603,SANDUMA,Sandur Manganese & Iron Ores Ltd,INE149K01016,SANDUMA,SANDUMA,S,Metals & Mining,NSE,2025-12-31
 604,TTKPRESTIG,TTK Prestige Ltd,INE690A01028,TTKPRESTIG,TTKPRESTIG,S,Consumer Durables,NSE,2025-12-31
@@ -613,7 +613,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 612,LOTUSDEV,Sri Lotus Developers and Realty Ltd,INE0V9Q01010,LOTUSDEV,LOTUSDEV,S,Realty,NSE,2025-12-31
 613,JAIBALAJI,Jai Balaji Industries Ltd,INE091G01026,JAIBALAJI,JAIBALAJI,S,Metals & Mining,NSE,2025-12-31
 614,SAREGAMA,Saregama India Ltd,INE979A01025,SAREGAMA,SAREGAMA,S,Media Entertainment & Publication,NSE,2025-12-31
-615,KIRLFER-BSE,Kirloskar Ferrous Industries Ltd,INE884B01025,,KIRLFER,S,Metals & Mining,Yahoo,2025-12-31
+615,KIRLFER,Kirloskar Ferrous Industries Ltd,INE884B01025,,KIRLFER,S,Metals & Mining,Yahoo,2025-12-31
 616,PCJEWELLER,PC Jeweller Ltd,INE785M01021,PCJEWELLER,PCJEWELLER,S,Consumer Durables,NSE,2025-12-31
 617,LUMAXTECH,Lumax Auto Technologies Ltd,INE872H01027,LUMAXTECH,LUMAXTECH,S,Automobile and Auto Components,NSE,2025-12-31
 618,CORONA,Corona Remedies Ltd,INE02ZQ01018,CORONA,CORONA,S,Healthcare,Yahoo,2025-12-31
@@ -621,7 +621,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 620,DBREALTY,Valor Estate Ltd,INE879I01012,DBREALTY,DBREALTY,S,Realty,NSE,2025-12-31
 621,MANORAMA,Manorama Industries Ltd,INE00VM01036,MANORAMA,MANORAMA,S,Fast Moving Consumer Goods,NSE,2025-12-31
 622,ARVIND,Arvind Ltd,INE034A01011,ARVIND,ARVIND,S,Textiles,NSE,2025-12-31
-623,ELANTAS-BSE,Elantas Beck India Ltd,INE280B01018,,ELANTAS,S,Chemicals,Yahoo,2025-12-31
+623,ELANTAS,Elantas Beck India Ltd,INE280B01018,,ELANTAS,S,Chemicals,Yahoo,2025-12-31
 624,APOLLO,Apollo Micro Systems Ltd,INE713T01028,APOLLO,APOLLO,S,Capital Goods,NSE,2025-12-31
 625,PNGJL,P N Gadgil Jewellers Ltd,INE953R01016,PNGJL,PNGJL,S,Consumer Durables,NSE,2025-12-31
 626,MAHSEAMLES,Maharashtra Seamless Ltd,INE271B01025,MAHSEAMLES,MAHSEAMLES,S,Metals & Mining,Yahoo,2025-12-31
@@ -696,7 +696,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 695,MHRIL,Mahindra Holidays & Resorts India Ltd,INE998I01010,MHRIL,MHRIL,S,Consumer Services,Yahoo,2025-12-31
 696,THYROCARE,Thyrocare Technologies Ltd,INE594H01019,THYROCARE,THYROCARE,S,Healthcare,NSE,2025-12-31
 697,ARVINDFASN,Arvind Fashions Ltd,INE955V01021,ARVINDFASN,ARVINDFASN,S,Consumer Services,NSE,2025-12-31
-698,KOVAI-BSE,Kovai Medical Center & Hospital Ltd,INE177F01017,,KOVAI,S,Healthcare,Yahoo,2025-12-31
+698,KOVAI,Kovai Medical Center & Hospital Ltd,INE177F01017,,KOVAI,S,Healthcare,Yahoo,2025-12-31
 699,EQUITASBNK,Equitas Small Finance Bank Ltd,INE063P01018,EQUITASBNK,EQUITASBNK,S,Financial Services,NSE,2025-12-31
 700,ELLEN,Ellenbarrie Industrial Gases Ltd,INE236E01022,ELLEN,ELLEN,S,Chemicals,NSE,2025-12-31
 701,CMSINFO,CMS Info Systems Ltd,INE925R01014,CMSINFO,CMSINFO,S,Services,NSE,2025-12-31
@@ -811,7 +811,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 810,MIDWESTLTD,Midwest Ltd,INE0XAD01024,MIDWESTLTD,MIDWESTLTD,S,Construction Materials,Yahoo,2025-12-31
 811,ANUP,The Anup Engineering Ltd,INE294Z01018,ANUP,ANUP,S,Capital Goods,Yahoo,2025-12-31
 812,GREAVESCOT,Greaves Cotton Ltd,INE224A01026,GREAVESCOT,GREAVESCOT,S,Capital Goods,NSE,2025-12-31
-813,KENNAMET-BSE,Kennametal India Limtied,INE717A01029,,KENNAMET,S,Capital Goods,Yahoo,2025-12-31
+813,KENNAMET,Kennametal India Limtied,INE717A01029,,KENNAMET,S,Capital Goods,Yahoo,2025-12-31
 814,SUVEN,Suven Life Sciences Ltd,INE495B01038,SUVEN,SUVEN,S,Healthcare,NSE,2025-12-31
 815,SKYGOLD,Sky Gold And Diamonds Ltd,INE01IU01018,SKYGOLD,SKYGOLD,S,Consumer Durables,NSE,2025-12-31
 816,REFEX,Refex Industries Ltd,INE056I01025,REFEX,REFEX,S,Utilities,NSE,2025-12-31
@@ -820,36 +820,36 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 819,NIITMTS,NIIT Learning Systems Ltd,INE342G01023,NIITMTS,NIITMTS,S,Consumer Services,Yahoo,2025-12-31
 820,DBCORP,D.B.Corp Ltd,INE950I01011,DBCORP,DBCORP,S,Media Entertainment & Publication,Yahoo,2025-12-31
 821,INNOVACAP,Innova Captab Ltd,INE0DUT01020,INNOVACAP,INNOVACAP,S,Healthcare,Yahoo,2025-12-31
-822,BPAGRI-BSE,Blue Pearl Agriventures Ltd,INE439N01031,,BPAGRI,S,Textiles,Yahoo,2025-12-31
+822,BPAGRI,Blue Pearl Agriventures Ltd,INE439N01031,,BPAGRI,S,Textiles,Yahoo,2025-12-31
 823,NEPHROPLUS,Nephrocare Health Services Ltd,INE428V01029,NEPHROPLUS,NEPHROPLUS,S,Healthcare,NSE,2025-12-31
-824,NIRLON-BSE,Nirlon Ltd,INE910A01012,,NIRLON,S,Realty,Yahoo,2025-12-31
-825,ASMTEC-BSE,ASM Technologies Ltd,INE867C01010,,ASMTEC,S,Information Technology,Yahoo,2025-12-31
+824,NIRLON,Nirlon Ltd,INE910A01012,,NIRLON,S,Realty,Yahoo,2025-12-31
+825,ASMTEC,ASM Technologies Ltd,INE867C01010,,ASMTEC,S,Information Technology,Yahoo,2025-12-31
 826,DCBBANK,DCB Bank Ltd,INE503A01015,DCBBANK,DCBBANK,S,Financial Services,NSE,2025-12-31
 827,BALAMINES,Balaji Amines Ltd,INE050E01027,BALAMINES,BALAMINES,S,Chemicals,NSE,2025-12-31
 828,SJS,S.J.S. Enterprises Ltd,INE284S01014,SJS,SJS,S,Automobile and Auto Components,NSE,2025-12-31
 829,NACLIND,NACL Industries Ltd,INE295D01020,NACLIND,NACLIND,S,Chemicals,Yahoo,2025-12-31
 830,CIGNITITEC,Cigniti Technologies Ltd,INE675C01017,CIGNITITEC,CIGNITITEC,S,Unclassified,none,2025-12-31
-831,HAWKINCOOK-BSE,Hawkins Cooker Ltd,INE979B01015,,HAWKINCOOK,S,Consumer Durables,Yahoo,2025-12-31
+831,HAWKINCOOK,Hawkins Cooker Ltd,INE979B01015,,HAWKINCOOK,S,Consumer Durables,Yahoo,2025-12-31
 832,BOSCH-HCIL,Bosch Home Comfort India Ltd,INE782A01015,BOSCH-HCIL,BOSCH-HCIL,S,Consumer Durables,Yahoo,2025-12-31
 833,NFL,National Fertilizers Ltd,INE870D01012,NFL,NFL,S,Chemicals,NSE,2025-12-31
 834,SPARC,Sun Pharma Advanced Research Company Ltd,INE232I01014,SPARC,SPARC,S,Healthcare,NSE,2025-12-31
 835,INDIQUBE,Indiqube Spaces Ltd,INE06ST01018,INDIQUBE,INDIQUBE,S,Realty,Yahoo,2025-12-31
 836,BANARISUG,Bannari Amman Sugars Ltd,INE459A01010,BANARISUG,BANARISUG,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 837,SHREEJISPG,Shreeji Shipping Global Ltd,INE1B6101010,SHREEJISPG,SHREEJISPG,S,Services,NSE,2025-12-31
-838,INE341O01029-BSE,Sital Leasing And Finance Ltd,INE341O01029,,,S,Unclassified,none,2025-12-31
+838,INE341O01029,Sital Leasing And Finance Ltd,INE341O01029,,,S,Unclassified,none,2025-12-31
 839,VSTTILLERS,V.S.T.Tillers Tractors Ltd,INE764D01017,VSTTILLERS,VSTTILLERS,S,Capital Goods,Yahoo,2025-12-31
 840,INDRAMEDCO,Indraprastha Medical Corporation Lt,INE681B01017,INDRAMEDCO,INDRAMEDCO,S,Healthcare,Yahoo,2025-12-31
 841,PACEDIGITK,Pace Digitek Ltd,INE0S3G01027,PACEDIGITK,PACEDIGITK,S,Information Technology,Yahoo,2025-12-31
 842,VSTIND,VST Industries Ltd,INE710A01016,VSTIND,VSTIND,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 843,RAIN,Rain Industries Ltd,INE855B01025,RAIN,RAIN,S,Chemicals,NSE,2025-12-31
 844,SAMHI,Samhi Hotels Ltd,INE08U801020,SAMHI,SAMHI,S,Consumer Services,NSE,2025-12-31
-845,BONDADA-BSE,Bondada Engineering Ltd,INE0Q8P01029,,BONDADA,S,Construction,Yahoo,2025-12-31
+845,BONDADA,Bondada Engineering Ltd,INE0Q8P01029,,BONDADA,S,Construction,Yahoo,2025-12-31
 846,HEIDELBERG,HeidelbergCement India Ltd,INE578A01017,HEIDELBERG,HEIDELBERG,S,Construction Materials,Yahoo,2025-12-31
 847,CEIGALL,Ceigall India Ltd,INE0AG901020,CEIGALL,CEIGALL,S,Construction,NSE,2025-12-31
-848,KOTIC-BSE,Kothari Industrial Corpn. Ltd,INE972A01020,,KOTIC,S,Chemicals,Yahoo,2025-12-31
+848,KOTIC,Kothari Industrial Corpn. Ltd,INE972A01020,,KOTIC,S,Chemicals,Yahoo,2025-12-31
 849,HERITGFOOD,Heritage Foods Ltd,INE978A01027,HERITGFOOD,HERITGFOOD,S,Fast Moving Consumer Goods,NSE,2025-12-31
 850,STYRENIX,Styrenix Performance Materials Ltd,INE189B01011,STYRENIX,STYRENIX,S,Chemicals,Yahoo,2025-12-31
-851,SPICEJET-BSE,SpiceJet Ltd,INE285B01017,,SPICEJET,S,Services,Yahoo,2025-12-31
+851,SPICEJET,SpiceJet Ltd,INE285B01017,,SPICEJET,S,Services,Yahoo,2025-12-31
 852,BHARATRAS,Bharat Rasayan Ltd,INE838B01021,BHARATRAS,BHARATRAS,S,Chemicals,Yahoo,2025-12-31
 853,ORIENTCEM,Orient Cement Ltd,INE876N01018,ORIENTCEM,ORIENTCEM,S,Construction Materials,Yahoo,2025-12-31
 854,AARTIDRUGS,Aarti Drugs Ltd,INE767A01016,AARTIDRUGS,AARTIDRUGS,S,Healthcare,Yahoo,2025-12-31
@@ -860,13 +860,13 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 859,SGMART,SG Mart Ltd,INE385F01024,SGMART,SGMART,S,Metals & Mining,NSE,2025-12-31
 860,LUMAXIND,Lumax Industries Ltd,INE162B01018,LUMAXIND,LUMAXIND,S,Automobile and Auto Components,NSE,2025-12-31
 861,ZOTA,Zota Health Care Ltd,INE358U01012,ZOTA,,S,Healthcare,Yahoo,2025-12-31
-862,TANFACIND-BSE,TANFAC Industries Ltd,INE639B01015,,TANFACIND,S,Chemicals,Yahoo,2025-12-31
+862,TANFACIND,TANFAC Industries Ltd,INE639B01015,,TANFACIND,S,Chemicals,Yahoo,2025-12-31
 863,AVANTEL,Avantel Ltd,INE005B01027,AVANTEL,AVANTEL,S,Information Technology,Yahoo,2025-12-31
-864,INA-BSE,Insolation Energy Ltd,INE0LGX01024,,INA,S,Information Technology,Yahoo,2025-12-31
+864,INA,Insolation Energy Ltd,INE0LGX01024,,INA,S,Information Technology,Yahoo,2025-12-31
 865,EIEL,Enviro Infra Engineers Ltd,INE0LLY01014,EIEL,EIEL,S,Utilities,NSE,2025-12-31
 866,HUBTOWN,Hubtown Ltd,INE703H01016,HUBTOWN,HUBTOWN,S,Realty,Yahoo,2025-12-31
 867,KITEX,Kitex Garmenets Ltd,INE602G01020,KITEX,KITEX,S,Textiles,NSE,2025-12-31
-868,WPIL-BSE,WPIL Ltd,INE765D01022,,WPIL,S,Capital Goods,Yahoo,2025-12-31
+868,WPIL,WPIL Ltd,INE765D01022,,WPIL,S,Capital Goods,Yahoo,2025-12-31
 869,RAYMONDREL,Raymond Realty Ltd,INE1SY401010,RAYMONDREL,RAYMONDREL,S,Realty,Yahoo,2025-12-31
 870,SANATHAN,Sanathan Textiles Ltd,INE0JPD01013,SANATHAN,SANATHAN,S,Textiles,Yahoo,2025-12-31
 871,NORTHARC,Northern Arc Capital Ltd,INE850M01015,NORTHARC,NORTHARC,S,Financial Services,NSE,2025-12-31
@@ -880,7 +880,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 879,JTEKTINDIA,JTEKT India Ltd,INE643A01035,JTEKTINDIA,JTEKTINDIA,S,Automobile and Auto Components,Yahoo,2025-12-31
 880,HEMIPROP,Hemisphere Properties India Ltd,INE0AJG01018,HEMIPROP,HEMIPROP,S,Realty,Yahoo,2025-12-31
 881,63MOONS,63 Moons Technologies Ltd,INE111B01023,63MOONS,63MOONS,S,Information Technology,Yahoo,2025-12-31
-882,GRAUWEIL-BSE,Grauer & Weil (India) Ltd,INE266D01021,,GRAUWEIL,S,Chemicals,Yahoo,2025-12-31
+882,GRAUWEIL,Grauer & Weil (India) Ltd,INE266D01021,,GRAUWEIL,S,Chemicals,Yahoo,2025-12-31
 883,MARATHON,Marathon Nextgen Realty Ltd,INE182D01020,MARATHON,MARATHON,S,Realty,Yahoo,2025-12-31
 884,KIRLOSIND,Kirloskar Industries Ltd,INE250A01039,KIRLOSIND,KIRLOSIND,S,Metals & Mining,Yahoo,2025-12-31
 885,SHANTIGEAR,Shanthi Gears Ltd,INE631A01022,SHANTIGEAR,SHANTIGEAR,S,Capital Goods,Yahoo,2025-12-31
@@ -902,7 +902,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 901,EBGNG,GNG Electronics Ltd,INE18JU01028,EBGNG,EBGNG,S,Information Technology,NSE,2025-12-31
 902,QUESS,Quess Corp Ltd,INE615P01015,QUESS,QUESS,S,Services,NSE,2025-12-31
 903,WONDERLA,Wonderla Holidays Ltd,INE066O01014,WONDERLA,WONDERLA,S,Consumer Services,Yahoo,2025-12-31
-904,MANGCHEFER-BSE,Mangalore Chemicals & Fertilisers L,INE558B01017,,MANGCHEFER,S,Unclassified,none,2025-12-31
+904,MANGCHEFER,Mangalore Chemicals & Fertilisers L,INE558B01017,,MANGCHEFER,S,Unclassified,none,2025-12-31
 905,GREENPLY,Greenply Industries Ltd,INE461C01038,GREENPLY,GREENPLY,S,Forest Materials,Yahoo,2025-12-31
 906,NEOGEN,Neogen Chemicals Ltd,INE136S01016,NEOGEN,NEOGEN,S,Chemicals,NSE,2025-12-31
 907,KOLTEPATIL,Kolte-Patil Developers Ltd,INE094I01018,KOLTEPATIL,KOLTEPATIL,S,Realty,Yahoo,2025-12-31
@@ -913,13 +913,13 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 912,MBAPL,Madhya Bharat Agro Products Ltd,INE900L01010,MBAPL,,S,Chemicals,Yahoo,2025-12-31
 913,ARSSBL,Anand Rathi Share AND Stock Brokers Ltd,INE549H01021,ARSSBL,ARSSBL,S,Financial Services,Yahoo,2025-12-31
 914,MEDIASSIST,Medi Assist Healthcare Services Ltd,INE456Z01021,MEDIASSIST,MEDIASSIST,S,Healthcare,Yahoo,2025-12-31
-915,CIANAGRO-BSE,CIAN Agro Industries & Infrastructure Ltd,INE052V01019,,CIANAGRO,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
+915,CIANAGRO,CIAN Agro Industries & Infrastructure Ltd,INE052V01019,,CIANAGRO,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 916,NPST,Network People Services Technologies Ltd,INE0FFK01017,NPST,NPST,S,Information Technology,Yahoo,2025-12-31
 917,CENTUM,Centum Electronics Ltd,INE320B01020,CENTUM,CENTUM,S,Capital Goods,NSE,2025-12-31
-918,DHANI-BSE,Dhani Services Ltd,INE274G01010,,DHANI,S,Unclassified,none,2025-12-31
+918,DHANI,Dhani Services Ltd,INE274G01010,,DHANI,S,Unclassified,none,2025-12-31
 919,HARSHA,Harsha Engineers International Ltd,INE0JUS01029,HARSHA,HARSHA,S,Capital Goods,Yahoo,2025-12-31
 920,GOCOLORS,Go Fashion (India) Ltd,INE0BJS01011,GOCOLORS,GOCOLORS,S,Consumer Services,Yahoo,2025-12-31
-921,NATIONSTD-BSE,National Standard (India) Ltd,INE166R01015,,NATIONSTD,S,Realty,Yahoo,2025-12-31
+921,NATIONSTD,National Standard (India) Ltd,INE166R01015,,NATIONSTD,S,Realty,Yahoo,2025-12-31
 922,NSIL,Nalwa Sons Investment Ltd,INE023A01030,NSIL,NSIL,S,Financial Services,Yahoo,2025-12-31
 923,GKENERGY,GK Energy Ltd,INE1AG301022,GKENERGY,GKENERGY,S,Power,Yahoo,2025-12-31
 924,INDOSTAR,IndoStar Capital Finance Ltd,INE896L01010,INDOSTAR,INDOSTAR,S,Financial Services,Yahoo,2025-12-31
@@ -949,7 +949,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 948,BHAGCHEM,Bhagiradha Chemicals and Industries,INE414D01027,BHAGCHEM,BHAGCHEM,S,Chemicals,Yahoo,2025-12-31
 949,BAJAJCON,Bajaj Consumer Care Ltd,INE933K01021,BAJAJCON,BAJAJCON,S,Fast Moving Consumer Goods,NSE,2025-12-31
 950,GREENPANEL,Greenpanel Industries Ltd,INE08ZM01014,GREENPANEL,GREENPANEL,S,Forest Materials,Yahoo,2025-12-31
-951,BNAGROCHEM-BSE,BN Agrochem Ltd,INE00HZ01011,,BNAGROCHEM,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
+951,BNAGROCHEM,BN Agrochem Ltd,INE00HZ01011,,BNAGROCHEM,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 952,BBL,Bharat Bijlee Ltd,INE464A01036,BBL,BBL,S,Power,Yahoo,2025-12-31
 953,NAVNETEDUL,Navneet Education Ltd,INE060A01024,NAVNETEDUL,NAVNETEDUL,S,Media Entertainment & Publication,Yahoo,2025-12-31
 954,PROTEAN,Protean eGov Technologies Ltd,INE004A01022,PROTEAN,PROTEAN,S,Information Technology,Yahoo,2025-12-31
@@ -959,14 +959,14 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 958,BOMDYEING,Bombay Dyeing & Mfg. Co. Ltd,INE032A01023,BOMDYEING,BOMDYEING,S,Textiles,Yahoo,2025-12-31
 959,UEL,Ujaas Energy Ltd,INE899L01030,UEL,UEL,S,Information Technology,Yahoo,2025-12-31
 960,SENORES,Senores Pharmaceuticals Ltd,INE0RB801010,SENORES,SENORES,S,Healthcare,NSE,2025-12-31
-961,TECHNVISN-BSE,TechNVision Ventures Ltd,INE314H01012,,TECHNVISN,S,Information Technology,Yahoo,2025-12-31
+961,TECHNVISN,TechNVision Ventures Ltd,INE314H01012,,TECHNVISN,S,Information Technology,Yahoo,2025-12-31
 962,HLEGLAS,HLE Glascoat Ltd,INE461D01028,HLEGLAS,HLEGLAS,S,Capital Goods,Yahoo,2025-12-31
 963,HIKAL,Hikal Ltd,INE475B01022,HIKAL,HIKAL,S,Healthcare,Yahoo,2025-12-31
 964,KIRIINDUS,Kiri Industries Ltd,INE415I01015,KIRIINDUS,KIRIINDUS,S,Chemicals,Yahoo,2025-12-31
 965,FLAIR,Flair Writing Industries Ltd,INE00Y201027,FLAIR,FLAIR,S,Capital Goods,Yahoo,2025-12-31
 966,KKCL,Kewal Kiran Clothing Ltd,INE401H01017,KKCL,KKCL,S,Textiles,Yahoo,2025-12-31
 967,MAHLOG,Mahindra Logistics Ltd,INE766P01016,MAHLOG,MAHLOG,S,Services,Yahoo,2025-12-31
-968,TIMEX-BSE,Timex Group India Ltd,INE064A01026,,TIMEX,S,Consumer Durables,NSE,2025-12-31
+968,TIMEX,Timex Group India Ltd,INE064A01026,,TIMEX,S,Consumer Durables,NSE,2025-12-31
 969,EPACK,EPACK Durable Ltd,INE0G5901015,EPACK,EPACK,S,Consumer Durables,Yahoo,2025-12-31
 970,ARKADE,Arkade Developers Ltd,INE0QRL01017,ARKADE,ARKADE,S,Realty,Yahoo,2025-12-31
 971,PENIND,Pennar Industries Ltd,INE932A01024,PENIND,PENIND,S,Capital Goods,Yahoo,2025-12-31
@@ -981,7 +981,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 980,JASH,Jash Engineering Ltd,INE039O01011,JASH,,S,Capital Goods,Yahoo,2025-12-31
 981,JASH-BSE,Jash Engineering Ltd,INE039O01029,,JASH,S,Capital Goods,Yahoo,2025-12-31
 982,PAISALO,Paisalo Digital Ltd,INE420C01059,PAISALO,PAISALO,S,Financial Services,NSE,2025-12-31
-983,SPICELOUNG-BSE,Spice Lounge Food Works Ltd,INE631E01024,,SPICELOUNG,S,Information Technology,Yahoo,2025-12-31
+983,SPICELOUNG,Spice Lounge Food Works Ltd,INE631E01024,,SPICELOUNG,S,Information Technology,Yahoo,2025-12-31
 984,DDEVPLSTIK,Ddev Plastiks Industries Ltd,INE0HR601026,DDEVPLSTIK,DDEVPLSTIK,S,Chemicals,Yahoo,2025-12-31
 985,PATELENG,Patel Engineering Ltd,INE244B01030,PATELENG,PATELENG,S,Construction,Yahoo,2025-12-31
 986,WSTCSTPAPR,West Coast Paper Mills Ltd,INE976A01021,WSTCSTPAPR,WSTCSTPAPR,S,Forest Materials,Yahoo,2025-12-31
@@ -993,7 +993,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 992,SAGCEM,Sagar Cements Ltd,INE229C01021,SAGCEM,SAGCEM,S,Construction Materials,Yahoo,2025-12-31
 993,SIYSIL,Siyaram Silk Mills Ltd,INE076B01028,SIYSIL,SIYSIL,S,Textiles,Yahoo,2025-12-31
 994,EUROPRATIK,Euro Pratik Sales Ltd,INE198501012,EUROPRATIK,EUROPRATIK,S,Construction Materials,Yahoo,2025-12-31
-995,MARSONS-BSE,Marsons Ltd,INE415B01044,,MARSONS,S,Power,Yahoo,2025-12-31
+995,MARSONS,Marsons Ltd,INE415B01044,,MARSONS,S,Power,Yahoo,2025-12-31
 996,EASEMYTRIP,Easy Trip Planners Ltd,INE07O001026,EASEMYTRIP,EASEMYTRIP,S,Consumer Services,Yahoo,2025-12-31
 997,HPL,HPL Electric & Power Ltd,INE495S01016,HPL,HPL,S,Power,Yahoo,2025-12-31
 998,ASHIANA,Ashiana Housing Ltd,INE365D01021,ASHIANA,ASHIANA,S,Realty,Yahoo,2025-12-31
@@ -1004,7 +1004,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1003,SHK,S H Kelkar and Company Ltd,INE500L01026,SHK,SHK,S,Chemicals,Yahoo,2025-12-31
 1004,TFCILTD,Tourism Finance Corpn. Of India Ltd,INE305A01023,TFCILTD,TFCILTD,S,Financial Services,Yahoo,2025-12-31
 1005,RAMRAT,Ram Ratna Wires Ltd,INE207E01023,RAMRAT,RAMRAT,S,Power,Yahoo,2025-12-31
-1006,META-BSE,String Metaverse Ltd,INE958L01026,,META,S,Information Technology,Yahoo,2025-12-31
+1006,META,String Metaverse Ltd,INE958L01026,,META,S,Information Technology,Yahoo,2025-12-31
 1007,SUNDROP,Sundrop Brands Ltd,INE209A01019,SUNDROP,SUNDROP,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1008,ORISSAMINE,Orissa Minerals Development Company Ltd,INE725E01024,ORISSAMINE,ORISSAMINE,S,Metals & Mining,Yahoo,2025-12-31
 1009,VEEDOL,Veedol Corporation Ltd,INE484C01030,VEEDOL,VEEDOL,S,Chemicals,Yahoo,2025-12-31
@@ -1012,7 +1012,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1011,AGIIL,AGI Infra Ltd,INE976R01033,AGIIL,AGIIL,S,Realty,Yahoo,2025-12-31
 1012,NOCIL,NOCIL Ltd,INE163A01018,NOCIL,NOCIL,S,Chemicals,Yahoo,2025-12-31
 1013,SOLARA,Solara Active Pharma Sciences Ltd,INE624Z01016,SOLARA,SOLARA,S,Healthcare,Yahoo,2025-12-31
-1014,CPML-BSE,City Pulse Multiventures Ltd,INE056001014,,CPML,S,Media Entertainment & Publication,Yahoo,2025-12-31
+1014,CPML,City Pulse Multiventures Ltd,INE056001014,,CPML,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1015,EMSLIMITED,EMS Ltd,INE0OV601013,EMSLIMITED,EMSLIMITED,S,Construction,Yahoo,2025-12-31
 1016,MANINDS,Man Industries (India) Ltd,INE993A01026,MANINDS,MANINDS,S,Metals & Mining,Yahoo,2025-12-31
 1017,PREMEXPLN,Premier Explosives Ltd,INE863B01029,PREMEXPLN,PREMEXPLN,S,Chemicals,Yahoo,2025-12-31
@@ -1034,7 +1034,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1033,IOLCP,IOL Chemicals & Pharmaceuticals Ltd,INE485C01029,IOLCP,IOLCP,S,Healthcare,Yahoo,2025-12-31
 1034,BAJAJHIND,Bajaj Hindusthan Sugar Ltd,INE306A01021,BAJAJHIND,BAJAJHIND,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1035,BFUTILITIE,BF Utilities Ltd,INE243D01012,BFUTILITIE,BFUTILITIE,S,Construction,Yahoo,2025-12-31
-1036,LSIND-BSE,LS Industries Ltd,INE345D01031,,LSIND,S,Textiles,Yahoo,2025-12-31
+1036,LSIND,LS Industries Ltd,INE345D01031,,LSIND,S,Textiles,Yahoo,2025-12-31
 1037,RAMCOIND,Ramco Industries Ltd,INE614A01028,RAMCOIND,RAMCOIND,S,Capital Goods,Yahoo,2025-12-31
 1038,TVSSRICHAK,TVS Srichakra Ltd,INE421C01016,TVSSRICHAK,TVSSRICHAK,S,Automobile and Auto Components,Yahoo,2025-12-31
 1039,EPACKPEB,Epack Prefab Technologies Ltd,INE0MLS01022,EPACKPEB,EPACKPEB,S,Construction,Yahoo,2025-12-31
@@ -1048,14 +1048,14 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1047,HIRECT,Hind Rectifiers Ltd,INE835D01023,HIRECT,HIRECT,S,Power,Yahoo,2025-12-31
 1048,VENUSPIPES,Venus Pipes & Tubes Ltd,INE0JA001018,VENUSPIPES,VENUSPIPES,S,Metals & Mining,Yahoo,2025-12-31
 1049,SOTL,Savita Oil Technologies Ltd,INE035D01020,SOTL,SOTL,S,Chemicals,Yahoo,2025-12-31
-1050,KLBRENG-B-BSE,Kilburn Engineering Ltd,INE338F01015,,KLBRENG-B,S,Capital Goods,Yahoo,2025-12-31
+1050,KLBRENG-B,Kilburn Engineering Ltd,INE338F01015,,KLBRENG-B,S,Capital Goods,Yahoo,2025-12-31
 1051,JTLIND,JTL Industries Ltd,INE391J01032,JTLIND,JTLIND,S,Metals & Mining,Yahoo,2025-12-31
 1052,MTNL,Mahanagar Telephone Nigam Ltd,INE153A01019,MTNL,MTNL,S,Telecommunication,Yahoo,2025-12-31
 1053,RELTD,Ravindra Energy Ltd,INE206N01018,RELTD,RELTD,S,Information Technology,Yahoo,2025-12-31
 1054,ALEMBICLTD,Alembic Ltd,INE426A01027,ALEMBICLTD,ALEMBICLTD,S,Realty,Yahoo,2025-12-31
 1055,DIGITIDE,Digitide Solutions Ltd,INE0U4701011,DIGITIDE,DIGITIDE,S,Services,Yahoo,2025-12-31
-1056,MIDWEST-BSE,Midwest Gold Ltd,INE519N01014,,MIDWEST,S,Unclassified,none,2025-12-31
-1057,ELCIDIN-BSE,Elcid Investments Ltd,INE927X01018,,ELCIDIN,S,Financial Services,Yahoo,2025-12-31
+1056,MIDWEST,Midwest Gold Ltd,INE519N01014,,MIDWEST,S,Unclassified,none,2025-12-31
+1057,ELCIDIN,Elcid Investments Ltd,INE927X01018,,ELCIDIN,S,Financial Services,Yahoo,2025-12-31
 1058,SAKSOFT,Saksoft Ltd,INE667G01023,SAKSOFT,SAKSOFT,S,Information Technology,Yahoo,2025-12-31
 1059,UTKARSHBNK,Utkarsh Small Finance Bank Ltd,INE735W01017,UTKARSHBNK,UTKARSHBNK,S,Financial Services,Yahoo,2025-12-31
 1060,NUCLEUS,Nucleus Software Exports Ltd,INE096B01018,NUCLEUS,NUCLEUS,S,Information Technology,Yahoo,2025-12-31
@@ -1075,21 +1075,21 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1074,VIKRAN,Vikran Engineering Ltd,INE01R501028,VIKRAN,VIKRAN,S,Construction,Yahoo,2025-12-31
 1075,VSSL,Vardhman Special Steels Ltd,INE050M01012,VSSL,VSSL,S,Metals & Mining,Yahoo,2025-12-31
 1076,KALAMANDIR,Sai Silks (Kalamandir) Ltd,INE438K01021,KALAMANDIR,KALAMANDIR,S,Consumer Services,Yahoo,2025-12-31
-1077,KPGEL-BSE,KP Green Engineering Ltd,INE0QVH01025,,KPGEL,S,Metals & Mining,Yahoo,2025-12-31
+1077,KPGEL,KP Green Engineering Ltd,INE0QVH01025,,KPGEL,S,Metals & Mining,Yahoo,2025-12-31
 1078,KRSNAA,Krsnaa Diagnostics Ltd,INE08LI01020,KRSNAA,KRSNAA,S,Healthcare,Yahoo,2025-12-31
-1079,COLAB-BSE,Colab Platforms Ltd,INE317W01030,,COLAB,S,Media Entertainment & Publication,Yahoo,2025-12-31
+1079,COLAB,Colab Platforms Ltd,INE317W01030,,COLAB,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1080,CARYSIL,Carysil Ltd,INE482D01024,CARYSIL,CARYSIL,S,Consumer Durables,Yahoo,2025-12-31
 1081,TCIEXP,TCI Express Ltd,INE586V01016,TCIEXP,TCIEXP,S,Services,Yahoo,2025-12-31
 1082,SDBL,Som Distilleries & Breweries Ltd,INE480C01038,SDBL,SDBL,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1083,KMEW,Knowledge Marine & Engineering Works Ltd,INE0CJD01029,KMEW,KMEW,S,Services,NSE,2025-12-31
 1084,KCP,K.c.p. Ltd,INE805C01028,KCP,KCP,S,Construction Materials,Yahoo,2025-12-31
-1085,CEINSYSTECH-BSE,Ceinsys Tech Ltd,INE016Q01014,,CEINSYSTECH,S,Unclassified,none,2025-12-31
+1085,CEINSYSTECH,Ceinsys Tech Ltd,INE016Q01014,,CEINSYSTECH,S,Unclassified,none,2025-12-31
 1086,BEPL,Bhansali Engineering Polymers Ltd,INE922A01025,BEPL,BEPL,S,Chemicals,Yahoo,2025-12-31
 1087,HATHWAY,Hathway Cable & Datacom Ltd,INE982F01036,HATHWAY,HATHWAY,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1088,MONARCH,Monarch Networth Capital Ltd,INE903D01011,MONARCH,MONARCH,S,Financial Services,Yahoo,2025-12-31
 1089,DALMIASUG,Dalmia Bharat Sugar and Industries Ltd,INE495A01022,DALMIASUG,DALMIASUG,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1090,REPCOHOME,Repco Home Finance Ltd,INE612J01015,REPCOHOME,REPCOHOME,S,Financial Services,Yahoo,2025-12-31
-1091,RAJESH-BSE,Rajesh Power Services Ltd,INE0VN801010,,RAJESH,S,Construction,Yahoo,2025-12-31
+1091,RAJESH,Rajesh Power Services Ltd,INE0VN801010,,RAJESH,S,Construction,Yahoo,2025-12-31
 1092,ADFFOODS,ADF Foods Ltd,INE982B01027,ADFFOODS,ADFFOODS,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1093,PANACEABIO,Panacea Biotec Ltd,INE922B01023,PANACEABIO,PANACEABIO,S,Healthcare,Yahoo,2025-12-31
 1094,JAYKAY,Jaykay Enterprises Ltd,INE903A01025,JAYKAY,JAYKAY,S,Services,Yahoo,2025-12-31
@@ -1101,23 +1101,23 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1100,FILATEX,Filatex India Ltd,INE816B01035,FILATEX,FILATEX,S,Textiles,Yahoo,2025-12-31
 1101,SMSPHARMA,SMS Pharmaceuticals Ltd,INE812G01025,SMSPHARMA,SMSPHARMA,S,Healthcare,Yahoo,2025-12-31
 1102,JINDALPOLY,Jindal Poly Films Ltd,INE197D01010,JINDALPOLY,JINDALPOLY,S,Consumer Services,Yahoo,2025-12-31
-1103,SIKA-BSE,Sika Interplant Systems Ltd,INE438E01032,,SIKA,S,Capital Goods,Yahoo,2025-12-31
+1103,SIKA,Sika Interplant Systems Ltd,INE438E01032,,SIKA,S,Capital Goods,Yahoo,2025-12-31
 1104,TASTYBITE,Tasty Bite Eatables Ltd,INE488B01017,TASTYBITE,TASTYBITE,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1105,HGS,Hinduja Global Solutions Ltd,INE170I01016,HGS,HGS,S,Services,Yahoo,2025-12-31
 1106,AEROFLEX,Aeroflex Industries Ltd,INE024001021,AEROFLEX,AEROFLEX,S,Capital Goods,NSE,2025-12-31
-1107,COCKERILL-BSE,John Cockerill India Ltd,INE515A01019,,COCKERILL,S,Metals & Mining,Yahoo,2025-12-31
+1107,COCKERILL,John Cockerill India Ltd,INE515A01019,,COCKERILL,S,Metals & Mining,Yahoo,2025-12-31
 1108,JAICORPLTD,Jai Corp Ltd,INE070D01027,JAICORPLTD,JAICORPLTD,S,Chemicals,Yahoo,2025-12-31
 1109,MOLDTKPAC,Mold-Tek Packaging Ltd,INE893J01029,MOLDTKPAC,MOLDTKPAC,S,Consumer Services,Yahoo,2025-12-31
 1110,COSMOFIRST,Cosmo First Ltd,INE757A01017,COSMOFIRST,COSMOFIRST,S,Consumer Services,Yahoo,2025-12-31
 1111,PFS,PTC India Financial Services Ltd,INE560K01014,PFS,PFS,S,Financial Services,Yahoo,2025-12-31
 1112,MBEL,M & B Engineering Ltd,INE08N601015,MBEL,MBEL,S,Construction,Yahoo,2025-12-31
 1113,BAJEL,Bajel Projects Ltd,INE0KQN01018,BAJEL,BAJEL,S,Power,Yahoo,2025-12-31
-1114,WELSPLSOL-BSE,Welspun Specialty Solutions Ltd,INE731F01037,,WELSPLSOL,S,Metals & Mining,Yahoo,2025-12-31
+1114,WELSPLSOL,Welspun Specialty Solutions Ltd,INE731F01037,,WELSPLSOL,S,Metals & Mining,Yahoo,2025-12-31
 1115,KSHINTL,KSH International Ltd,INE987S01020,KSHINTL,KSHINTL,S,Power,Yahoo,2025-12-31
 1116,INSECTICID,Insecticides India Ltd,INE070I01018,INSECTICID,INSECTICID,S,Chemicals,Yahoo,2025-12-31
 1117,SHALBY,Shalby Ltd,INE597J01018,SHALBY,SHALBY,S,Healthcare,Yahoo,2025-12-31
 1118,NDRAUTO,NDR Auto Components Ltd,INE07OG01012,NDRAUTO,NDRAUTO,S,Automobile and Auto Components,Yahoo,2025-12-31
-1119,DRAGARWQ-BSE,Dr.Agarwals Eye Hospital Ltd,INE934C01018,,DRAGARWQ,S,Healthcare,Yahoo,2025-12-31
+1119,DRAGARWQ,Dr.Agarwals Eye Hospital Ltd,INE934C01018,,DRAGARWQ,S,Healthcare,Yahoo,2025-12-31
 1120,FINOPB,Fino Payments Bank Ltd,INE02NC01014,FINOPB,FINOPB,S,Financial Services,Yahoo,2025-12-31
 1121,ORIENTHOT,Oriental Hotels Ltd,INE750A01020,ORIENTHOT,ORIENTHOT,S,Consumer Services,Yahoo,2025-12-31
 1122,STYLEBAAZA,Baazar Style Retail Ltd,INE01FR01028,STYLEBAAZA,STYLEBAAZA,S,Consumer Services,Yahoo,2025-12-31
@@ -1134,14 +1134,14 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1133,YATRA,Yatra Online Ltd,INE0JR601024,YATRA,YATRA,S,Consumer Services,Yahoo,2025-12-31
 1134,STEELCAS,Steelcast Ltd,INE124E01038,STEELCAS,STEELCAS,S,Metals & Mining,Yahoo,2025-12-31
 1135,GENESYS,Genesys International Corporation Ltd,INE727B01026,GENESYS,GENESYS,S,Information Technology,Yahoo,2025-12-31
-1136,NOVARTIND-BSE,Novartis India Ltd,INE234A01025,,NOVARTIND,S,Healthcare,Yahoo,2025-12-31
+1136,NOVARTIND,Novartis India Ltd,INE234A01025,,NOVARTIND,S,Healthcare,Yahoo,2025-12-31
 1137,GVPIL,GE Power India Ltd,INE878A01011,GVPIL,GVPIL,S,Construction,Yahoo,2025-12-31
 1138,KICL,Kalyani Investment Company Ltd,INE029L01018,KICL,KICL,S,Financial Services,Yahoo,2025-12-31
 1139,SIMPLEXINF,Simplex Infrastructures Ltd,INE059B01024,SIMPLEXINF,SIMPLEXINF,S,Construction,Yahoo,2025-12-31
-1140,GOODYEAR-BSE,Goodyear India Ltd,INE533A01012,,GOODYEAR,S,Automobile and Auto Components,Yahoo,2025-12-31
+1140,GOODYEAR,Goodyear India Ltd,INE533A01012,,GOODYEAR,S,Automobile and Auto Components,Yahoo,2025-12-31
 1141,SPECTRUM,Spectrum Electrical Industries Ltd,INE01EO01010,SPECTRUM,SPECTRUM,S,Power,Yahoo,2025-12-31
-1142,AFCOM-BSE,Afcom Holdings Ltd,INE0OXY01013,,AFCOM,S,Services,Yahoo,2025-12-31
-1143,GHVINFRA-BSE,GHV Infra Projects Ltd,INE809Q01020,,GHVINFRA,S,Construction,Yahoo,2025-12-31
+1142,AFCOM,Afcom Holdings Ltd,INE0OXY01013,,AFCOM,S,Services,Yahoo,2025-12-31
+1143,GHVINFRA,GHV Infra Projects Ltd,INE809Q01020,,GHVINFRA,S,Construction,Yahoo,2025-12-31
 1144,SULA,Sula Vineyards Ltd,INE142Q01026,SULA,SULA,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1145,SGFIN,SG Finserve Ltd,INE618R01015,SGFIN,SGFIN,S,Financial Services,Yahoo,2025-12-31
 1146,CANTABIL,Cantabil Retail India Ltd,INE068L01024,CANTABIL,CANTABIL,S,Textiles,Yahoo,2025-12-31
@@ -1155,13 +1155,13 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1154,STOVEKRAFT,Stove Kraft Ltd,INE00IN01015,STOVEKRAFT,STOVEKRAFT,S,Consumer Durables,Yahoo,2025-12-31
 1155,GEOJITFSL,Geojit Financial Services Ltd,INE007B01023,GEOJITFSL,GEOJITFSL,S,Financial Services,Yahoo,2025-12-31
 1156,IDEAFORGE,Ideaforge Technology Ltd,INE349Y01013,IDEAFORGE,IDEAFORGE,S,Information Technology,Yahoo,2025-12-31
-1157,CITURGIA-BSE,Citurgia Biochemicals Ltd,INE795B01031,,CITURGIA,S,Chemicals,Yahoo,2025-12-31
+1157,CITURGIA,Citurgia Biochemicals Ltd,INE795B01031,,CITURGIA,S,Chemicals,Yahoo,2025-12-31
 1158,ACCELYA,Accelya Solutions India Ltd,INE793A01012,ACCELYA,ACCELYA,S,Information Technology,Yahoo,2025-12-31
 1159,RPTECH,Rashi Peripherals Ltd,INE0J1F01024,RPTECH,RPTECH,S,Information Technology,Yahoo,2025-12-31
 1160,VENKEYS,Venky's (India) Ltd,INE398A01010,VENKEYS,VENKEYS,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1161,TIL,TIL Ltd,INE806C01018,TIL,TIL,S,Capital Goods,Yahoo,2025-12-31
 1162,YASHO,Yasho Industries Ltd,INE616Z01012,YASHO,YASHO,S,Chemicals,Yahoo,2025-12-31
-1163,DECNGOLD-BSE,Deccan Gold Mines Ltd,INE945F01025,,DECNGOLD,S,Metals & Mining,Yahoo,2025-12-31
+1163,DECNGOLD,Deccan Gold Mines Ltd,INE945F01025,,DECNGOLD,S,Metals & Mining,Yahoo,2025-12-31
 1164,WEL,Wonder Electricals Ltd,INE02WG01024,WEL,WEL,S,Consumer Durables,Yahoo,2025-12-31
 1165,DOLLAR,Dollar Industries Ltd,INE325C01035,DOLLAR,DOLLAR,S,Textiles,Yahoo,2025-12-31
 1166,INDIANHUME,Indian Hume Pipe Co. Ltd,INE323C01030,INDIANHUME,INDIANHUME,S,Construction,Yahoo,2025-12-31
@@ -1172,39 +1172,39 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1171,THEJO,Thejo Engineering Ltd,INE121N01019,THEJO,,S,Capital Goods,Yahoo,2025-12-31
 1172,UGROCAP,Ugro Capital Ltd,INE583D01011,UGROCAP,UGROCAP,S,Financial Services,Yahoo,2025-12-31
 1173,HITECH,Hi-tech Pipes Ltd,INE106T01025,HITECH,HITECH,S,Metals & Mining,Yahoo,2025-12-31
-1174,RIR-BSE,RIR Power Electronics Ltd,INE302D01024,,RIR,S,Information Technology,Yahoo,2025-12-31
+1174,RIR,RIR Power Electronics Ltd,INE302D01024,,RIR,S,Information Technology,Yahoo,2025-12-31
 1175,MANGLMCEM,Mangalam Cement Ltd,INE347A01017,MANGLMCEM,MANGLMCEM,S,Construction Materials,Yahoo,2025-12-31
 1176,SHRINGARMS,Shringar House OF Mangalsutra Ltd,INE1B3L01017,SHRINGARMS,SHRINGARMS,S,Consumer Durables,Yahoo,2025-12-31
 1177,WHEELS,Wheels India Ltd,INE715A01015,WHEELS,WHEELS,S,Automobile and Auto Components,Yahoo,2025-12-31
 1178,APCOTEXIND,Apcotex Industries Ltd,INE116A01032,APCOTEXIND,APCOTEXIND,S,Chemicals,Yahoo,2025-12-31
 1179,SYSTMTXC,Systematix Corporate Services Ltd,INE356B01024,SYSTMTXC,SYSTMTXC,S,Financial Services,Yahoo,2025-12-31
 1180,VERANDA,Veranda Learning Solutions Ltd,INE0IQ001011,VERANDA,VERANDA,S,Consumer Services,Yahoo,2025-12-31
-1181,UDAICEMENT-BSE,Udaipur Cement Works Ltd,INE225C01029,,UDAICEMENT,S,Unclassified,none,2025-12-31
+1181,UDAICEMENT,Udaipur Cement Works Ltd,INE225C01029,,UDAICEMENT,S,Unclassified,none,2025-12-31
 1182,GMBREW,G.M. Breweries Ltd,INE075D01018,GMBREW,GMBREW,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1183,SEPC,Sepc Ltd,INE964H01014,SEPC,SEPC,S,Construction,Yahoo,2025-12-31
 1184,MOBIKWIK,One Mobikwik Systems Ltd,INE0HLU01028,MOBIKWIK,MOBIKWIK,S,Information Technology,Yahoo,2025-12-31
 1185,PIXTRANS,Pix Transmissions Ltd,INE751B01018,PIXTRANS,PIXTRANS,S,Capital Goods,Yahoo,2025-12-31
-1186,SEIL-BSE,Shanti Educational Initiatives Ltd,INE440T01028,,SEIL,S,Consumer Services,Yahoo,2025-12-31
+1186,SEIL,Shanti Educational Initiatives Ltd,INE440T01028,,SEIL,S,Consumer Services,Yahoo,2025-12-31
 1187,UNIPARTS,Uniparts India Ltd,INE244O01017,UNIPARTS,UNIPARTS,S,Capital Goods,Yahoo,2025-12-31
 1188,RAJRATAN,Rajratan Global Wire Ltd,INE451D01029,RAJRATAN,RAJRATAN,S,Metals & Mining,Yahoo,2025-12-31
 1189,VINCOFE,Vintage Coffee AND Beverages Ltd,INE498Q01014,VINCOFE,VINCOFE,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
-1190,DISAQ-BSE,Disa India Ltd,INE131C01011,,DISAQ,S,Capital Goods,Yahoo,2025-12-31
+1190,DISAQ,Disa India Ltd,INE131C01011,,DISAQ,S,Capital Goods,Yahoo,2025-12-31
 1191,INDNIPPON,India Nippon Electricals Ltd,INE092B01025,INDNIPPON,INDNIPPON,S,Automobile and Auto Components,Yahoo,2025-12-31
-1192,ADVAIT-BSE,Advait Energy Transitions Ltd,INE0ALI01010,,ADVAIT,S,Capital Goods,Yahoo,2025-12-31
+1192,ADVAIT,Advait Energy Transitions Ltd,INE0ALI01010,,ADVAIT,S,Capital Goods,Yahoo,2025-12-31
 1193,MUKANDLTD,Mukand Ltd,INE304A01026,MUKANDLTD,MUKANDLTD,S,Metals & Mining,Yahoo,2025-12-31
 1194,SOMANYCERA,Somany Ceramics Ltd,INE355A01028,SOMANYCERA,SOMANYCERA,S,Capital Goods,Yahoo,2025-12-31
-1195,INE162D01014-BSE,Emrald Commercial Ltd,INE162D01014,,,S,Unclassified,none,2025-12-31
+1195,INE162D01014,Emrald Commercial Ltd,INE162D01014,,,S,Unclassified,none,2025-12-31
 1196,DYCL,Dynamic Cables Ltd,INE600Y01019,DYCL,DYCL,S,Power,Yahoo,2025-12-31
 1197,NELCO,Nelco Ltd,INE045B01015,NELCO,NELCO,S,Information Technology,Yahoo,2025-12-31
 1198,DIVGIITTS,Divgi Torqtransfer Systems Ltd,INE753U01022,DIVGIITTS,DIVGIITTS,S,Automobile and Auto Components,Yahoo,2025-12-31
 1199,MSPL,MSP Steel & Power Ltd,INE752G01015,MSPL,MSPL,S,Metals & Mining,Yahoo,2025-12-31
 1200,KERNEX,Kernex Microsystems (India) Ltd,INE202H01019,KERNEX,KERNEX,S,Information Technology,Yahoo,2025-12-31
 1201,WAAREEINDO,Indosolar Ltd,INE866K01023,WAAREEINDO,WAAREEINDO,S,Information Technology,Yahoo,2025-12-31
-1202,KESAR-BSE,Kesar India Ltd,INE0L1C01019,,KESAR,S,Realty,Yahoo,2025-12-31
+1202,KESAR,Kesar India Ltd,INE0L1C01019,,KESAR,S,Realty,Yahoo,2025-12-31
 1203,NITINSPIN,Nitin Spinners Ltd,INE229H01012,NITINSPIN,NITINSPIN,S,Textiles,Yahoo,2025-12-31
 1204,BGRENERGY,BGR Energy Systems Ltd,INE661I01014,BGRENERGY,BGRENERGY,S,Construction,Yahoo,2025-12-31
 1205,WINDLAS,Windlas Biotech Ltd,INE0H5O01029,WINDLAS,WINDLAS,S,Healthcare,Yahoo,2025-12-31
-1206,GRANDOAK-BSE,Grand OAK Canyons Distillery Ltd,INE926B01016,,GRANDOAK,S,Financial Services,Yahoo,2025-12-31
+1206,GRANDOAK,Grand OAK Canyons Distillery Ltd,INE926B01016,,GRANDOAK,S,Financial Services,Yahoo,2025-12-31
 1207,RAMCOSYS,Ramco Systems Ltd,INE246B01019,RAMCOSYS,RAMCOSYS,S,Information Technology,Yahoo,2025-12-31
 1208,SPAL,S.P. Apparels Ltd,INE212I01016,SPAL,SPAL,S,Textiles,Yahoo,2025-12-31
 1209,RMDRIP,R M Drip AND Sprinklers Systems Ltd,INE219Y01026,RMDRIP,RMDRIP,S,Capital Goods,Yahoo,2025-12-31
@@ -1212,9 +1212,9 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1211,ASALCBR,Associated Alcohols & Breweries Ltd,INE073G01016,ASALCBR,ASALCBR,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1212,NIBE,Nibe Ltd,INE149O01018,NIBE,NIBE,S,Capital Goods,Yahoo,2025-12-31
 1213,SPIC,Southern Petrochemical Industries Corporation Ltd,INE147A01011,SPIC,SPIC,S,Chemicals,Yahoo,2025-12-31
-1214,ALGOQUANT-BSE,Algoquant Fintech Ltd,INE598D01035,,ALGOQUANT,S,Financial Services,Yahoo,2025-12-31
+1214,ALGOQUANT,Algoquant Fintech Ltd,INE598D01035,,ALGOQUANT,S,Financial Services,Yahoo,2025-12-31
 1215,LAXMIDENTL,Laxmi Dental Ltd,INE0WO601020,LAXMIDENTL,LAXMIDENTL,S,Healthcare,Yahoo,2025-12-31
-1216,TCC-BSE,TCC Concept Ltd,INE887D01016,,TCC,S,Realty,Yahoo,2025-12-31
+1216,TCC,TCC Concept Ltd,INE887D01016,,TCC,S,Realty,Yahoo,2025-12-31
 1217,PANAMAPET,Panama Petrochem Ltd,INE305C01029,PANAMAPET,PANAMAPET,S,Oil Gas & Consumable Fuels,Yahoo,2025-12-31
 1218,INDOTECH,Indo Tech Transformers Ltd,INE332H01014,INDOTECH,INDOTECH,S,Power,Yahoo,2025-12-31
 1219,ALLTIME,ALL Time Plastics Ltd,INE0GV601021,ALLTIME,ALLTIME,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
@@ -1225,8 +1225,8 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1224,DEEDEV,DEE Development Engineers Ltd,INE841L01016,DEEDEV,DEEDEV,S,Metals & Mining,Yahoo,2025-12-31
 1225,ADOR,Ador Welding Ltd,INE045A01017,ADOR,ADOR,S,Capital Goods,Yahoo,2025-12-31
 1226,GARUDA,Garuda Construction and Engineering Ltd,INE0JVO01026,GARUDA,GARUDA,S,Construction,Yahoo,2025-12-31
-1227,FRONTSP-BSE,Frontier Springs Ltd,INE572D01014,,FRONTSP,S,Metals & Mining,Yahoo,2025-12-31
-1228,BLIL-BSE,Balmer Lawrie Investments Ltd,INE525F01025,,BLIL,S,Diversified,Yahoo,2025-12-31
+1227,FRONTSP,Frontier Springs Ltd,INE572D01014,,FRONTSP,S,Metals & Mining,Yahoo,2025-12-31
+1228,BLIL,Balmer Lawrie Investments Ltd,INE525F01025,,BLIL,S,Diversified,Yahoo,2025-12-31
 1229,VINDHYATEL,Vindhya Telelinks Ltd,INE707A01012,VINDHYATEL,VINDHYATEL,S,Construction,Yahoo,2025-12-31
 1230,PRECAM,Precision Camshafts Ltd,INE484I01029,PRECAM,PRECAM,S,Automobile and Auto Components,Yahoo,2025-12-31
 1231,ASTEC,Astec Lifesciences Ltd,INE563J01010,ASTEC,ASTEC,S,Chemicals,Yahoo,2025-12-31
@@ -1243,18 +1243,18 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1242,GOCLCORP,GOCL Corporation Ltd,INE077F01035,GOCLCORP,GOCLCORP,S,Chemicals,Yahoo,2025-12-31
 1243,HUHTAMAKI,Huhtamaki India Ltd,INE275B01026,HUHTAMAKI,HUHTAMAKI,S,Consumer Services,Yahoo,2025-12-31
 1244,QUICKHEAL,Quick Heal Technologies Ltd,INE306L01010,QUICKHEAL,QUICKHEAL,S,Information Technology,Yahoo,2025-12-31
-1245,CNCRD-BSE,Concord Control Systems Ltd,INE0N0J01014,,CNCRD,S,Services,Yahoo,2025-12-31
+1245,CNCRD,Concord Control Systems Ltd,INE0N0J01014,,CNCRD,S,Services,Yahoo,2025-12-31
 1246,PNBGILTS,PNB Gilts Ltd,INE859A01011,PNBGILTS,PNBGILTS,S,Financial Services,Yahoo,2025-12-31
 1247,JINDRILL,Jindal Drilling & Industries Ltd,INE742C01031,JINDRILL,JINDRILL,S,Oil Gas & Consumable Fuels,Yahoo,2025-12-31
 1248,DLINKINDIA,D-Link (India) Ltd,INE250K01012,DLINKINDIA,DLINKINDIA,S,Information Technology,Yahoo,2025-12-31
 1249,SOLEX,Solex Energy Ltd,INE880Y01017,SOLEX,,S,Information Technology,Yahoo,2025-12-31
-1250,BGDL-BSE,Bharat Global Developers Ltd,INE893C01032,,BGDL,S,Information Technology,Yahoo,2025-12-31
+1250,BGDL,Bharat Global Developers Ltd,INE893C01032,,BGDL,S,Information Technology,Yahoo,2025-12-31
 1251,BLISSGVS,Bliss GVS Pharma Ltd,INE416D01022,BLISSGVS,BLISSGVS,S,Healthcare,Yahoo,2025-12-31
 1252,SANSTAR,Sanstar Ltd,INE08NE01025,SANSTAR,SANSTAR,S,Chemicals,Yahoo,2025-12-31
 1253,SANGHIIND,Sanghi Industries Ltd,INE999B01013,SANGHIIND,SANGHIIND,S,Unclassified,none,2025-12-31
 1254,EXPLEOSOL,Expleo Solutions Ltd,INE201K01015,EXPLEOSOL,EXPLEOSOL,S,Information Technology,Yahoo,2025-12-31
-1255,MOBAVENUE-BSE,Mobavenue AI Tech Ltd,INE622Q01019,,MOBAVENUE,S,Consumer Services,Yahoo,2025-12-31
-1256,CROPSTER-BSE,Cropster Agro Ltd,INE293E01031,,CROPSTER,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
+1255,MOBAVENUE,Mobavenue AI Tech Ltd,INE622Q01019,,MOBAVENUE,S,Consumer Services,Yahoo,2025-12-31
+1256,CROPSTER,Cropster Agro Ltd,INE293E01031,,CROPSTER,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1257,SESHAPAPER,Seshasayee Paper & Boards Ltd,INE630A01024,SESHAPAPER,SESHAPAPER,S,Forest Materials,Yahoo,2025-12-31
 1258,DEN,DEN Networks Ltd,INE947J01015,DEN,DEN,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1259,TTKHLTCARE,TTK Healthcare Ltd,INE910C01018,TTKHLTCARE,TTKHLTCARE,S,Healthcare,Yahoo,2025-12-31
@@ -1272,8 +1272,8 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1271,TARSONS,Tarsons Products Ltd,INE144Z01023,TARSONS,TARSONS,S,Healthcare,Yahoo,2025-12-31
 1272,HIMATSEIDE,Himatsingka Seide Ltd,INE049A01027,HIMATSEIDE,HIMATSEIDE,S,Textiles,Yahoo,2025-12-31
 1273,MMFL,M.M.Forgings Ltd,INE227C01017,MMFL,MMFL,S,Metals & Mining,Yahoo,2025-12-31
-1274,AMIC-BSE,Amic Forging Ltd,INE0P9J01013,,AMIC,S,Metals & Mining,Yahoo,2025-12-31
-1275,KHAZANCHI-BSE,Khazanchi Jewellers Ltd,INE0OWC01011,,KHAZANCHI,S,Consumer Durables,Yahoo,2025-12-31
+1274,AMIC,Amic Forging Ltd,INE0P9J01013,,AMIC,S,Metals & Mining,Yahoo,2025-12-31
+1275,KHAZANCHI,Khazanchi Jewellers Ltd,INE0OWC01011,,KHAZANCHI,S,Consumer Durables,Yahoo,2025-12-31
 1276,TINNARUBR,Tinna Rubber and Infrastructure Ltd,INE015C01016,TINNARUBR,TINNARUBR,S,Chemicals,Yahoo,2025-12-31
 1277,UDS,Updater Services Ltd,INE851I01011,UDS,UDS,S,Services,Yahoo,2025-12-31
 1278,SYNCOMF,Syncom Formulations (India) Ltd,INE312C01025,SYNCOMF,SYNCOMF,S,Healthcare,Yahoo,2025-12-31
@@ -1297,16 +1297,16 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1296,IVALUE,Ivalue Infosolutions Ltd,INE056801025,IVALUE,IVALUE,S,Information Technology,Yahoo,2025-12-31
 1297,HESTERBIO,Hester Biosciences Ltd,INE782E01017,HESTERBIO,HESTERBIO,S,Healthcare,Yahoo,2025-12-31
 1298,QUADFUTURE,Quadrant Future Tek Ltd,INE0LRY01011,QUADFUTURE,QUADFUTURE,S,Services,Yahoo,2025-12-31
-1299,INDOKEM-BSE,Indokem Ltd,INE716F01012,,INDOKEM,S,Chemicals,Yahoo,2025-12-31
+1299,INDOKEM,Indokem Ltd,INE716F01012,,INDOKEM,S,Chemicals,Yahoo,2025-12-31
 1300,SMCGLOBAL,SMC Global Securities Ltd,INE103C01036,SMCGLOBAL,SMCGLOBAL,S,Financial Services,Yahoo,2025-12-31
 1301,HMAAGRO,HMA Agro Industries Ltd,INE0ECP01024,HMAAGRO,HMAAGRO,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1302,FINKURVE,Finkurve Financial Services Ltd,INE734I01027,FINKURVE,FINKURVE,S,Financial Services,Yahoo,2025-12-31
 1303,JAGSNPHARM,Jagsonpal Pharmaceuticals Ltd,INE048B01035,JAGSNPHARM,JAGSNPHARM,S,Healthcare,Yahoo,2025-12-31
 1304,PLATIND,Platinum Industries Ltd,INE0PT501018,PLATIND,PLATIND,S,Chemicals,Yahoo,2025-12-31
-1305,ELPROINTL-BSE,Elpro International Ltd,INE579B01039,,ELPROINTL,S,Realty,Yahoo,2025-12-31
+1305,ELPROINTL,Elpro International Ltd,INE579B01039,,ELPROINTL,S,Realty,Yahoo,2025-12-31
 1306,ORIENTTECH,Orient Technologies Ltd,INE0PPK01015,ORIENTTECH,ORIENTTECH,S,Information Technology,Yahoo,2025-12-31
 1307,EKC,Everest Kanto Cylinders Ltd,INE184H01027,EKC,EKC,S,Capital Goods,Yahoo,2025-12-31
-1308,JYOTIRES-BSE,Jyoti Resins & Adhesives Ltd,INE577D01013,,JYOTIRES,S,Chemicals,Yahoo,2025-12-31
+1308,JYOTIRES,Jyoti Resins & Adhesives Ltd,INE577D01013,,JYOTIRES,S,Chemicals,Yahoo,2025-12-31
 1309,ANDHRAPAP,Andhra Paper Ltd,INE435A01051,ANDHRAPAP,ANDHRAPAP,S,Forest Materials,Yahoo,2025-12-31
 1310,SALASAR,Salasar Techno Engineering Ltd,INE170V01027,SALASAR,SALASAR,S,Metals & Mining,Yahoo,2025-12-31
 1311,ESAFSFB,ESAF Small Finance Bank Ltd,INE818W01011,ESAFSFB,ESAFSFB,S,Financial Services,Yahoo,2025-12-31
@@ -1315,17 +1315,17 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1314,DOLATALGO,Dolat Algotech Ltd,INE966A01022,DOLATALGO,DOLATALGO,S,Financial Services,Yahoo,2025-12-31
 1315,ROTO,Roto Pumps Ltd,INE535D01037,ROTO,ROTO,S,Capital Goods,Yahoo,2025-12-31
 1316,NIITLTD,NIIT Ltd,INE161A01038,NIITLTD,NIITLTD,S,Consumer Services,Yahoo,2025-12-31
-1317,MMWL-BSE,Media Matrix Worldwide Ltd,INE200D01020,,MMWL,S,Media Entertainment & Publication,Yahoo,2025-12-31
-1318,PQIF-BSE,Polo Queen Industrial and Fintech Ltd,INE689M01025,,PQIF,S,Diversified,Yahoo,2025-12-31
-1319,SHUKRAPHAR-BSE,Shukra Pharmaceuticals Ltd,INE551C01044,,SHUKRAPHAR,S,Healthcare,Yahoo,2025-12-31
+1317,MMWL,Media Matrix Worldwide Ltd,INE200D01020,,MMWL,S,Media Entertainment & Publication,Yahoo,2025-12-31
+1318,PQIF,Polo Queen Industrial and Fintech Ltd,INE689M01025,,PQIF,S,Diversified,Yahoo,2025-12-31
+1319,SHUKRAPHAR,Shukra Pharmaceuticals Ltd,INE551C01044,,SHUKRAPHAR,S,Healthcare,Yahoo,2025-12-31
 1320,GPTINFRA,GPT Infraprojects Ltd,INE390G01014,GPTINFRA,GPTINFRA,S,Construction,Yahoo,2025-12-31
 1321,SURYODAY,Suryoday Small Finance Bank Ltd,INE428Q01011,SURYODAY,SURYODAY,S,Financial Services,Yahoo,2025-12-31
 1322,BIRLANU,Birlanu Ltd,INE557A01011,BIRLANU,BIRLANU,S,Capital Goods,Yahoo,2025-12-31
 1323,RISHABH,Rishabh Instruments Ltd,INE0N2P01017,RISHABH,RISHABH,S,Information Technology,Yahoo,2025-12-31
 1324,ASIANENE,Asian Energy Services Ltd,INE276G01015,ASIANENE,ASIANENE,S,Oil Gas & Consumable Fuels,Yahoo,2025-12-31
-1325,ZSARACOM-BSE,Saraswati Commercial (India) Ltd,INE967G01019,,ZSARACOM,S,Financial Services,Yahoo,2025-12-31
+1325,ZSARACOM,Saraswati Commercial (India) Ltd,INE967G01019,,ZSARACOM,S,Financial Services,Yahoo,2025-12-31
 1326,GANDHAR,Gandhar Oil Refinery (India) Ltd,INE717W01049,GANDHAR,GANDHAR,S,Oil Gas & Consumable Fuels,Yahoo,2025-12-31
-1327,HARAFIN-BSE,Haryana Financial Corporation Ltd,INE737G01016,,HARAFIN,S,Financial Services,Yahoo,2025-12-31
+1327,HARAFIN,Haryana Financial Corporation Ltd,INE737G01016,,HARAFIN,S,Financial Services,Yahoo,2025-12-31
 1328,EXCELINDUS,Excell Industries Ltd,INE369A01029,EXCELINDUS,EXCELINDUS,S,Chemicals,Yahoo,2025-12-31
 1329,BAJAJHCARE,Bajaj Healthcare Ltd,INE411U01027,BAJAJHCARE,BAJAJHCARE,S,Healthcare,Yahoo,2025-12-31
 1330,ALICON,Alicon Castalloy Ltd,INE062D01024,ALICON,ALICON,S,Metals & Mining,Yahoo,2025-12-31
@@ -1334,19 +1334,19 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1333,RAJRILTD,Raj Rayon Industries Ltd,INE533D01032,RAJRILTD,RAJRILTD,S,Textiles,Yahoo,2025-12-31
 1334,INDORAMA,Indo Rama Synthetics (India) Ltd,INE156A01020,INDORAMA,INDORAMA,S,Textiles,Yahoo,2025-12-31
 1335,PARACABLES,Paramount Communications Ltd,INE074B01023,PARACABLES,PARACABLES,S,Information Technology,Yahoo,2025-12-31
-1336,A1L-BSE,A-1 Ltd,INE911Z01017,,A1L,S,Chemicals,Yahoo,2025-12-31
+1336,A1L,A-1 Ltd,INE911Z01017,,A1L,S,Chemicals,Yahoo,2025-12-31
 1337,VPRPL,Vishnu Prakash R Punglia Ltd,INE0AE001013,VPRPL,VPRPL,S,Construction,Yahoo,2025-12-31
 1338,SALZERELEC,Salzer Electronics Ltd,INE457F01013,SALZERELEC,SALZERELEC,S,Power,Yahoo,2025-12-31
 1339,SIGACHI,Sigachi Industries Ltd,INE0D0K01022,SIGACHI,SIGACHI,S,Healthcare,Yahoo,2025-12-31
-1340,YASHHV-BSE,Yash Highvoltage Ltd,INE00GK01023,,YASHHV,S,Power,Yahoo,2025-12-31
+1340,YASHHV,Yash Highvoltage Ltd,INE00GK01023,,YASHHV,S,Power,Yahoo,2025-12-31
 1341,ALLDIGI,Alldigi Tech Ltd,INE835G01018,ALLDIGI,ALLDIGI,S,Services,Yahoo,2025-12-31
 1342,BLKASHYAP,B L Kashyap and Sons Ltd,INE350H01032,BLKASHYAP,BLKASHYAP,S,Construction,Yahoo,2025-12-31
 1343,INFOBEAN,InfoBeans Technologies Ltd,INE344S01016,INFOBEAN,INFOBEAN,S,Information Technology,Yahoo,2025-12-31
 1344,GODAVARIB,Godavari Biorefineries Ltd,INE497S01012,GODAVARIB,GODAVARIB,S,Chemicals,Yahoo,2025-12-31
-1345,ASHIKA-BSE,Ashika Credit Capital Ltd,INE094B01013,,ASHIKA,S,Unclassified,none,2025-12-31
-1346,ULTRAMAR-BSE,Ultramarine & Pigments Ltd,INE405A01021,,ULTRAMAR,S,Chemicals,Yahoo,2025-12-31
+1345,ASHIKA,Ashika Credit Capital Ltd,INE094B01013,,ASHIKA,S,Unclassified,none,2025-12-31
+1346,ULTRAMAR,Ultramarine & Pigments Ltd,INE405A01021,,ULTRAMAR,S,Chemicals,Yahoo,2025-12-31
 1347,UNIECOM,Unicommerce Esolutions Ltd,INE00U401027,UNIECOM,UNIECOM,S,Information Technology,Yahoo,2025-12-31
-1348,LOTUSCHO-BSE,Lotus Chocolate Co. Ltd,INE026D01011,,LOTUSCHO,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
+1348,LOTUSCHO,Lotus Chocolate Co. Ltd,INE026D01011,,LOTUSCHO,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1349,JARO,Jaro Institute of Technology Management and Research Ltd,INE00YJ01010,JARO,JARO,S,Consumer Services,Yahoo,2025-12-31
 1350,SURAJEST,Suraj Estate Developers Ltd,INE843S01025,SURAJEST,SURAJEST,S,Realty,Yahoo,2025-12-31
 1351,CIFL,Capital India Finance Ltd,INE345H01024,CIFL,CIFL,S,Financial Services,Yahoo,2025-12-31
@@ -1356,7 +1356,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1355,SPORTKING,Sportking India Ltd,INE885H01029,SPORTKING,SPORTKING,S,Textiles,Yahoo,2025-12-31
 1356,SUMEETINDS,Sumeet Industries Ltd,INE235C01036,SUMEETINDS,SUMEETINDS,S,Textiles,Yahoo,2025-12-31
 1357,DECCANCE,Deccan Cements Ltd,INE583C01021,DECCANCE,DECCANCE,S,Construction Materials,Yahoo,2025-12-31
-1358,VOEPL-BSE,Virtuoso Optoelectronics Ltd,INE0I0T01010,,VOEPL,S,Consumer Durables,Yahoo,2025-12-31
+1358,VOEPL,Virtuoso Optoelectronics Ltd,INE0I0T01010,,VOEPL,S,Consumer Durables,Yahoo,2025-12-31
 1359,HITECHGEAR,The Hi-Tech Gears Ltd,INE127B01011,HITECHGEAR,HITECHGEAR,S,Automobile and Auto Components,Yahoo,2025-12-31
 1360,GNA,G N A Axles Ltd,INE934S01014,GNA,GNA,S,Automobile and Auto Components,Yahoo,2025-12-31
 1361,RIIL,Reliance Industrial Infrastructure,INE046A01015,RIIL,RIIL,S,Construction,Yahoo,2025-12-31
@@ -1366,14 +1366,14 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1365,BSHSL,Bombay Super Hybrid Seeds Ltd,INE032Z01020,BSHSL,,S,Chemicals,Yahoo,2025-12-31
 1366,RGL,Renaissance Global Ltd,INE722H01024,RGL,RGL,S,Consumer Durables,Yahoo,2025-12-31
 1367,SHREDIGCEM,Shree Digvijay Cement Co. Ltd,INE232A01011,SHREDIGCEM,SHREDIGCEM,S,Construction Materials,Yahoo,2025-12-31
-1368,CFF-BSE,CFF Fluid Control Ltd,INE0NJ001013,,CFF,S,Capital Goods,Yahoo,2025-12-31
+1368,CFF,CFF Fluid Control Ltd,INE0NJ001013,,CFF,S,Capital Goods,Yahoo,2025-12-31
 1369,SIGNPOST,Signpost India Ltd,INE0KGZ01021,SIGNPOST,SIGNPOST,S,Media Entertainment & Publication,Yahoo,2025-12-31
-1370,ANDREWYU-BSE,Andrew Yule & Company Ltd,INE449C01025,,ANDREWYU,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
+1370,ANDREWYU,Andrew Yule & Company Ltd,INE449C01025,,ANDREWYU,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1371,BALAJITELE,Balaji Telefilms Ltd,INE794B01026,BALAJITELE,BALAJITELE,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1372,ATULAUTO,Atul Auto Ltd,INE951D01028,ATULAUTO,ATULAUTO,S,Automobile and Auto Components,Yahoo,2025-12-31
 1373,AGARIND,Agarwal Industrial Corporation Ltd,INE204E01012,AGARIND,AGARIND,S,Chemicals,Yahoo,2025-12-31
 1374,DIFFNKG,Diffusion Engineers Ltd,INE184O01015,DIFFNKG,DIFFNKG,S,Capital Goods,Yahoo,2025-12-31
-1375,AAYUSHBULL-BSE,Aayush ART AND Bullion Ltd,INE777X01017,,AAYUSHBULL,S,Consumer Durables,Yahoo,2025-12-31
+1375,AAYUSHBULL,Aayush ART AND Bullion Ltd,INE777X01017,,AAYUSHBULL,S,Consumer Durables,Yahoo,2025-12-31
 1376,ONEPOINT,One Point One Solutions Ltd,INE840Y01029,ONEPOINT,,S,Services,Yahoo,2025-12-31
 1377,CAPITALSFB,Capital Small Finance Bank Ltd,INE646H01017,CAPITALSFB,CAPITALSFB,S,Financial Services,Yahoo,2025-12-31
 1378,YUKEN,Yuken India Ltd,INE384C01016,YUKEN,YUKEN,S,Capital Goods,Yahoo,2025-12-31
@@ -1389,37 +1389,37 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1388,TEXINFRA,Texmaco Infrastructure & Holdings Ltd,INE435C01024,TEXINFRA,TEXINFRA,S,Realty,Yahoo,2025-12-31
 1389,WCIL,Western Carriers (India) Ltd,INE0CJF01024,WCIL,WCIL,S,Services,Yahoo,2025-12-31
 1390,HERANBA,Heranba Industries Ltd,INE694N01015,HERANBA,HERANBA,S,Chemicals,Yahoo,2025-12-31
-1391,TGVSL-BSE,TGV Sraac Ltd,INE284B01028,,TGVSL,S,Chemicals,Yahoo,2025-12-31
-1392,PANORAMA-BSE,Panorama Studios International Ltd,INE258R01028,,PANORAMA,S,Media Entertainment & Publication,Yahoo,2025-12-31
+1391,TGVSL,TGV Sraac Ltd,INE284B01028,,TGVSL,S,Chemicals,Yahoo,2025-12-31
+1392,PANORAMA,Panorama Studios International Ltd,INE258R01028,,PANORAMA,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1393,BOROSCI,Borosil Scientific Ltd,INE02L001032,BOROSCI,BOROSCI,S,Consumer Services,Yahoo,2025-12-31
 1394,HEUBACHIND,Heubach Colorants India Ltd,INE492A01029,HEUBACHIND,HEUBACHIND,S,Unclassified,none,2025-12-31
 1395,GPTHEALTH,GPT Healthcare Ltd,INE486R01017,GPTHEALTH,GPTHEALTH,S,Healthcare,Yahoo,2025-12-31
 1396,IRMENERGY,IRM Energy Ltd,INE07U701015,IRMENERGY,IRMENERGY,S,Utilities,Yahoo,2025-12-31
 1397,LEMERITE,Le Merite Exports Ltd,INE0G1L01017,LEMERITE,,S,Textiles,Yahoo,2025-12-31
-1398,INE00R201018-BSE,Legend Infoways (india) Ltd,INE00R201018,,,S,Unclassified,none,2025-12-31
+1398,INE00R201018,Legend Infoways (india) Ltd,INE00R201018,,,S,Unclassified,none,2025-12-31
 1399,SHREEPUSHK,Shree Pushkar Chemicals & Fertilisers Ltd,INE712K01011,SHREEPUSHK,SHREEPUSHK,S,Chemicals,Yahoo,2025-12-31
 1400,MEIL,Mangal Electrical Industries Ltd,INE0PKD01011,MEIL,MEIL,S,Power,Yahoo,2025-12-31
 1401,GTPL,GTPL Hathway Ltd,INE869I01013,GTPL,GTPL,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1402,ROHLTD,Royal Orchid Hotels Ltd,INE283H01019,ROHLTD,ROHLTD,S,Consumer Services,Yahoo,2025-12-31
 1403,VHL,Vardhman Holdings Ltd,INE701A01023,VHL,VHL,S,Financial Services,Yahoo,2025-12-31
-1404,BENARAS-BSE,Benares Hotels Ltd,INE664D01019,,BENARAS,S,Consumer Services,Yahoo,2025-12-31
+1404,BENARAS,Benares Hotels Ltd,INE664D01019,,BENARAS,S,Consumer Services,Yahoo,2025-12-31
 1405,DSSL,Dynacons Systems & Solutions Ltd,INE417B01040,DSSL,DSSL,S,Information Technology,Yahoo,2025-12-31
 1406,BAJAJINDEF,Indef Manufacturing Ltd,INE0O9T01021,BAJAJINDEF,BAJAJINDEF,S,Capital Goods,Yahoo,2025-12-31
 1407,TBZ,Tribhovandas Bhimji Zaveri Ltd,INE760L01018,TBZ,TBZ,S,Consumer Durables,Yahoo,2025-12-31
 1408,STLNETWORK,STL Networks Ltd,INE1VXE01018,STLNETWORK,STLNETWORK,S,Telecommunication,Yahoo,2025-12-31
 1409,ARISINFRA,ArisInfra Solutions Ltd,INE0H9P01028,ARISINFRA,ARISINFRA,S,Unclassified,none,2025-12-31
-1410,BLUECLOUDS-BSE,Blue Cloud Softech Solutions Ltd,INE373T01047,,BLUECLOUDS,S,Information Technology,Yahoo,2025-12-31
-1411,3BBLACKBIO-BSE,3B BlackBio Dx Ltd,INE994E01018,,3BBLACKBIO,S,Healthcare,Yahoo,2025-12-31
+1410,BLUECLOUDS,Blue Cloud Softech Solutions Ltd,INE373T01047,,BLUECLOUDS,S,Information Technology,Yahoo,2025-12-31
+1411,3BBLACKBIO,3B BlackBio Dx Ltd,INE994E01018,,3BBLACKBIO,S,Healthcare,Yahoo,2025-12-31
 1412,CONTROLPR,Control Print (India) Ltd,INE663B01015,CONTROLPR,CONTROLPR,S,Capital Goods,Yahoo,2025-12-31
 1413,JINDALPHOT,Jindal Photo Ltd,INE796G01012,JINDALPHOT,JINDALPHOT,S,Financial Services,Yahoo,2025-12-31
 1414,ALLCARGO,Allcargo Logistics Ltd,INE418H01029,ALLCARGO,ALLCARGO,S,Services,Yahoo,2025-12-31
 1415,ELECTHERM,Electrotherm (India) Ltd,INE822G01016,ELECTHERM,ELECTHERM,S,Metals & Mining,Yahoo,2025-12-31
 1416,ABINFRA,A B Infrabuild Ltd,INE00YB01025,ABINFRA,ABINFRA,S,Construction,Yahoo,2025-12-31
-1417,MIIL-BSE,Meghna Infracon Infrastructure Ltd,INE898Q01015,,MIIL,S,Realty,Yahoo,2025-12-31
+1417,MIIL,Meghna Infracon Infrastructure Ltd,INE898Q01015,,MIIL,S,Realty,Yahoo,2025-12-31
 1418,SRM,SRM Contractors Ltd,INE0R6Z01013,SRM,SRM,S,Construction,Yahoo,2025-12-31
 1419,KRISHNADEF,Krishna Defence and Allied Industries Ltd,INE0J5601015,KRISHNADEF,,S,Capital Goods,Yahoo,2025-12-31
 1420,KROSS,Kross Ltd,INE0O6601022,KROSS,KROSS,S,Automobile and Auto Components,Yahoo,2025-12-31
-1421,COSMICCRF-BSE,Cosmic CRF Ltd,INE0ORA01015,,COSMICCRF,S,Services,Yahoo,2025-12-31
+1421,COSMICCRF,Cosmic CRF Ltd,INE0ORA01015,,COSMICCRF,S,Services,Yahoo,2025-12-31
 1422,AMNPLST,Amines & Plasticizers Ltd,INE275D01022,AMNPLST,AMNPLST,S,Chemicals,Yahoo,2025-12-31
 1423,WEALTH,Wealth First Portfolio Managers Ltd,INE658T01017,WEALTH,WEALTH,S,Financial Services,Yahoo,2025-12-31
 1424,ZUARI,Zuari Agro Chemicals Ltd,INE840M01016,ZUARI,ZUARI,S,Chemicals,Yahoo,2025-12-31
@@ -1429,20 +1429,20 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1428,ANTELOPUS,Antelopus Selan Energy Ltd,INE818A01017,ANTELOPUS,ANTELOPUS,S,Oil Gas & Consumable Fuels,Yahoo,2025-12-31
 1429,PASHUPATI,Pashupati Cotspin Ltd,INE124Y01010,PASHUPATI,PASHUPATI,S,Textiles,Yahoo,2025-12-31
 1430,ICEMAKE,Ice Make Refrigeration Ltd,INE520Y01019,ICEMAKE,,S,Capital Goods,Yahoo,2025-12-31
-1431,ACGL-BSE,Automobile Corpn. of Goa Ltd,INE451C01013,,ACGL,S,Automobile and Auto Components,Yahoo,2025-12-31
+1431,ACGL,Automobile Corpn. of Goa Ltd,INE451C01013,,ACGL,S,Automobile and Auto Components,Yahoo,2025-12-31
 1432,BLUSPRING,Bluspring Enterprises Ltd,INE0U4101014,BLUSPRING,BLUSPRING,S,Services,Yahoo,2025-12-31
 1433,MANALIPETC,Manali Petrochemicals Ltd,INE201A01024,MANALIPETC,MANALIPETC,S,Chemicals,Yahoo,2025-12-31
 1434,DVL,Dhunseri Ventures Ltd,INE477B01010,DVL,DVL,S,Financial Services,Yahoo,2025-12-31
-1435,ARIHANT-BSE,Arihant Foundations & Housing Ltd,INE413D01011,,ARIHANT,S,Realty,Yahoo,2025-12-31
+1435,ARIHANT,Arihant Foundations & Housing Ltd,INE413D01011,,ARIHANT,S,Realty,Yahoo,2025-12-31
 1436,BCLIND,BCL Industries Ltd,INE412G01024,BCLIND,BCLIND,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
 1437,DPSCLTD,DPSC Ltd,INE360C01024,DPSCLTD,,S,Power,Yahoo,2025-12-31
-1438,BAJAJST-BSE,Bajaj Steel Industries Ltd,INE704G01024,,BAJAJST,S,Capital Goods,Yahoo,2025-12-31
+1438,BAJAJST,Bajaj Steel Industries Ltd,INE704G01024,,BAJAJST,S,Capital Goods,Yahoo,2025-12-31
 1439,NELCAST,Nelcast Ltd,INE189I01024,NELCAST,NELCAST,S,Metals & Mining,Yahoo,2025-12-31
 1440,EIMCOELECO,EIMCO Elecon India Ltd,INE158B01016,EIMCOELECO,EIMCOELECO,S,Capital Goods,Yahoo,2025-12-31
-1441,ASTAR-BSE,Asian Star Co. Ltd,INE194D01017,,ASTAR,S,Consumer Durables,Yahoo,2025-12-31
+1441,ASTAR,Asian Star Co. Ltd,INE194D01017,,ASTAR,S,Consumer Durables,Yahoo,2025-12-31
 1442,MEGASOFT,Megasoft Ltd,INE933B01012,MEGASOFT,MEGASOFT,S,Capital Goods,NSE,2025-12-31
 1443,OAL,Oriental Aromatics Ltd,INE959C01023,OAL,OAL,S,Chemicals,Yahoo,2025-12-31
-1444,KMCSHIL-BSE,KMC Speciality Hospitals India Ltd,INE879K01018,,KMCSHIL,S,Healthcare,Yahoo,2025-12-31
+1444,KMCSHIL,KMC Speciality Hospitals India Ltd,INE879K01018,,KMCSHIL,S,Healthcare,Yahoo,2025-12-31
 1445,STERTOOLS,Sterling Tools Ltd,INE334A01023,STERTOOLS,STERTOOLS,S,Capital Goods,Yahoo,2025-12-31
 1446,SAURASHCEM,Saurashtra Cement Ltd,INE626A01014,SAURASHCEM,SAURASHCEM,S,Construction Materials,Yahoo,2025-12-31
 1447,GEMAROMA,Gem Aromatics Ltd,INE06XZ01023,GEMAROMA,GEMAROMA,S,Chemicals,Yahoo,2025-12-31
@@ -1450,13 +1450,13 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1449,EXCELSOFT,Excelsoft Technologies Ltd,INE606N01019,EXCELSOFT,EXCELSOFT,S,Information Technology,Yahoo,2025-12-31
 1450,PROSTARM,Prostarm Info Systems Ltd,INE0BX301013,PROSTARM,PROSTARM,S,Power,Yahoo,2025-12-31
 1451,IZMO,IZMO Ltd,INE848A01014,IZMO,IZMO,S,Information Technology,Yahoo,2025-12-31
-1452,YSL-BSE,The Yamuna Syndicate Ltd,INE868X01014,,YSL,S,Diversified,Yahoo,2025-12-31
+1452,YSL,The Yamuna Syndicate Ltd,INE868X01014,,YSL,S,Diversified,Yahoo,2025-12-31
 1453,MATRIMONY,Matrimony.com Ltd,INE866R01028,MATRIMONY,MATRIMONY,S,Telecommunication,Yahoo,2025-12-31
 1454,SWELECTES,Swelect Energy Systems Ltd,INE409B01013,SWELECTES,SWELECTES,S,Information Technology,Yahoo,2025-12-31
 1455,PDMJEPAPER,Pudumjee Paper Products Ltd,INE865T01018,PDMJEPAPER,PDMJEPAPER,S,Forest Materials,Yahoo,2025-12-31
 1456,AYMSYNTEX,AYM Syntex Ltd,INE193B01039,AYMSYNTEX,AYMSYNTEX,S,Textiles,Yahoo,2025-12-31
 1457,OMINFRAL,OM Infra Ltd,INE239D01028,OMINFRAL,OMINFRAL,S,Construction,Yahoo,2025-12-31
-1458,ECORECO-BSE,Eco Recycling Ltd,INE316A01038,,ECORECO,S,Services,Yahoo,2025-12-31
+1458,ECORECO,Eco Recycling Ltd,INE316A01038,,ECORECO,S,Services,Yahoo,2025-12-31
 1459,VIDYAWIRES,Vidya Wires Ltd,INE14UN01029,VIDYAWIRES,VIDYAWIRES,S,Power,Yahoo,2025-12-31
 1460,5PAISA,5paisa Capital Ltd,INE618L01018,5PAISA,5PAISA,S,Financial Services,Yahoo,2025-12-31
 1461,PENINLAND,Peninsula Land Ltd,INE138A01028,PENINLAND,PENINLAND,S,Realty,Yahoo,2025-12-31
@@ -1466,7 +1466,7 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1465,AFSL,Abans Financial Services Ltd,INE00ZE01026,AFSL,AFSL,S,Financial Services,Yahoo,2025-12-31
 1466,TNPL,Tamil Nadu Newsprint And Papers Ltd,INE107A01015,TNPL,TNPL,S,Forest Materials,Yahoo,2025-12-31
 1467,GANESHCP,Ganesh Consumer Products Ltd,INE652V01016,GANESHCP,GANESHCP,S,Fast Moving Consumer Goods,Yahoo,2025-12-31
-1468,MAFATIND-BSE,Mafatlal Industries Ltd,INE270B01035,,MAFATIND,S,Textiles,Yahoo,2025-12-31
+1468,MAFATIND,Mafatlal Industries Ltd,INE270B01035,,MAFATIND,S,Textiles,Yahoo,2025-12-31
 1469,AVTNPL,AVT Natural Products Ltd,INE488D01021,AVTNPL,AVTNPL,S,Chemicals,Yahoo,2025-12-31
 1470,KOKUYOCMLN,Kokuyo Camlin Ltd,INE760A01029,KOKUYOCMLN,KOKUYOCMLN,S,Capital Goods,Yahoo,2025-12-31
 1471,MAXIND,Max India Ltd,INE0CG601016,MAXIND,MAXIND,S,Healthcare,Yahoo,2025-12-31
@@ -1474,11 +1474,11 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1473,LINCOLN,Lincoln Pharmaceuticals Ltd,INE405C01035,LINCOLN,LINCOLN,S,Healthcare,Yahoo,2025-12-31
 1474,CREST,Crest Ventures Ltd,INE559D01011,CREST,CREST,S,Financial Services,Yahoo,2025-12-31
 1475,THEMISMED,Themis Medicare Ltd,INE083B01024,THEMISMED,THEMISMED,S,Healthcare,Yahoo,2025-12-31
-1476,INDPRUD-BSE,Industrial & Prudential Inv. Co. Lt,INE620D01011,,INDPRUD,S,Financial Services,Yahoo,2025-12-31
+1476,INDPRUD,Industrial & Prudential Inv. Co. Lt,INE620D01011,,INDPRUD,S,Financial Services,Yahoo,2025-12-31
 1477,CNL,Creative Newtech Ltd,INE985W01018,CNL,CNL,S,Information Technology,Yahoo,2025-12-31
 1478,RNBDENIMS,R&B Denims Ltd,INE012Q01021,RNBDENIMS,RNBDENIMS,S,Textiles,Yahoo,2025-12-31
 1479,CENTENKA,Century Enka Ltd,INE485A01015,CENTENKA,CENTENKA,S,Textiles,Yahoo,2025-12-31
-1480,ORIRAIL-BSE,Oriental Rail Infrastructure Ltd,INE457G01029,,ORIRAIL,S,Services,Yahoo,2025-12-31
+1480,ORIRAIL,Oriental Rail Infrastructure Ltd,INE457G01029,,ORIRAIL,S,Services,Yahoo,2025-12-31
 1481,ARIHANTCAP,Arihant Capital Markets Ltd,INE420B01036,ARIHANTCAP,ARIHANTCAP,S,Financial Services,Yahoo,2025-12-31
 1482,DHANBANK,Dhanlaxmi Bank Ltd,INE680A01011,DHANBANK,DHANBANK,S,Financial Services,Yahoo,2025-12-31
 1483,UNIENTER,Uniphos Enterprises Ltd,INE037A01022,UNIENTER,UNIENTER,S,Chemicals,Yahoo,2025-12-31
@@ -1487,15 +1487,15 @@ rank,slug,name,isin,nse,bse,cap,sector,sector_source,list_date
 1486,SBC,SBC Exports Ltd,INE04AK01028,SBC,SBC,S,Textiles,Yahoo,2025-12-31
 1487,CEWATER,Concord Enviro Systems Ltd,INE037Z01029,CEWATER,CEWATER,S,Utilities,Yahoo,2025-12-31
 1488,RADHIKAJWE,Radhika Jeweltech Ltd,INE583V01021,RADHIKAJWE,RADHIKAJWE,S,Consumer Durables,Yahoo,2025-12-31
-1489,KPL-BSE,Kwality Pharmaceuticals Ltd,INE552U01010,,KPL,S,Healthcare,Yahoo,2025-12-31
+1489,KPL,Kwality Pharmaceuticals Ltd,INE552U01010,,KPL,S,Healthcare,Yahoo,2025-12-31
 1490,INNOVANA,Innovana Thinklabs Ltd,INE403Y01018,INNOVANA,INNOVANA,S,Information Technology,Yahoo,2025-12-31
 1491,GKWLIMITED,GKW Ltd,INE528A01020,GKWLIMITED,,S,Services,Yahoo,2025-12-31
 1492,NDTV,New Delhi Television Ltd,INE155G01029,NDTV,NDTV,S,Media Entertainment & Publication,Yahoo,2025-12-31
 1493,FAIRCHEMOR,Fairchem Organics Ltd,INE0DNW01011,FAIRCHEMOR,FAIRCHEMOR,S,Chemicals,Yahoo,2025-12-31
 1494,KHAICHEM,Khaitan Chemicals & Fertilizers Ltd,INE745B01028,KHAICHEM,KHAICHEM,S,Chemicals,Yahoo,2025-12-31
-1495,LKPFIN-BSE,LKP Finance Ltd,INE724A01017,,LKPFIN,S,Unclassified,none,2025-12-31
-1496,SEKURITIND-BSE,Saint-Gobain Sekurit India Ltd,INE068B01017,,SEKURITIND,S,Automobile and Auto Components,Yahoo,2025-12-31
-1497,FEDDERSHOL-BSE,Fedders Holding Ltd,INE417D01020,,FEDDERSHOL,S,Financial Services,Yahoo,2025-12-31
-1498,AMAL-BSE,Amal Ltd,INE841D01013,,AMAL,S,Chemicals,Yahoo,2025-12-31
+1495,LKPFIN,LKP Finance Ltd,INE724A01017,,LKPFIN,S,Unclassified,none,2025-12-31
+1496,SEKURITIND,Saint-Gobain Sekurit India Ltd,INE068B01017,,SEKURITIND,S,Automobile and Auto Components,Yahoo,2025-12-31
+1497,FEDDERSHOL,Fedders Holding Ltd,INE417D01020,,FEDDERSHOL,S,Financial Services,Yahoo,2025-12-31
+1498,AMAL,Amal Ltd,INE841D01013,,AMAL,S,Chemicals,Yahoo,2025-12-31
 1499,AEROENTER,Aeroflex Enterprises Ltd,INE065D01027,AEROENTER,AEROENTER,S,Metals & Mining,Yahoo,2025-12-31
 1500,INDOAMIN,Indo Amines Ltd,INE760F01028,INDOAMIN,INDOAMIN,S,Chemicals,Yahoo,2025-12-31

@@ -16,8 +16,14 @@ stops for one ticker. See regime/pipeline.py.
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
+
+# One BLAS thread per process: the pool already uses every core, and nested
+# thread pools would oversubscribe the machine many times over.
+for _var in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
+    os.environ.setdefault(_var, '1')
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))

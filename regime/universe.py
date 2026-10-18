@@ -221,12 +221,19 @@ def map_yahoo_sector(sector: str | None, industry: str | None) -> str | None:
 
 
 def make_slugs(companies: list[dict]) -> None:
-    """Assign each company a URL- and filename-safe slug, unique in the set."""
-    seen: set[str] = set()
+    """
+    Assign each company a URL- and filename-safe slug, unique in the set.
+    NSE symbols take precedence; a BSE-only symbol that collides with one
+    gets a -BSE suffix.
+    """
+    def base(c):
+        return re.sub(r'[^A-Z0-9]+', '-', (c['nse'] or c['bse'] or c['isin']).upper()).strip('-')
+    seen = {base(c) for c in companies if c['nse']}
     for c in companies:
-        base = re.sub(r'[^A-Z0-9]+', '-', (c['nse'] or c['bse'] or c['isin']).upper()).strip('-')
-        slug = base if c['nse'] else f'{base}-BSE'
-        while slug in seen:
+        slug = base(c)
+        if not c['nse'] and slug in seen:
+            slug += '-BSE'
+        while not c['nse'] and slug in seen:
             slug += '-X'
         seen.add(slug)
         c['slug'] = slug
