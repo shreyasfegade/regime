@@ -1,0 +1,13 @@
+{
+  "note": "Market-wide Indian events annotated on regime timelines. Dates are the first session of the market reaction.",
+  "events": [
+    {"date": "2016-11-09", "label": "Demonetisation"},
+    {"date": "2018-09-21", "label": "IL&FS default"},
+    {"date": "2020-03-23", "label": "COVID crash"},
+    {"date": "2022-05-04", "label": "RBI starts hiking"},
+    {"date": "2023-01-25", "label": "Adani–Hindenburg"},
+    {"date": "2024-06-04", "label": "Election-result day"},
+    {"date": "2024-09-30", "label": "FPI sell-off"},
+    {"date": "2025-04-07", "label": "US tariff shock"}
+  ]
+}
