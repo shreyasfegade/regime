@@ -116,6 +116,44 @@ The kit lives in `static/js/figure.js`: DPR-aware sizing, `ResizeObserver`
 redraws, scales, tick generators, the Crisis hatch, label layout and the
 `Figure` class.
 
+## Pages
+
+**Market (`/`).** Opens with one serif sentence naming the largest regime
+("19 of the 50 NIFTY 50 stocks are Bearish"), a 100% composition bar and the
+four counts. Below it: an indices strip (a ruled 4 × 2 grid), Fig. 1 breadth
+over time, and Fig. 2, the map.
+
+- *Breadth* is a 100% stacked area of weekly counts. Crisis sits on the
+  baseline and Bearish above it, so the top of the ochre band reads directly as
+  the share of the market in a falling regime. Direct labels sit at the right
+  end; a sector selector and range buttons sit above.
+- *Map tiles* are 104 × 46 px links carrying the symbol and today's confidence.
+  A tile is solid regime ink when confidence is at least 80%, and the regime
+  wash with a 3 px ink edge when it is lower. Crisis tiles add a hatched right
+  edge. Tiles group by sector (largest group first) or by regime, ordered by
+  AMFI rank. The map is a single tab stop; arrow keys, Home and End move
+  between tiles, and focus or hover opens the tooltip card.
+- *Table view* has the same rows, with sortable column headings (`aria-sort`).
+  Turning every regime off shows an empty-filter notice instead of a blank.
+
+**Explainer (`/how-it-works`).** On desktop, a 5 : 7 grid: numbered steps on
+the left in the prose face, and one sticky figure on the right that switches
+when a step crosses the middle of the viewport. The active step carries a 3 px
+ink rule on its left edge; inactive steps keep full contrast. On screens under
+900 px, or with reduced motion, every step instead carries its own static
+figure inline. Controls (range inputs, link-style buttons) sit in the step
+text, and the belief bars beside them are plain HTML, so they work with a
+screen reader. Without JavaScript the page reads as an article.
+
+**Methodology (`/methodology`).** A 200 px sticky table of contents beside a
+74ch column of prose. Formulas are set in mono on a paper-2 block with an ink
+rule. Reference tables (features, costs, exclusions) use the standard table
+style inside the prose column. The covered list is set in three columns, each
+name with its regime swatch.
+
+**404.** The not-covered state layout: kicker, serif title, one sentence
+pointing to the `/stock/SYMBOL` pattern, and two actions.
+
 ## Interaction and accessibility
 
 - Search is an ARIA combobox (`/` focuses it; ↑ ↓ Enter Esc). It covers
@@ -127,7 +165,8 @@ redraws, scales, tick generators, the Crisis hatch, label layout and the
   Selecting a cell lists every historical example, and each one jumps the
   timeline to that date.
 - URLs are shareable: `/stock/RELIANCE?range=5Y&at=2020-03-23` restores the
-  range and the cursor.
+  range and the cursor; `/?view=table&sort=posterior&group=regime&show=0,3`
+  restores the market view.
 - A skip link, landmarks, visible 2 px focus rings, and an axe-core pass with
   no serious or critical violations on every page and state
   (`scripts/screenshots.mjs`).
