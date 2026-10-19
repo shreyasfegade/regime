@@ -3,7 +3,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/stock/:slug", "destination": "/stock.html" }
+    { "source": "/stock/:slug", "destination": "/stock" }
   ],
   "headers": [
     {
