@@ -1,14 +1,14 @@
 {
  "asof": "2026-10-16",
- "compute_seconds": 157.9,
+ "compute_seconds": 239.6,
  "excluded": 9,
  "file_bytes": {
   "count": 58,
-  "max": 39111,
-  "mean": 33593,
-  "total": 1948427
+  "max": 39115,
+  "mean": 33595,
+  "total": 1948514
  },
- "generated_at": "2026-10-18T23:44:57Z",
+ "generated_at": "2026-10-19T00:17:51Z",
  "stale": 0,
  "universe": {
   "covered": 50,
