@@ -1,8 +1,10 @@
-# Lower bounds chosen for broad compatibility; any newer release works too.
-hmmlearn>=0.3.2
-scikit-learn>=1.5
-pandas>=2.2
-numpy>=1.26
-yfinance>=0.2.40
-fastapi>=0.110
-uvicorn[standard]>=0.29
+# Data pipeline (scripts/precompute.py). Pinned so weekly refits are
+# reproducible and the committed data only changes when the market does.
+hmmlearn==0.3.3
+scikit-learn==1.9.1
+scipy==1.18.1
+numpy==2.5.3
+pandas==3.0.5
+yfinance==1.7.0
+openpyxl==3.1.5
+requests==2.34.2

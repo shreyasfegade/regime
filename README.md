@@ -1,160 +1,116 @@
 # REGIME
 
-**Classify any equity into one of four hidden market regimes with a Gaussian Hidden Markov Model — then see it, trade it, and stress-test it out-of-sample.** Built India-first for NSE/BSE equities and indices, rendered through a zero-dependency HTML5 Canvas engine where every pixel is drawn by hand.
+**Hidden market regimes for the NIFTY 50.** A 4-state Gaussian hidden Markov model fitted to each stock's own ten-year history classifies every trading day as Bullish Trending, Accumulation, Bearish Trending or Crisis. The site shows today's regime, how the stock got there, how much to trust the label, and what trading on it would have earned after real costs.
 
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
-![Canvas API](https://img.shields.io/badge/Canvas_API-E34F26?style=flat-square&logo=html5&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+It is a fully static site. Every number is precomputed by a weekly job and served as plain files; there is no backend to wait for.
 
-### ▶ [Live demo → regime-omega.vercel.app](https://regime-omega.vercel.app)
+![MIT licence](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-Loads instantly from a precomputed cache; type any ticker (e.g. `INFY.NS`, `AAPL`) for a live fit.
+### [Live site → regime-omega.vercel.app](https://regime-omega.vercel.app)
 
-![REGIME dashboard](demo.gif)
+![The NIFTY 50 stock page: today's regime, the figures behind it, and ten years of regime bands over price](screenshots/hero.png)
 
----
+## What's covered
 
-## The idea
+**Only NIFTY 50 stocks are covered.** Every stock gets a full multi-start model fit, walk-forward refits and robustness checks, and keeping to the 50 largest, most liquid names keeps that complete and refreshed every week.
 
-Markets are non-stationary. A stock spends months grinding higher in a calm uptrend, then a few brutal weeks in a volatility spike, then a long quiet base — and a single set of "average" statistics describes none of those phases well. **REGIME treats the market as a hidden state machine.** A 4-state Gaussian HMM reads daily return, volatility, volume, and momentum and infers which *unobserved* regime the market is in on any given day:
+- **50 stocks**: NSE's official NIFTY 50 constituents. Cap bands and ranks come from AMFI's average market-cap list (31 Dec 2025 list), sectors from NSE's industry classification.
+- **8 indices**: NIFTY 50, SENSEX, NIFTY Bank, NIFTY Next 50, NIFTY 500, NIFTY Midcap 50, NIFTY IT and NIFTY Pharma.
+- **9 more sector indices** are tried every week but excluded, because Yahoo Finance has only a day or two of history for them. The methodology page lists each exclusion with its reason, and they come back automatically if the history appears.
 
-| Regime | Character | Strategy stance |
-|---|---|---|
-| 🟢 **Bullish Trending** | Positive drift, contained volatility | 100% invested |
-| 🔵 **Accumulation** | Near-zero drift, very low volatility — quiet basing | 50% invested |
-| 🟠 **Bearish Trending** | Negative drift, elevated volatility | Cash |
-| 🔴 **Crisis** | Extreme dispersion, sharp downside — panic | Cash |
+Search covers exactly this universe and says so when a query misses.
 
-The states are discovered unsupervised; a labeler maps each one to a semantic regime by inspecting the learned emission parameters, so the dashboard stays consistent across tickers and reruns.
+## The site
 
-But a regime label is only worth something if it *predicts* something and *survives* an honest test. So REGIME doesn't stop at classification — it measures the forward edge of each regime, projects crisis risk forward, and runs a **walk-forward, out-of-sample backtest** that refits the model on past data only.
-
-## What's in it
-
-**Modelling**
-- **4-state Gaussian HMM** over five engineered features — log return, 5- and 20-day volatility, volume z-score, and 10-day momentum — fit with `hmmlearn`, decoded via Viterbi, with full per-day posterior probabilities.
-- **Model diagnostics** — log-likelihood, AIC, and BIC, so the choice of four states is justified rather than asserted.
-
-**Quant signal & risk**
-- **Forward-return edge** — for each regime, the average return over the *next* N sessions, with win rate and sample count. The test of whether the classification carries signal, not just hindsight.
-- **Crisis early-warning** — today's posterior state distribution propagated through the transition matrix to project the probability of rotating into Crisis over the coming sessions.
-- **Walk-forward out-of-sample backtest** — the model is refit on an expanding trailing window (semi-annual cadence), each window standardized on its own statistics, classifying only forward. This is the real credibility test, toggled live against the in-sample view.
-- **Tail risk** — daily VaR and CVaR (95%) alongside Sharpe, Sortino, Calmar, and max drawdown.
-
-**India-first data**
-- Native handling of NSE (`.NS`), BSE (`.BO`), and Indian indices (`^NSEI`, `^BSESN`, `^NSEBANK`), plus US symbols for comparison. Friendly aliases (`NIFTY` → `^NSEI`) and per-symbol currency rendering (₹ / $).
-
-**Visualization**
-- **A custom Canvas renderer, not a charting library.** Candlesticks, the probability field, the transition heatmap, the regime timeline, the equity curve, the forward-edge bars and the crisis gauge are all drawn directly to `<canvas>`/SVG and animated with GSAP. An aurora mesh backdrop and particle field re-tint themselves from the active regime, so the whole interface *feels* the market state.
-
-![Backtest panel](screenshots/backtest.png)
-
-## How it works
-
-```
-   ┌──────────────┐      ┌───────────────────┐      ┌────────────────────┐
-   │  DATA LAYER  │      │     ML ENGINE     │      │      FRONTEND      │
-   │ yfinance     │─OHLCV│ 5-feature matrix  │states│ Canvas candlesticks│
-   │ NSE/BSE/US   │─────►│ Gaussian HMM (EM) │─────►│ probability field  │
-   │ validation   │ raw  │ Viterbi decode    │+probs│ transition heatmap │
-   │ currency tag │      │ state auto-labeler│      │ equity / edge / gauge
-   └──────────────┘      └─────────┬─────────┘      └────────────────────┘
-              ┌──────────────┬─────┴──────┬─────────────────┐
-              ▼              ▼            ▼                 ▼
-        in-sample      walk-forward  forward-return    crisis
-        backtest       OOS refit     edge + risk       early-warning
-```
-
-The API is three endpoints:
-
-| Endpoint | Returns |
+| Page | What it shows |
 |---|---|
-| `GET /api/analyze` | Full pipeline: regimes, probabilities, stats, transition matrix, in-sample backtest, forward edge, crisis warning, diagnostics |
-| `GET /api/walkforward` | Out-of-sample walk-forward backtest (heavier; called on demand) |
-| `GET /api/presets` | Curated ticker list for the picker |
+| **Market** `/` | How many of the 50 are in each regime today, all 8 indices, weekly breadth over ten years (by sector too), and every stock on a sector map or a sortable table. |
+| **Stock** `/stock/RELIANCE` | Today's regime and confidence, then the regime timeline over price and posterior ribbon, then the evidence: regime statistics, a calendar heatmap, a transition explorer that lists every historical switch, forward returns, crisis early warning, robustness checks, the backtest, and the fitted model. |
+| **How it works** `/how-it-works` | "How an HMM sees the market": a step-by-step explainer on real NIFTY 50 data. The forward filter runs in the browser, so you can change how sticky the model is and watch the regimes respond. |
+| **Methodology** `/methodology` | The universe, model, robustness definitions, full cost schedule, overfitting statistics, data refresh, exclusions and limits. |
 
-## Running it
+URLs are shareable: `/stock/RELIANCE?range=5Y&at=2020-03-23` opens the five-year view with the cursor on the COVID crash, and `/?view=table&sort=posterior` restores the table sort.
 
-**Local (two commands):**
+Every chart is drawn by hand on Canvas (no chart library), works from the keyboard (← → move a session, PgUp/PgDn a month), and has a text readout. Every page has designed loading, not-covered, offline and stale-data states. Pages are checked with axe-core for WCAG AA in light and dark themes on desktop and mobile; the screenshots in [`screenshots/`](screenshots) cover every page and state.
+
+## The model
+
+- **Features** (daily, standardised): log return, 5- and 20-session volatility, volume z-score, 10-session momentum.
+- **Fit**: 4-state Gaussian HMM with full covariances (hmmlearn), from five random starts plus a warm start from last week's parameters; the highest log-likelihood wins.
+- **Labels**: the highest-volatility state is Crisis, the quietest Accumulation, and the other two split by drift into Bullish and Bearish. The same rule everywhere means a regime means the same kind of market on every page.
+- **Walk-forward**: refit every 126 sessions on data up to that point (after 504 sessions of training) and label the next stretch with the forward filter, so nothing looks ahead.
+
+## How much to trust a label
+
+Each stock page reports:
+
+- **Seed stability**: how often other random starts agree with the winning fit, day by day.
+- **Refit stability**: how often walk-forward models fitted on less history agree with the full-history labels.
+- **BIC over 2–6 states**: which number of states the information criterion prefers. It often prefers more than four, and the page says so rather than hiding it.
+- **Confidence score**: 100 × the geometric mean of today's posterior, seed stability and refit stability.
+
+## The backtest, honestly
+
+The strategy holds 100% in Bullish, 50% in Accumulation and cash otherwise. A signal at the close fills at the **next open**. Every trade pays **Zerodha equity-delivery charges** (STT, exchange and SEBI fees, stamp duty, GST and the DP charge; schedule as of 18 Oct 2026) plus assumed slippage by cap band. Six variants are evaluated per ticker, and results are reported with the **probabilistic Sharpe ratio against buy-and-hold** and the **Deflated Sharpe Ratio** (Bailey and López de Prado).
+
+The headline view is walk-forward. In the current data, the strategy beat buy-and-hold's CAGR on **none** of the 50 stocks after costs, and had a shallower maximum drawdown on 46 of them. For the NIFTY 50 index: 3.4% a year against 10.7%, with a worst drawdown of −20% against −38% and 1.6% a year lost to costs. The site shows this as it is. Read REGIME as a description of market state, not a trading system.
+
+## Data and the weekly refresh
+
+`.github/workflows/refresh-data.yml` runs every Saturday at 07:47 IST, on any push to `main` that touches the model or pipeline, and on demand. It works in four steps:
+
+1. Rebuild the universe from the current NIFTY 50 list and the newest AMFI list. If that fails, keep the committed one.
+2. Fit every ticker across two parallel shards. Prices are fetched in batches with retries and exponential backoff. A failing ticker is logged and skipped, never fatal.
+3. Merge the shards. A ticker that failed keeps last week's file, marked with its own date.
+4. Validate: at least 45 of 50 stocks covered, every file under 50 KB and consistent with the index. Only then does it commit the data, as `github-actions[bot]`. If validation fails, nothing is committed and the site keeps serving the last good data. Every page shows a notice once the data is more than ten days old.
+
+A full run takes about three minutes on four cores. Per-ticker files average about 34 KB (about 2 MB for all 58). Because every file gains a week of data, a refresh rewrites all of them: expect roughly 1 MB of compressed repository growth a week. Successive runs are stable: re-running on the same data relabelled 0.1% of days and changed no current regime.
+
+## Running it locally
 
 ```bash
-pip install -r requirements.txt
-python -m uvicorn server:app --port 8050
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements-dev.txt
+
+python scripts/serve.py                 # http://127.0.0.1:8050, same routes as production
+python scripts/precompute.py --workers 4                    # refresh all data (~3 min, needs network)
+python scripts/precompute.py --tickers RELIANCE,NIFTY50     # just a few
+python scripts/precompute.py --synthetic --limit 20 --out /tmp/regime-data   # offline, synthetic
+python scripts/validate_data.py --data static/data
 ```
 
-Open **http://localhost:8050**. The dashboard paints instantly from a precomputed example cache, then you can type any symbol for a live fit. Defaults to `RELIANCE.NS`; the **Instant examples** chips (NIFTY 50, SENSEX, S&P 500, Apple) load with zero wait. Try `^NSEI`, `INFY.NS`, `HDFCBANK.NS`, or a US name like `AAPL` — the picker fills in exchange suffixes for you.
-
-**Docker (one command):**
+Tests run offline: the Python suite blocks the network and uses synthetic data with known regimes.
 
 ```bash
-docker build -t regime . && docker run -p 8050:8050 regime
+pytest -q            # 90 tests: features, model, robustness, costs, backtest, encoding, universe, pipeline, site checks
+npm install && npm test             # 15 tests: JS decoders and forward filter against Python output, formatting
+npm run screenshots  # every page and state, desktop and mobile, with an axe-core accessibility pass
 ```
 
-## Deploy the live demo — Vercel (frontend) + Render (backend)
+## Deploying
 
-REGIME ships as a split deploy: the zero-build static frontend goes to **Vercel**, the FastAPI server to **Render**. [`static/vercel.json`](static/vercel.json) proxies `/api/*` to the backend for short calls; a live fit takes 30-60s on a free instance — longer than Vercel's proxy will hold a rewritten request open — so `app.js` sends those straight to the backend origin (`BACKEND` at the top of the data layer, with CORS open on the server). Change the host in both places when you deploy your own.
+The site is the `static/` folder, with no build step. On Vercel, set the project's root directory to `static/`; `static/vercel.json` provides clean URLs, the `/stock/:slug` route and cache headers. The weekly workflow commits new data to `main`, which redeploys the site.
 
-Live: **[regime-omega.vercel.app](https://regime-omega.vercel.app)** (frontend) → `regime-api-eu56.onrender.com` (backend).
-
-**1. Backend → Render**
-
-- New Render **Blueprint** → pick this repo. Render reads [`render.yaml`](render.yaml) and provisions a free Python web service (`pip install -r requirements.txt`, `uvicorn server:app --host 0.0.0.0 --port $PORT`, health check on `/api/presets`). No environment variables are required — REGIME has **no secrets** (it reads only public Yahoo Finance data).
-- Copy the service's public URL once the first deploy goes live. `autoDeploy` is on, so every push to `main` redeploys.
-
-**2. Frontend → Vercel**
-
-- Replace the backend host in [`static/vercel.json`](static/vercel.json) (`rewrites[0].destination`) and in [`static/app.js`](static/app.js) (`const BACKEND`). Commit.
-- Deploy the **`static/` directory** as the Vercel project root (CLI: `cd static && vercel --prod`; or in the dashboard set **Root Directory** to `static`). Vercel detects no framework and serves the static files, proxying `/api/*` to Render. Deploying from `static/` keeps Vercel from mistaking the repo-root Python files for a backend.
-- The site loads instantly from the committed static data bundle; live ticker queries hit Render.
-
-> **The demo does not depend on the backend being awake.** [`static/data/`](static/data) holds the ticker presets, the example-chip metadata, and — for each of the five showcase tickers — both the full analysis and the walk-forward out-of-sample test, as plain JSON. `app.js` reads those first, so first paint is sub-second and the Walk-Forward toggle resolves instantly even on a cold (or dead) backend; only a query for a non-showcase ticker touches the API. Regenerate the bundle with `python scripts/build_cache.py && python scripts/build_static_data.py` (no API key needed) and commit it.
-
-> **Why not the whole app on Vercel?** Each live analysis fits an HMM on the fly (~10–25s), which exceeds Vercel's serverless timeout, and the `scikit-learn`/`scipy`/`hmmlearn` stack overflows the bundle limit. The server wants a box that stays warm. Render / Railway / Fly / Heroku all work (`render.yaml`, `Procfile`, `Dockerfile` are included). Note that a free-tier box sleeps when idle — the static bundle above is what keeps the demo instant regardless.
-
-## About the backtest
-
-The strategy maps each regime to a target exposure (100% Bullish, 50% Accumulation, 0% Bearish/Crisis), acts on the **prior day's** regime (a one-bar lag, no lookahead), and pays a realistic round-trip cost (5 bps) on every switch. Two views:
-
-- **In-Sample** — the HMM is fit once over the full history. Fast, but the regime labels have seen the whole series. A diagnostic, not a track record.
-- **Walk-Forward · OOS** — the model is refit on past data only and classifies forward. This is the honest test. On `RELIANCE.NS` (split at the eve of the 2020 crash) the rotation strategy went to cash through the crash and finished the out-of-sample window ahead of buy-and-hold on return, Sharpe, *and* drawdown — but expect the edge to vary by name, and sometimes to give up return for a much smoother ride. That variance is the point: it's measured, not assumed.
-
-## Notes on yfinance & Indian coverage
-
-- NSE and BSE equities resolve cleanly with `.NS` / `.BO` suffixes; large-cap history typically goes back well over a decade.
-- **Indices often report zero or missing volume** on Yahoo (`^NSEI`, `^BSESN`). REGIME tolerates this — the volume z-score degrades gracefully rather than erroring.
-- Yahoo data is adjusted-close based and occasionally has gaps around corporate actions or holidays; the data layer forward-fills small gaps and rejects series with more than 5% missing prices.
-- A minimum of **two years** of history is required to fit the HMM; walk-forward needs **three-plus**.
+Earlier versions used a separate API on Render for live fits. Nothing uses it any more, so that service can be shut down.
 
 ## Project layout
 
 ```
-regime/
-├── static/
-│   ├── index.html     # Shell, design system, layout
-│   └── app.js         # Canvas engine, animations, quant panels
-├── config.py          # Single source of truth: params, palette, presets, costs
-├── data.py            # yfinance ingestion, ticker/currency handling, validation
-├── features.py        # Five-feature engineering (+ raw matrix for walk-forward)
-├── model.py           # HMM fit, Viterbi decode, state labeling, regime stats
-├── backtest.py        # In-sample + walk-forward backtests, performance metrics
-├── analytics.py       # Forward edge, crisis early-warning, model diagnostics
-├── server.py          # FastAPI endpoints (+ cache-aware /api/analyze, /api/examples)
-├── cache.py           # Precomputed example cache (instant first paint + resilience)
-├── cache/             # Committed analysis payloads for the showcase tickers
-├── scripts/
-│   └── build_cache.py # Regenerate the cache from live yfinance data (no key)
-├── static/vercel.json # Vercel static-frontend config + /api proxy to Render
-├── Dockerfile · render.yaml · Procfile   # frictionless backend deploy
-└── requirements.txt
+regime/             model, robustness, costs, backtest, analytics, encoding, universe, pipeline
+scripts/            precompute, universe builder, validator, local server, screenshots
+data/universe.csv   the committed universe snapshot
+static/             the site: HTML, css/, js/ (native ES modules), fonts/, data/
+tests/              pytest suite and tests/js (node --test)
+docs/               design-system.md
+screenshots/        every page and state, plus the hero image above
 ```
 
-## Roadmap
+## Limits
 
-- **Regime-conditional position sizing** beyond the long/flat exposure map (e.g. volatility targeting).
-- **Cross-asset regimes** — fit on an index and overlay individual names.
-- **Intraday and crypto support** — adapt the features for 24/7 markets.
+The regimes summarise past returns, volatility and volume for each stock separately; the same label can mean somewhat different conditions on two stocks. Transition probabilities are ten-year averages. Timeline bands and breadth use hindsight (Viterbi over the full history); only the walk-forward backtest and today's call avoid it. Prices come from a free data source.
+
+**Research, not investment advice.**
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). Fonts (Newsreader, IBM Plex) are under the SIL Open Font License; see `static/fonts/`.

@@ -1,0 +1,14 @@
+{
+  "name": "regime-tools",
+  "private": true,
+  "description": "Development tooling only (tests and screenshots). The site itself has no build step.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/js/*.test.mjs",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.11.0",
+    "playwright": "1.56.1"
+  }
+}

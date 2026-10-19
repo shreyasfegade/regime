@@ -1,352 +1,65 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>REGIME — Market State Intelligence</title>
-<meta name="description" content="A 4-state Gaussian HMM that classifies equities into market regimes, rendered through a zero-dependency Canvas engine.">
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#08090C; --surface:rgba(20,24,33,.55); --surface-solid:#0E1117;
-  --border:rgba(255,255,255,.07); --border-hi:rgba(255,255,255,.14);
-  --txt:#ECEEF3; --txt-2:#9AA1B0; --txt-3:#646B7C; --txt-4:rgba(255,255,255,.32);
-  --bull:#1FC77D; --bear:#E8623A; --crisis:#F5384E; --accum:#4D8DF5;
-  --accent:#4D8DF5; --accent-rgb:77,141,245;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-  --sans:'Inter',system-ui,-apple-system,sans-serif;
-  --r:10px; --r-lg:14px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;overflow-x:hidden;font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(1200px 700px at 78% -8%, rgba(var(--accent-rgb),.10), transparent 60%),
-    radial-gradient(900px 600px at 8% 105%, rgba(var(--accent-rgb),.06), transparent 55%);
-  transition:background 1.2s cubic-bezier(.22,1,.36,1)}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.18)}
-#mesh-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;filter:blur(46px) saturate(130%)}
-#particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9}
-
-/* ── Header ── */
-.header{display:flex;align-items:center;gap:14px;padding:0 22px;height:60px;
-  background:rgba(8,9,12,.72);backdrop-filter:blur(26px) saturate(140%);-webkit-backdrop-filter:blur(26px) saturate(140%);
-  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
-.logo{font-size:15px;font-weight:800;letter-spacing:.26em;display:flex;align-items:center;gap:9px;user-select:none}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);position:relative;box-shadow:0 0 12px var(--accent)}
-.logo-dot::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid var(--accent);opacity:.5;animation:pulse 2.4s ease-out infinite}
-@keyframes pulse{0%{transform:scale(.8);opacity:.6}100%{transform:scale(2.2);opacity:0}}
-.tagline{font-size:10.5px;letter-spacing:.12em;color:var(--txt-3);text-transform:uppercase;font-weight:500;padding-left:14px;border-left:1px solid var(--border)}
-.spacer{flex:1}
-.controls{display:flex;align-items:center;gap:9px}
-.field{position:relative}
-.field-lbl{position:absolute;top:-7px;left:9px;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-3);background:var(--bg);padding:0 4px;font-weight:600}
-.controls input{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;color:var(--txt);
-  font-family:var(--mono);font-size:12px;padding:8px 11px;outline:none;color-scheme:dark;transition:border-color .2s,background .2s,box-shadow .2s}
-.controls input:hover{border-color:var(--border-hi)}
-.controls input:focus{border-color:rgba(var(--accent-rgb),.7);background:rgba(255,255,255,.05);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
-#ticker-input{width:140px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
-#dt-start,#dt-end{width:128px}
-.analyze-btn{background:linear-gradient(180deg,rgba(var(--accent-rgb),.95),rgba(var(--accent-rgb),.78));border:none;border-radius:8px;
-  color:#fff;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.02em;padding:9px 20px;cursor:pointer;
-  transition:transform .12s,box-shadow .25s,filter .2s;box-shadow:0 4px 16px rgba(var(--accent-rgb),.28);min-width:96px;position:relative;overflow:hidden}
-.analyze-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(var(--accent-rgb),.42);filter:brightness(1.08)}
-.analyze-btn:active{transform:translateY(0)}
-.analyze-btn.busy{pointer-events:none;opacity:.85}
-
-/* ── Ticker picker dropdown ── */
-.picker{position:absolute;top:calc(100% + 8px);left:0;width:300px;max-height:340px;overflow-y:auto;z-index:300;
-  background:rgba(14,17,23,.96);backdrop-filter:blur(24px);border:1px solid var(--border-hi);border-radius:var(--r);
-  box-shadow:0 24px 60px rgba(0,0,0,.6);padding:6px;opacity:0;transform:translateY(-6px) scale(.98);pointer-events:none;
-  transition:opacity .18s,transform .18s}
-.picker.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.picker-group{font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-3);font-weight:700;padding:9px 10px 5px}
-.picker-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:background .12s}
-.picker-item:hover,.picker-item.active{background:rgba(var(--accent-rgb),.14)}
-.picker-sym{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--txt)}
-.picker-name{font-size:11px;color:var(--txt-2);flex:1;text-align:left;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.picker-tag{font-size:9px;color:var(--txt-3);font-weight:500;white-space:nowrap}
-
-/* ── Layout ── */
-.err{margin:14px 22px 0;padding:12px 16px;border-radius:var(--r);background:rgba(245,56,78,.07);border:1px solid rgba(245,56,78,.26);
-  color:#FF8A98;font-size:13px;display:none;align-items:center;gap:9px;animation:slideDown .35s cubic-bezier(.22,1,.36,1)}
-@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.main{position:relative;z-index:5;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:18px 22px 40px;max-width:1640px;margin:0 auto}
-.left-col{min-width:0;display:flex;flex-direction:column;gap:12px}
-.sidebar{display:flex;flex-direction:column;gap:12px}
-
-/* ── Glass panel base ── */
-.panel{background:var(--surface);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--border);border-radius:var(--r-lg);position:relative;overflow:hidden}
-.panel::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.10),transparent)}
-
-/* ── KPI strip ── */
-.kpi-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:12px}
-.kpi{padding:16px 18px;opacity:0;transition:transform .25s,border-color .25s}
-.kpi:hover{transform:translateY(-2px);border-color:var(--border-hi)}
-#regime-card{border-left:2.5px solid var(--accent)}
-.kpi-lbl{font-size:9px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-4);margin-bottom:9px;display:flex;align-items:center;gap:6px}
-.kpi-val{font-size:27px;font-weight:700;line-height:1;font-family:var(--mono);letter-spacing:-.01em}
-.kpi-sub{font-size:10.5px;color:var(--txt-3);margin-top:7px;font-family:var(--mono)}
-#stat-regime-name{font-size:21px;font-weight:700;font-family:var(--sans);letter-spacing:-.01em}
-
-/* ── Chart ── */
-.chart-wrap{position:relative}
-.chart-head{display:flex;align-items:center;justify-content:space-between;padding:13px 18px 0}
-.chart-title{font-size:12px;font-weight:600;color:var(--txt-2);display:flex;align-items:center;gap:9px}
-#chart-ticker{font-family:var(--mono);font-weight:600;color:var(--txt);font-size:13px}
-.legend{display:flex;gap:13px;flex-wrap:wrap}
-.lg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--txt-3);font-weight:500}
-.lg-dot{width:8px;height:8px;border-radius:2px}
-#scan-line{display:none;position:absolute;left:0;width:100%;height:2px;
-  background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.9),transparent);box-shadow:0 0 18px rgba(var(--accent-rgb),.6);pointer-events:none;z-index:6}
-#chart-canvas,#prob-canvas{display:block;width:100%}
-.prob-head,.panel-head{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-4);padding:12px 18px 2px}
-.tl-wrap{height:40px;cursor:pointer}
-.tl-wrap canvas{width:100%;height:40px;display:block}
-
-/* ── Sidebar sections ── */
-.sb-sec{padding:15px 16px;opacity:0}
-.sb-lbl{font-size:9px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-4);margin-bottom:13px;display:flex;align-items:center;justify-content:space-between}
-#matrix-cv{display:block;margin:0 auto;max-width:100%}
-.st-row{display:grid;grid-template-columns:1fr 42px 54px 46px;align-items:center;height:30px;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;opacity:0;transform:translateX(8px)}
-.st-row.show{opacity:1;transform:translateX(0);transition:all .45s cubic-bezier(.16,1,.3,1)}
-.st-head{display:grid;grid-template-columns:1fr 42px 54px 46px;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:2px;font-size:9px;color:var(--txt-3);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-.st-head span:not(:first-child),.st-v{text-align:right}
-.st-dot{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:7px;flex-shrink:0}
-.st-name{display:flex;align-items:center;white-space:nowrap;overflow:hidden;font-weight:500}
-.st-v{color:var(--txt-2);font-family:var(--mono);font-size:10.5px}
-.ring-wrap{position:relative;width:128px;height:128px;margin:6px auto 2px}
-#ring-svg{width:100%;height:100%}
-#ring-lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.rv{font-size:23px;font-weight:700;font-family:var(--mono)}
-.rs{font-size:9px;color:var(--txt-3);letter-spacing:.05em;margin-top:2px;text-transform:uppercase}
-
-/* ── Backtest panel ── */
-.bt-panel{opacity:0}
-.bt-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:15px 18px 4px;flex-wrap:wrap}
-.bt-title{font-size:13px;font-weight:600;color:var(--txt)}
-.bt-desc{font-size:11px;color:var(--txt-3);margin-top:4px;max-width:560px;line-height:1.55}
-.bt-legend{display:flex;gap:14px;align-items:center;flex-shrink:0}
-.bt-metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:12px}
-.bt-m{background:var(--surface-solid);padding:13px 16px}
-.bt-m-lbl{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-4);font-weight:600;margin-bottom:7px}
-.bt-m-val{font-size:18px;font-weight:700;font-family:var(--mono);line-height:1}
-.bt-m-sub{font-size:9.5px;color:var(--txt-3);margin-top:5px;font-family:var(--mono)}
-.bt-caveat{font-size:10px;color:var(--txt-3);padding:11px 18px;display:flex;align-items:center;gap:8px;line-height:1.5}
-.bt-caveat svg{flex-shrink:0;opacity:.6}
-#bt-canvas{display:block;width:100%;cursor:crosshair}
-.pos{color:var(--bull)}.neg{color:var(--bear)}
-#bt-split{font-size:9.5px;color:var(--txt-3);font-family:var(--mono);margin-left:8px}
-
-/* ── Segmented control (In-Sample / Walk-Forward) ── */
-.seg{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:2px;gap:2px}
-.seg-btn{background:transparent;border:none;color:var(--txt-3);font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.02em;padding:6px 12px;border-radius:6px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap;position:relative}
-.seg-btn:hover{color:var(--txt-2)}
-.seg-btn.active{color:#fff;background:rgba(var(--accent-rgb),.85);box-shadow:0 2px 10px rgba(var(--accent-rgb),.3)}
-.seg-btn.loading{color:var(--txt-3);pointer-events:none}
-.seg-btn.loading::after{content:"";position:absolute;right:8px;top:50%;width:9px;height:9px;margin-top:-4.5px;border:1.5px solid rgba(255,255,255,.25);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── Quant signal row ── */
-.quant-row{display:grid;grid-template-columns:1.35fr 1fr;gap:12px}
-.sig-panel{opacity:0;padding-bottom:14px}
-.sig-foot{font-size:10px;color:var(--txt-3);padding:8px 18px 0;line-height:1.5}
-.sig-foot em{color:var(--txt-2);font-style:normal}
-#edge-bars{padding:6px 18px 0;display:flex;flex-direction:column;gap:11px}
-.edge-row{display:grid;grid-template-columns:74px 1fr 58px;align-items:center;gap:10px}
-.edge-name{font-size:10.5px;font-weight:500;display:flex;align-items:center;gap:6px;color:var(--txt-2)}
-.edge-track{position:relative;height:18px;background:rgba(255,255,255,.03);border-radius:4px;overflow:hidden}
-.edge-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.14)}
-.edge-fill{position:absolute;top:3px;bottom:3px;border-radius:3px;width:0;transition:width 1s cubic-bezier(.16,1,.3,1)}
-.edge-val{font-family:var(--mono);font-size:11px;text-align:right;font-weight:600}
-.edge-win{font-family:var(--mono);font-size:9px;color:var(--txt-3);text-align:right}
-.crisis-body{display:flex;align-items:center;gap:8px;padding:10px 18px 0}
-#crisis-gauge{width:148px;height:92px;flex-shrink:0}
-#crisis-spark{flex:1;height:92px;display:block}
-.diag{display:flex;gap:18px;padding:9px 18px 0;font-family:var(--mono);font-size:9.5px;color:var(--txt-3);flex-wrap:wrap}
-.diag b{color:var(--txt-2);font-weight:600}
-
-/* ── Skeleton shimmer ── */
-.shimmer{position:relative;overflow:hidden}
-.shimmer::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.05) 50%,transparent 80%);animation:shim 1.4s infinite}
-@keyframes shim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-.reveal{opacity:0;transform:translateY(22px)}
-.reveal.in{opacity:1;transform:translateY(0);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
-
-/* ── Tooltip ── */
-#tooltip{position:fixed;background:rgba(14,17,23,.97);border:1px solid var(--border-hi);border-radius:var(--r);padding:11px 14px;
-  pointer-events:none;opacity:0;transition:opacity .12s;z-index:1000;backdrop-filter:blur(10px);font-family:var(--mono);font-size:11px;min-width:158px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
-.tt-r{font-weight:600;margin-bottom:6px;font-family:var(--sans);font-size:12px;display:flex;justify-content:space-between;gap:10px}
-.tt-d{display:flex;justify-content:space-between;gap:14px;line-height:1.85}.tt-l{color:var(--txt-3)}.tt-v{color:var(--txt)}
-
-/* ── Header help button ── */
-.help-btn{width:34px;height:34px;flex-shrink:0;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.03);
-  color:var(--txt-2);font-size:14px;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s,background .2s;display:flex;align-items:center;justify-content:center}
-.help-btn:hover{border-color:var(--border-hi);color:var(--txt);background:rgba(255,255,255,.05)}
-
-/* ── Example chips bar ── */
-.chips-bar{position:relative;z-index:6;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 22px 0;max-width:1640px;margin:0 auto}
-.ex-lbl{font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-4);margin-right:2px}
-.ex-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;cursor:pointer;
-  background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--txt-2);font-family:var(--sans);font-size:11.5px;font-weight:500;
-  transition:border-color .2s,background .2s,transform .12s,color .2s}
-.ex-chip:hover{border-color:var(--border-hi);background:rgba(255,255,255,.06);color:var(--txt);transform:translateY(-1px)}
-.ex-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ex-mkt{font-size:9px;color:var(--txt-4);letter-spacing:.04em}
-
-/* ── Live-fit loading overlay (over the chart) ── */
-#chart-loading{position:absolute;inset:0;z-index:7;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-  background:rgba(8,9,12,.55);backdrop-filter:blur(3px);border-radius:var(--r-lg)}
-#chart-loading.on{display:flex}
-.cl-spinner{width:34px;height:34px;border:2.5px solid rgba(255,255,255,.12);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-.cl-title{font-size:13px;font-weight:600;color:var(--txt)}
-.cl-title .cl-ticker{font-family:var(--mono);color:var(--accent)}
-.cl-sub{font-size:11px;color:var(--txt-3);font-family:var(--mono)}
-
-/* ── First-visit intro modal ── */
-.intro-scrim{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:24px;
-  background:rgba(4,5,8,.62);backdrop-filter:blur(6px)}
-.intro-scrim.on{display:flex;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.intro{position:relative;width:min(560px,100%);background:rgba(14,17,23,.97);border:1px solid var(--border-hi);border-radius:18px;
-  padding:30px 30px 26px;box-shadow:0 32px 90px rgba(0,0,0,.65);animation:introIn .42s cubic-bezier(.16,1,.3,1)}
-@keyframes introIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-.intro h2{font-size:20px;font-weight:800;letter-spacing:.01em;margin-bottom:8px}
-.intro h2 span{color:var(--accent)}
-.intro-lead{font-size:13px;line-height:1.6;color:var(--txt-2);margin-bottom:20px}
-.intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
-.intro-r{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid var(--border)}
-.intro-r .ir-dot{width:9px;height:9px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.ir-name{font-size:12px;font-weight:700;color:var(--txt)}
-.ir-desc{font-size:10.5px;line-height:1.45;color:var(--txt-3);margin-top:2px}
-.intro-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.intro-note{font-size:10.5px;color:var(--txt-4);line-height:1.45}
-.intro-cta{background:linear-gradient(180deg,rgba(var(--accent-rgb),.95),rgba(var(--accent-rgb),.78));border:none;border-radius:9px;
-  color:#fff;font-family:var(--sans);font-size:12.5px;font-weight:600;padding:10px 22px;cursor:pointer;white-space:nowrap;
-  box-shadow:0 4px 16px rgba(var(--accent-rgb),.3);transition:transform .12s,filter .2s}
-.intro-cta:hover{transform:translateY(-1px);filter:brightness(1.08)}
-.intro-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:7px;border:none;background:rgba(255,255,255,.05);
-  color:var(--txt-3);font-size:16px;cursor:pointer;transition:background .2s,color .2s}
-.intro-close:hover{background:rgba(255,255,255,.1);color:var(--txt)}
-
-@media(max-width:1080px){.main{grid-template-columns:1fr}.sidebar{flex-direction:row;flex-wrap:wrap}.sb-sec{flex:1;min-width:240px}.bt-metrics{grid-template-columns:repeat(3,1fr)}.kpi-row{grid-template-columns:1fr 1fr}.quant-row{grid-template-columns:1fr}.intro-grid{grid-template-columns:1fr}}
-</style>
-</head><body>
-<canvas id="mesh-canvas"></canvas>
-<canvas id="particle-canvas"></canvas>
-
-<div class="header">
-  <div class="logo">REGIME<span class="logo-dot" id="logo-dot"></span></div>
-  <div class="tagline">Market State Intelligence</div>
-  <div class="spacer"></div>
-  <div class="controls">
-    <div class="field">
-      <span class="field-lbl">Symbol</span>
-      <input id="ticker-input" type="text" value="RELIANCE.NS" spellcheck="false" autocomplete="off">
-      <div class="picker" id="picker"></div>
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REGIME — hidden market regimes for the NIFTY 50</title>
+<meta name="description" content="Which hidden regime each NIFTY 50 stock is in today, how market breadth has moved over ten years, and a map of every stock by sector.">
+<meta property="og:title" content="REGIME — hidden market regimes for the NIFTY 50">
+<meta property="og:description" content="Today's regime, ten years of regime history, robustness checks and a cost-aware backtest for every NIFTY 50 stock.">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F5F2EA">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/newsreader-var.woff2" as="font" type="font/woff2" crossorigin>
+<script>try{var t=localStorage.getItem('regime-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/css/regime.css">
+<script type="module" src="/js/market.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="/">REGIME<span>hidden market states, India</span></a>
+    <div class="search" role="search">
+      <label class="visually-hidden" for="q">Search stocks and indices</label>
+      <input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="q-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search the NIFTY 50">
+      <kbd aria-hidden="true">/</kbd>
+      <ul id="q-list" role="listbox" aria-label="Matching stocks and indices" hidden></ul>
     </div>
-    <div class="field"><span class="field-lbl">From</span><input id="dt-start" type="date" value="2018-01-01"></div>
-    <div class="field"><span class="field-lbl">To</span><input id="dt-end" type="date"></div>
-    <button class="analyze-btn" id="btn-go">Analyze</button>
-    <button class="help-btn" id="intro-help" title="What is this?">?</button>
+    <nav class="nav" aria-label="Primary">
+      <a href="/" aria-current="page">Market</a>
+      <a href="/how-it-works">How it works</a>
+      <a href="/methodology">Methodology</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch colour theme">Dark</button>
   </div>
-</div>
+</header>
 
-<div class="chips-bar" id="example-chips"></div>
-
-<div class="err" id="err-bar"></div>
-
-<div class="main">
-  <div class="left-col">
-    <div class="kpi-row">
-      <div class="panel kpi" id="regime-card"><div class="kpi-lbl">Current Regime</div><div class="kpi-val" id="stat-regime-name">—</div><div class="kpi-sub" id="stat-regime-sub">awaiting data</div></div>
-      <div class="panel kpi"><div class="kpi-lbl">Confidence</div><div class="kpi-val" id="stat-confidence">—</div><div class="kpi-sub">posterior prob.</div></div>
-      <div class="panel kpi"><div class="kpi-lbl">Persistence</div><div class="kpi-val" id="stat-persistence">—</div><div class="kpi-sub">expected days</div></div>
-      <div class="panel kpi"><div class="kpi-lbl">Strategy CAGR</div><div class="kpi-val" id="stat-cagr">—</div><div class="kpi-sub" id="stat-cagr-sub">vs buy &amp; hold</div></div>
-    </div>
-
-    <div class="panel chart-wrap">
-      <div class="chart-head">
-        <div class="chart-title">Price &amp; Regimes <span id="chart-ticker"></span></div>
-        <div class="legend" id="legend"></div>
-      </div>
-      <div id="scan-line"></div>
-      <div id="chart-loading">
-        <div class="cl-spinner"></div>
-        <div class="cl-title">Fitting a 4-state HMM on <span class="cl-ticker">—</span></div>
-        <div class="cl-sub">live market data · first run ~10–20s</div>
-      </div>
-      <canvas id="chart-canvas"></canvas>
-    </div>
-
-    <div class="panel">
-      <div class="prob-head">Regime Probability Field</div>
-      <canvas id="prob-canvas"></canvas>
-    </div>
-
-    <div class="panel tl-wrap"><canvas id="tl-canvas"></canvas></div>
-
-    <div class="panel bt-panel" id="bt-panel">
-      <div class="bt-head">
-        <div>
-          <div class="bt-title">Backtest · Regime Rotation <span id="bt-split"></span></div>
-          <div class="bt-desc">Hold long in Bullish (100%) and Accumulation (50%); move to cash in Bearish and Crisis. Positions act on the prior day's regime with realistic switching costs.</div>
-        </div>
-        <div class="seg" id="bt-mode">
-          <button class="seg-btn active" data-mode="insample">In-Sample</button>
-          <button class="seg-btn" data-mode="oos">Walk-Forward · OOS</button>
-        </div>
-      </div>
-      <canvas id="bt-canvas"></canvas>
-      <div class="bt-metrics" id="bt-metrics"></div>
-      <div class="bt-caveat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
-        <span id="bt-caveat-txt">In-sample view: regimes are fit over the full history. Switch to Walk-Forward for a true out-of-sample test that refits the model on past data only.</span>
-      </div>
-      <div class="diag" id="diag-line"></div>
-    </div>
-
-    <div class="quant-row">
-      <div class="panel sig-panel" id="edge-panel">
-        <div class="panel-head">Forward-Return Edge · next <span id="edge-h">5</span> sessions</div>
-        <div id="edge-bars"></div>
-        <div class="sig-foot">The average return that <em>follows</em> each regime — the test of whether the classification carries predictive signal, not just hindsight.</div>
-      </div>
-      <div class="panel sig-panel" id="crisis-panel">
-        <div class="panel-head">Crisis Early-Warning</div>
-        <div class="crisis-body">
-          <svg id="crisis-gauge" viewBox="0 0 160 100"></svg>
-          <canvas id="crisis-spark"></canvas>
-        </div>
-        <div class="sig-foot" id="crisis-foot">Probability of rotating into Crisis, propagated through the transition matrix.</div>
-      </div>
+<main id="main" class="wrap" tabindex="-1">
+  <h1 class="visually-hidden">REGIME: the NIFTY 50 by hidden market regime</h1>
+  <div id="notices"></div>
+  <div id="page" aria-live="polite" aria-busy="true">
+    <div class="state">
+      <p class="kicker">The market today</p>
+      <p class="loading-line">Loading the regime index…</p>
+      <div class="skeleton" style="height:320px;margin-top:24px"></div>
+      <noscript><p class="dek" style="margin-top:16px">The market map is drawn in the browser and needs JavaScript. The <a href="/methodology">methodology</a> and <a href="/how-it-works">explainer</a> read without it.</p></noscript>
     </div>
   </div>
+</main>
 
-  <div class="sidebar">
-    <div class="panel sb-sec" id="sb-matrix"><div class="sb-lbl">Transition Matrix</div><canvas id="matrix-cv" width="252" height="232"></canvas></div>
-    <div class="panel sb-sec" id="sb-stats"><div class="sb-lbl">Regime Statistics</div><div id="stats-tbl"></div></div>
-    <div class="panel sb-sec" id="sb-ring"><div class="sb-lbl">Regime Duration</div><div class="ring-wrap"><svg id="ring-svg" viewBox="0 0 128 128"></svg><div id="ring-lbl"></div></div></div>
-  </div>
-</div>
-
-<div class="intro-scrim" id="intro">
-  <div class="intro">
-    <button class="intro-close" id="intro-close" aria-label="Close">×</button>
-    <h2>What is <span>REGIME</span>?</h2>
-    <p class="intro-lead">Markets quietly shift between hidden states — calm accumulation, strong uptrends, grinding declines, outright panic. REGIME fits a 4-state Gaussian <b>Hidden Markov Model</b> to a stock or index and labels every day with the regime it was most likely in. The four states:</p>
-    <div class="intro-grid">
-      <div class="intro-r"><span class="ir-dot" style="background:#1FC77D"></span><div><div class="ir-name">Bullish Trending</div><div class="ir-desc">Positive drift, low volatility — the strong uptrend.</div></div></div>
-      <div class="intro-r"><span class="ir-dot" style="background:#4D8DF5"></span><div><div class="ir-name">Accumulation</div><div class="ir-desc">Quiet, range-bound base-building with little drift.</div></div></div>
-      <div class="intro-r"><span class="ir-dot" style="background:#E8623A"></span><div><div class="ir-name">Bearish Trending</div><div class="ir-desc">Negative drift, elevated volatility — the downtrend.</div></div></div>
-      <div class="intro-r"><span class="ir-dot" style="background:#F5384E"></span><div><div class="ir-name">Crisis</div><div class="ir-desc">Extreme volatility and drawdowns — capitulation.</div></div></div>
+<footer class="colophon">
+  <div class="wrap">
+    <div>
+      <p>REGIME classifies each day into one of four hidden regimes with a Gaussian hidden Markov model fitted to that stock's own history. Prices: Yahoo Finance daily data. Universe: the NIFTY 50 constituents (NSE), ranked by AMFI's market-cap list. Data as of <span data-asof>—</span>, refreshed weekly.</p>
+      <p>Research, not investment advice. Past regimes do not promise future returns.</p>
     </div>
-    <div class="intro-foot">
-      <p class="intro-note">Try an <b>instant example</b> below the header, or type any symbol (NSE <code>.NS</code>, BSE <code>.BO</code>, indices like <code>^NSEI</code>, or US tickers like <code>AAPL</code>) and hit Analyze for a live fit.</p>
-      <button class="intro-cta" id="intro-cta">Explore</button>
-    </div>
+    <div><p><a href="/methodology">Methodology</a> · <a href="/how-it-works">How an HMM sees the market</a></p></div>
   </div>
-</div>
-
-<div id="tooltip"></div>
-<script src="app.js"></script>
-</body></html>
+</footer>
+<div class="tip" id="tip" hidden></div>
+</body>
+</html>
