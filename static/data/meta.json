@@ -1,18 +1,18 @@
 {
- "asof": "2026-10-16",
- "compute_seconds": 239.6,
- "excluded": 9,
+ "asof": "2026-10-23",
+ "compute_seconds": 231.5,
+ "excluded": 1,
  "file_bytes": {
-  "count": 58,
-  "max": 39115,
-  "mean": 33595,
-  "total": 1948514
+  "count": 66,
+  "max": 39375,
+  "mean": 33422,
+  "total": 2205879
  },
- "generated_at": "2026-10-19T00:17:51Z",
- "stale": 0,
+ "generated_at": "2026-10-24T07:24:26Z",
+ "stale": 1,
  "universe": {
   "covered": 50,
-  "indices": 8,
+  "indices": 16,
   "list_date": "2025-12-31",
   "name": "NIFTY 50",
   "size": 50,
